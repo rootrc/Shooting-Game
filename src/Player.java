@@ -1,65 +1,39 @@
-import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import Geo.Line;
-import Geo.Point;
-import Geo.Polygon;
-
-class Player extends Polygon {
+class Player extends Entity {
     boolean a, d, s, w;
     boolean shoot, shooting;
-    double direction;
-    int moveSpeed = 8;
+    int moveSpeed = 5;
+    int speed = moveSpeed;
+    int xMovement, yMovement;
     Weapon weapon;
+    Weapon weapon1;
+    Weapon weapon2;
 
     Player(Point[] points) {
         super(points);
-        weapon = new Weapon("gun");
+        health = 10;
+        weapon1 = new Weapon("gun");
+        weapon2 = new Weapon("sniper");
+        weapon = weapon1;
     }
 
     void process() {
+        super.process();
         move();
-    }
-
-    void paint(Graphics2D g2d) {
-        draw(g2d);
-        fill(g2d);
-        // mouseLocation = Game.getInstance().panel.mouseLocation();
     }
 
     void move() {
         Point mouseLocation = Game.getInstance().panel.mouseLocation();
         double radian = new Line(centroid, mouseLocation).caculateRadian();
         Polygon polygon = this.clone();
-        if (w) {
-            polygon.moveY(-moveSpeed);
-        }
-        if (s) {
-            polygon.moveY(moveSpeed);
-        }
-        if (a) {
-            polygon.moveX(-moveSpeed);
-        }
-        if (d) {
-            polygon.moveX(moveSpeed);
-        }
+        polygon.move(xMovement * speed, yMovement * speed);
         polygon.rotate(direction - radian);
         if (!Game.getInstance().room.intersects(polygon)) {
-            if (w) {
-                moveY(-moveSpeed);
-            }
-            if (s) {
-                moveY(moveSpeed);
-            }
-            if (a) {
-                moveX(-moveSpeed);
-            }
-            if (d) {
-                moveX(moveSpeed);
-            }
+            super.move(xMovement * speed, yMovement * speed);
             super.rotate(direction - radian);
             direction = radian;
         }
@@ -85,22 +59,44 @@ class Player extends Polygon {
     void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
         switch (key) {
-            case KeyEvent.VK_A:
-                a = true;
-                break;
-            case KeyEvent.VK_D:
-                d = true;
-                break;
             case KeyEvent.VK_W:
-                w = true;
+                if (!w) {
+                    yMovement--;
+                    w = true;
+                }
                 break;
             case KeyEvent.VK_S:
-                s = true;
+                if (!s) {
+                    yMovement++;
+                    s = true;
+                }
+                break;
+            case KeyEvent.VK_A:
+                if (!a) {
+                    xMovement--;
+                    a = true;
+                }
+                break;
+            case KeyEvent.VK_D:
+                if (!d) {
+                    xMovement++;
+                    d = true;
+                }
                 break;
             case KeyEvent.VK_SPACE:
                 if (!shoot && !shooting) {
                     shoot = true;
+                    speed = (int) (moveSpeed * weapon.shootMovementSpeed);
                     shoot();
+                }
+                break;
+            case KeyEvent.VK_Q:
+                if (weapon2 != null) {
+                    if (weapon == weapon1) {
+                        weapon = weapon2;
+                    } else {
+                        weapon = weapon1;
+                    }
                 }
                 break;
         }
@@ -109,20 +105,34 @@ class Player extends Polygon {
     void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
         switch (key) {
-            case KeyEvent.VK_A:
-                a = false;
-                break;
-            case KeyEvent.VK_D:
-                d = false;
-                break;
             case KeyEvent.VK_W:
-                w = false;
+                if (w) {
+                    yMovement ++;
+                    w = false;
+                }
                 break;
             case KeyEvent.VK_S:
-                s = false;
+                if (s) {
+                    yMovement --;
+                    s = false;
+                }
+                break;
+            case KeyEvent.VK_A:
+                if (a) {
+                    xMovement ++;
+                    a = false;
+                }
+                break;
+            case KeyEvent.VK_D:
+                if (d) {
+                    d = false;
+                    xMovement --;
+                }
                 break;
             case KeyEvent.VK_SPACE:
                 shoot = false;
+                speed = moveSpeed;
+                break;
         }
     }
 

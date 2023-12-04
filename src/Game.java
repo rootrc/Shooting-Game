@@ -8,7 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.Timer;
 
 class Game {
-    final int delay = 20;
+    final int delay = 16;
     private static Game instance = new Game();
     int gameState;
     JFrame frame;

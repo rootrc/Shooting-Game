@@ -9,8 +9,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
-
-import Geo.Point;
 class Panel extends JPanel {
     Panel() {
         super();
@@ -39,7 +37,7 @@ class Panel extends JPanel {
         g2d.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING, RenderingHints.VALUE_COLOR_RENDER_QUALITY);
         g2d.setRenderingHint(RenderingHints.KEY_DITHERING, RenderingHints.VALUE_DITHER_ENABLE);
         g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-        Game.getInstance().room.paint(g2d);
+        Game.getInstance().room.draw(g2d);
     }
 
     class TKeyAdapter extends KeyAdapter {

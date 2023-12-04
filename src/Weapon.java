@@ -4,28 +4,37 @@ import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import Geo.Line;
-import Geo.Point;
-
 class Weapon {
 
-    int damage;
-    int shots;
     int cooldown;
-    int projectileWidth;
-    int projectileLength;
-    int projectileSpeed;
+    int shots;
+    int shotCooldown;
+    double shootMovementSpeed;
+
+    Projectile projectile;
 
     Weapon(String name) {
         try {
             Scanner data = new Scanner(new FileReader("data/weapons/" + name + ".txt"));
-            String type = data.nextLine();
-            damage = Integer.parseInt(data.next());
-            shots = Integer.parseInt(data.next());
             cooldown = Integer.parseInt(data.next()) * 100;
-            projectileWidth = Integer.parseInt(data.next());
-            projectileLength = Integer.parseInt(data.next());
-            projectileSpeed = Integer.parseInt(data.next());
+            shots = Integer.parseInt(data.next());
+            if (shots != 1) {
+                shotCooldown = Integer.parseInt(data.next());
+            }
+            shootMovementSpeed = Double.parseDouble(data.next());
+
+            String projectileType = data.next();
+            switch (projectileType) {
+                case "bullet":
+                    Bullet bullet = new Bullet(new Point(0, 0), new Point(0, 0));
+                    bullet.damage = Integer.parseInt(data.next());
+                    bullet.piercing = Integer.parseInt(data.next());
+                    bullet.setWidth(Integer.parseInt(data.next()));
+                    bullet.length = Integer.parseInt(data.next());
+                    bullet.speed = Integer.parseInt(data.next());
+                    projectile = bullet;
+                    break;
+            }
         } catch (IOException e) {
             System.out.println("Weapon Loading Error");
             System.exit(-1);
@@ -33,25 +42,10 @@ class Weapon {
     }
 
     void shoot(Point centroid, double direction) {
-        Timer timer = new Timer();
-        Point p1 = centroid.clone();
-        Point p2 = centroid.translate(- projectileLength * Math.cos(direction), projectileLength * Math.sin(direction));
-        Line line = new Line(p1, p2);
-        line.setWidth(projectileWidth);
-        TimerTask timertask = new TimerTask() {
-            public void run() {
-                p1.x -= projectileSpeed * Math.cos(direction);
-                p1.y += projectileSpeed * Math.sin(direction);
-                p2.x -= projectileSpeed * Math.cos(direction);
-                p2.y += projectileSpeed * Math.sin(direction);
-                if (Game.getInstance().room.intersects(line)) {
-                    Game.getInstance().room.projectiles.remove(line);
-                    timer.cancel();
-                    timer.purge();
-                }
-            }
-        };
-        Game.getInstance().room.projectiles.add(line);
-        timer.schedule(timertask, 0, Game.getInstance().delay);
+        projectile.p1 = centroid.translate(-projectile.length * Math.cos(direction),
+                projectile.length * Math.sin(direction));
+        projectile.p2 = centroid.translate(-2 * projectile.length * Math.cos(direction),
+                2 * projectile.length * Math.sin(direction));
+        projectile.shoot(direction);
     }
 }

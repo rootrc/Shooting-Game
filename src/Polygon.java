@@ -1,16 +1,16 @@
-package Geo;
+
 
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-public class Polygon {
-    public int length;
-    public Point[] points;
-    public Line[] lines;
-    public Point centroid;
+class Polygon {
+    int length;
+    Point[] points;
+    Line[] lines;
+    Point centroid;
     Color color = Color.black;
 
-    public Polygon(Point[] points) {
+    Polygon(Point[] points) {
         this.length = points.length;
         this.points = points.clone();
         lines = new Line[length];
@@ -21,7 +21,7 @@ public class Polygon {
         computeCentroid();
     }
 
-    public void setBorderColor(Color color) {
+    void setBorderColor(Color color) {
         for (Line line : lines) {
             line.color = color;
         }
@@ -29,11 +29,11 @@ public class Polygon {
             point.color = color;
         }
     }
-    public void setColor(Color color) {
+    void setColor(Color color) {
         this.color = color;
     }
 
-    public void setWidth(int width) {
+    void setWidth(int width) {
         for (Line line : lines) {
             line.width = width;
         }
@@ -42,13 +42,13 @@ public class Polygon {
         }
     }
 
-    public void draw(Graphics2D g2d) {
+    void draw(Graphics2D g2d) {
         for (int i = 0; i < length; i++) {
             lines[i].draw(g2d);
         }
     }
 
-    public void fill(Graphics2D g2d) {
+    void fill(Graphics2D g2d) {
         int[] xPoints = new int[length];
         int[] yPoints = new int[length];
         for (int i = 0; i < length; i++) {
@@ -64,18 +64,22 @@ public class Polygon {
         for (int i = 0; i < length; i++) {
             points[i] = this.points[i].clone();
         }
-        return new Polygon(points);
+        Polygon polygon = new Polygon(points);
+        polygon.color = color; 
+        return polygon;
     }
 
-    public Polygon translate(int x, int y) {
+    Polygon translate(int x, int y) {
         Point[] points = new Point[length];
         for (int i = 0; i < length; i++) {
             points[i] = this.points[i].translate(x, y);
         }
-        return new Polygon(points);
+        Polygon polygon = new Polygon(points);
+        polygon.color = color; 
+        return polygon;
     }
 
-    public Polygon translate(double x, double y) {
+    Polygon translate(double x, double y) {
         Point[] points = new Point[length];
         for (int i = 0; i < length; i++) {
             points[i] = this.points[i].translate(x, y);
@@ -85,38 +89,38 @@ public class Polygon {
         return new Polygon(points);
     }
 
-    public void move(int x, int y) {
+    void move(int x, int y) {
         moveX(x);
         moveY(y);
     }
 
-    public void move(double x, double y) {
+    void move(double x, double y) {
         moveX(x);
         moveY(y);
     }
 
-    public void moveX(int x) {
+    void moveX(int x) {
         for (Point point : points) {
             point.moveX(x);
         }
         centroid.x += x;
     }
 
-    public void moveX(double x) {
+    void moveX(double x) {
         for (Point point : points) {
             point.moveX(x);
         }
         centroid.x += x;
     }
 
-    public void moveY(int y) {
+    void moveY(int y) {
         for (Point point : points) {
             point.moveY(y);
         }
         centroid.y += y;
     }
 
-    public void moveY(double y) {
+    void moveY(double y) {
         for (Point point : points) {
             point.moveY(y);
         }
@@ -138,7 +142,7 @@ public class Polygon {
         return centroid;
     }
 
-    public boolean intersects(Line line) {
+    boolean intersects(Line line) {
         for (Line line2 : lines) {
             if (line2.intersects(line)) {
                 return true;
@@ -147,7 +151,7 @@ public class Polygon {
         return false;
     }
 
-    public boolean intersects(Polygon polygon) {
+    boolean intersects(Polygon polygon) {
         for (Line line1 : lines) {
             for (Line line2 : polygon.lines) {
                 if (line1.intersects(line2)) {
@@ -158,13 +162,13 @@ public class Polygon {
         return false;
     }
 
-    public void rotate(double radian) {
+    void rotate(double radian) {
         for (Point point : points) {
             point.rotate(radian, centroid);
         }
     }
 
-    public Polygon getRotation(double radian) {
+    Polygon getRotation(double radian) {
         Point[] points = new Point[length];
         for (int i = 0; i < length; i++) {
             points[i] = this.points[i].getRotation(radian, centroid);
