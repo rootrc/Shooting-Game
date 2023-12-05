@@ -26,13 +26,13 @@ class Weapon {
             String projectileType = data.next();
             switch (projectileType) {
                 case "bullet":
-                    Bullet bullet = new Bullet(new Point(0, 0), new Point(0, 0));
-                    bullet.damage = Integer.parseInt(data.next());
-                    bullet.piercing = Integer.parseInt(data.next());
-                    bullet.setWidth(Integer.parseInt(data.next()));
-                    bullet.length = Integer.parseInt(data.next());
-                    bullet.speed = Integer.parseInt(data.next());
-                    projectile = bullet;
+                    Bullet projectile = new Bullet(new Point(0, 0), new Point(0, 0));
+                    projectile.damage = Integer.parseInt(data.next());
+                    projectile.piercing = Integer.parseInt(data.next());
+                    projectile.setWidth(Integer.parseInt(data.next()));
+                    projectile.length = Integer.parseInt(data.next());
+                    projectile.speed = Integer.parseInt(data.next());
+                    this.projectile = projectile;
                     break;
             }
         } catch (IOException e) {

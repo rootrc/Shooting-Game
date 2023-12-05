@@ -1,38 +1,45 @@
 import java.awt.event.*;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-public class Room {
+public class Room extends Polygon {
     Player player;
-    Polygon[] polygons;
     ConcurrentHashMap.KeySetView<Projectile, Boolean> projectiles = ConcurrentHashMap.newKeySet();
     ConcurrentHashMap.KeySetView<Entity, Boolean> entities = ConcurrentHashMap.newKeySet();
+    HashMap<Enemy, Double> enemySpawns = new HashMap<>();
 
-    Room(String name) {
+    Room(Point[] points, String name) {
+        super(points);
+        color = Color.white;
         player = new Player(
                 new Point[] { new Point(200, 200), new Point(232, 200), new Point(232, 232), new Point(200, 232) });
         entities.add(player);
-        Obstacle obstacle = new Obstacle(new Point[] { new Point(300, 300), new Point(332, 300), new Point(332, 332), new Point(300, 332) }, 3);
-        Obstacle obstacle2 = new Obstacle(new Point[] { new Point(400, 400), new Point(432, 400), new Point(432, 432), new Point(400, 432) }, 3);
-        entities.add(obstacle);
-        entities.add(obstacle2);
         try {
             Scanner data = new Scanner(new FileReader("data/rooms/" + name + ".txt"));
             int N = Integer.parseInt(data.next());
-            polygons = new Polygon[N];
             for (int i = 0; i < N; i++) {
-                int M = Integer.parseInt(data.next());
-                Point[] points = new Point[M];
+                String enemyName = data.next();
+                double spawnRate = Double.parseDouble(data.next()) * 50;
+                Scanner data2 = new Scanner(new FileReader("data/enemies/" + enemyName + ".txt"));
+                int M = Integer.parseInt(data2.next());
+                Point [] points2 = new Point [M];
                 for (int j = 0; j < M; j++) {
-                    points[j] = new Point(Integer.parseInt(data.next()), Integer.parseInt(data.next()));
+                    points2[j] = new Point(Double.parseDouble(data2.next()), Double.parseDouble(data2.next()));
                 }
-                polygons[i] = new Polygon(points);
-                polygons[i].setColor(Color.white);
+                switch(enemyName.substring(0, enemyName.length() - 1)) {
+                    case "chaser":
+                        Chaser enemy = new Chaser(points2, enemyName.charAt(enemyName.length() - 1) - '0');
+                        enemySpawns.put(enemy, spawnRate);
+                        break;
+                }
             }
+
         } catch (IOException e) {
             System.out.println("Room Loading Error");
             System.exit(-1);
@@ -40,40 +47,41 @@ public class Room {
     }
 
     void process() {
-        for (Entity entity: entities) {
+        for (Entity entity : entities) {
             entity.process();
         }
-    }
-
-    boolean intersects(Line line) {
-        for (Polygon polygon : polygons) {
-            if (polygon.intersects(line)) {
-                return true;
+        for (Map.Entry<Enemy, Double> e: enemySpawns.entrySet()) {
+            if (Math.random() * e.getValue() <= 1) {
+                addEnemy(e.getKey());
             }
         }
-        return false;
     }
 
-    boolean intersects(Polygon polygon) {
-        for (Polygon polygon2 : polygons) {
-            if (polygon2.intersects(polygon)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    void draw(Graphics2D g2d){
-        for (Polygon polygon : polygons) {
-            polygon.draw(g2d);
-            polygon.fill(g2d);
-        }
+    void draw(Graphics2D g2d) {
+        super.draw(g2d);
+        super.fill(g2d);
         for (Line line : projectiles) {
             line.draw(g2d);
         }
-        for (Entity entity: entities) {
+        for (Entity entity : entities) {
             entity.draw(g2d);
             entity.fill(g2d);
         }
+    }
+
+    void addEnemy(Enemy enemy) {
+        double x = (777 - 10 - enemy.points[0].x) * Math.random() + 10;
+        double y;
+        if (30 < x && x < 777 - 30 - enemy.points[0].x) {
+            if (Math.random() < 0.5) {
+                y = (30 - 10) * Math.random() + 10;
+            } else {
+                y = (30 - 10 + enemy.points[0].y) * Math.random() + 700 - 30 - enemy.points[0].y;
+            }
+        } else {
+            y = (700 - 10 - enemy.points[0].y) * Math.random() + 10;
+        }
+        entities.add(enemy.translate(x, y));
     }
 
     void keyPressed(KeyEvent e) {

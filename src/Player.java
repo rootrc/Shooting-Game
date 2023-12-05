@@ -1,3 +1,4 @@
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Timer;
@@ -6,7 +7,7 @@ import java.util.TimerTask;
 class Player extends Entity {
     boolean a, d, s, w;
     boolean shoot, shooting;
-    int moveSpeed = 5;
+    int moveSpeed = 8;
     int speed = moveSpeed;
     int xMovement, yMovement;
     Weapon weapon;
@@ -15,14 +16,31 @@ class Player extends Entity {
 
     Player(Point[] points) {
         super(points);
-        health = 10;
         weapon1 = new Weapon("gun");
         weapon2 = new Weapon("sniper");
         weapon = weapon1;
+        health = 3;
+        color = Color.blue;
+        corpseLength = 100;
     }
 
     void process() {
         super.process();
+        for (Entity entity : Game.getInstance().room.entities) {
+            if (this == entity || entity.health == Integer.MAX_VALUE) {
+                continue;
+            }
+            if (this.intersects(entity)) {
+                health--;
+                entity.health--;
+                if (health <= 0) {
+                    this.death();
+                }
+                if (entity.health <= 0) {
+                    entity.death();
+                }
+            }
+        }
         move();
     }
 
@@ -30,13 +48,45 @@ class Player extends Entity {
         Point mouseLocation = Game.getInstance().panel.mouseLocation();
         double radian = new Line(centroid, mouseLocation).caculateRadian();
         Polygon polygon = this.clone();
-        polygon.move(xMovement * speed, yMovement * speed);
+        if (xMovement == 0 || yMovement == 0) {
+            polygon.move(xMovement * speed, yMovement * speed);
+        } else {
+            polygon.move(xMovement * speed / Math.sqrt(2), yMovement * speed / Math.sqrt(2));
+        }
         polygon.rotate(direction - radian);
         if (!Game.getInstance().room.intersects(polygon)) {
-            super.move(xMovement * speed, yMovement * speed);
+            if (xMovement == 0 || yMovement == 0) {
+                super.move(xMovement * speed, yMovement * speed);
+            } else {
+                super.move(xMovement * speed / Math.sqrt(2), yMovement * speed / Math.sqrt(2));
+            }
             super.rotate(direction - radian);
             direction = radian;
         }
+    }
+
+    void death() {
+        Game.getInstance().room.entities.remove(this);
+        Entity corpse = this.clone();
+        corpse.color = Color.black;
+        corpse.health = Integer.MAX_VALUE;
+        Timer timer = new Timer();
+        TimerTask timertask = new TimerTask() {
+            int frame = 0;
+
+            public void run() {
+                frame++;
+                if (frame == corpse.corpseLength) {
+                    Game.getInstance().room.entities.remove(corpse);
+                    System.exit(0);
+                    System.exit(0);
+                    timer.cancel();
+                    timer.purge();
+                }
+            }
+        };
+        Game.getInstance().room.entities.add(corpse);
+        timer.schedule(timertask, 0, Game.getInstance().delay);
     }
 
     void shoot() {
@@ -107,26 +157,26 @@ class Player extends Entity {
         switch (key) {
             case KeyEvent.VK_W:
                 if (w) {
-                    yMovement ++;
+                    yMovement++;
                     w = false;
                 }
                 break;
             case KeyEvent.VK_S:
                 if (s) {
-                    yMovement --;
+                    yMovement--;
                     s = false;
                 }
                 break;
             case KeyEvent.VK_A:
                 if (a) {
-                    xMovement ++;
+                    xMovement++;
                     a = false;
                 }
                 break;
             case KeyEvent.VK_D:
                 if (d) {
                     d = false;
-                    xMovement --;
+                    xMovement--;
                 }
                 break;
             case KeyEvent.VK_SPACE:

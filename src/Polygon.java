@@ -29,9 +29,6 @@ class Polygon {
             point.color = color;
         }
     }
-    void setColor(Color color) {
-        this.color = color;
-    }
 
     void setWidth(int width) {
         for (Line line : lines) {
@@ -76,7 +73,7 @@ class Polygon {
         }
         Polygon polygon = new Polygon(points);
         polygon.color = color; 
-        return polygon;
+        return new Polygon(points);
     }
 
     Polygon translate(double x, double y) {
@@ -84,8 +81,8 @@ class Polygon {
         for (int i = 0; i < length; i++) {
             points[i] = this.points[i].translate(x, y);
         }
-        centroid.x += x;
-        centroid.y += y;
+        Polygon polygon = new Polygon(points);
+        polygon.color = color; 
         return new Polygon(points);
     }
 

@@ -14,7 +14,7 @@ class Panel extends JPanel {
         super();
         addKeyListener(new TKeyAdapter());
         addMouseListener(new TMouseAdapter());
-        setBackground(Color.gray);
+        setBackground(Color.white);
         setFocusable(true);
         setLayout(null);
     }

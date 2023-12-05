@@ -1,3 +1,4 @@
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -8,7 +9,7 @@ import javax.swing.JFrame;
 import javax.swing.Timer;
 
 class Game {
-    final int delay = 16;
+    final int delay = 20;
     private static Game instance = new Game();
     int gameState;
     JFrame frame;
@@ -18,15 +19,16 @@ class Game {
     private Game() {
         frame = new JFrame();
         panel = new Panel();
-        room = new Room("lvl1");
+        room = new Room(new Point[] { new Point(10, 10), new Point(777, 10), new Point(777, 700), new Point(10, 700) }, "room1");
+        frame.add(panel);
+        frame.pack();
         frame.setTitle("Game");
         frame.setBackground(Color.black);
         frame.setSize(800, 800);
-        frame.setLocationRelativeTo(null);
         frame.setResizable(false);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(panel);
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Timer timer = new Timer(delay, new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
                 Game.getInstance().room.process();
