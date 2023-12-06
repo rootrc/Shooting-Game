@@ -6,6 +6,7 @@ class Entity extends Polygon {
     Timer timer = new Timer();
     double direction;
     int health;
+    int value;
     int corpseLength;
 
     Entity(Point[] points) {
@@ -47,13 +48,13 @@ class Entity extends Polygon {
         if (Enemy.class.isAssignableFrom(this.getClass()) || this.getClass() == Player.class) {
             timer.cancel();
             timer.purge();
-            Timer timer = new Timer();
+            Game.getInstance().room.score += value;
             Entity corpse = this.clone();
             corpse.color = Color.black;
             corpse.health = Integer.MAX_VALUE;
+            Timer timer = new Timer();
             TimerTask timertask = new TimerTask() {
                 int frame = 0;
-
                 public void run() {
                     frame++;
                     if (frame == corpse.corpseLength) {

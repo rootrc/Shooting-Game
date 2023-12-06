@@ -7,24 +7,41 @@ import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
+
+import javax.swing.SwingUtilities;
+
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 
 public class Room extends Polygon {
+    int id;
     Timer timer = new Timer();
-    Player player;
     ConcurrentHashMap.KeySetView<Projectile, Boolean> projectiles = ConcurrentHashMap.newKeySet();
     ConcurrentHashMap.KeySetView<Entity, Boolean> entities = ConcurrentHashMap.newKeySet();
     HashMap<Enemy, Double> enemySpawns = new HashMap<>();
+    Player player;
+    int score;
 
-    Room(Point[] points, String name) {
+    int scoreForNextRoom;
+    
+    Room(Point[] points, int id) {
         super(points);
         color = Color.white;
+        score = 0;
         player = new Player(
                 new Point[] { new Point(200, 200), new Point(232, 200), new Point(232, 232), new Point(200, 232) });
         entities.add(player);
+        loadRoom(id);
+    }
+
+    //temporary
+    void loadRoom(int id) {
+        this.id = id;
+        enemySpawns.clear();
         try {
-            Scanner data = new Scanner(new FileReader("data/rooms/" + name + ".txt"));
+            Scanner data = new Scanner(new FileReader("data/rooms/room" + id + ".txt"));
+            scoreForNextRoom = Integer.parseInt(data.next());
             int N = Integer.parseInt(data.next());
             for (int i = 0; i < N; i++) {
                 String enemyName = data.next();
@@ -42,6 +59,10 @@ public class Room extends Polygon {
                         Sniper sniper = new Sniper(null, enemyName.charAt(enemyName.length() - 1) - '0');
                         enemySpawns.put(sniper, spawnRate);
                         break;
+                    case "machine":
+                        Machine machine = new Machine(null, enemyName.charAt(enemyName.length() - 1) - '0');
+                        enemySpawns.put(machine, spawnRate);
+                        break;
                 }
             }
 
@@ -56,9 +77,12 @@ public class Room extends Polygon {
         TimerTask timertask = new TimerTask() {
             public void run() {
                 for (Map.Entry<Enemy, Double> e : enemySpawns.entrySet()) {
-                if (Math.random() * e.getValue() <= 1) {
-                addEnemy(e.getKey());
+                    if (Math.random() * e.getValue() < 1) {
+                        addEnemy(e.getKey());
+                    }
                 }
+                if (score >= scoreForNextRoom) {
+                    loadRoom(id + 1);
                 }
             }
         };
@@ -75,7 +99,10 @@ public class Room extends Polygon {
             entity.draw(g2d);
             entity.fill(g2d);
         }
-        g2d.drawString(String.valueOf(player.health), 15, 20);
+        g2d.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+        g2d.drawString(Integer.toString(player.health), 15, 30);
+        g2d.drawString(Integer.toString(score),
+                770 - SwingUtilities.computeStringWidth(g2d.getFontMetrics(), Integer.toString(score)), 30);
     }
 
     void addEnemy(Enemy enemy) {

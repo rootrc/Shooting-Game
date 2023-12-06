@@ -1,7 +1,4 @@
-3
+5
+1
 chaser1
-3
-rifle1
-4
-sniper1
-6
+1.8
