@@ -29,16 +29,14 @@ public class Room extends Polygon {
             for (int i = 0; i < N; i++) {
                 String enemyName = data.next();
                 double spawnRate = Double.parseDouble(data.next()) * 50;
-                Scanner data2 = new Scanner(new FileReader("data/enemies/" + enemyName + ".txt"));
-                int M = Integer.parseInt(data2.next());
-                Point[] points2 = new Point[M];
-                for (int j = 0; j < M; j++) {
-                    points2[j] = new Point(Double.parseDouble(data2.next()), Double.parseDouble(data2.next()));
-                }
                 switch (enemyName.substring(0, enemyName.length() - 1)) {
                     case "chaser":
-                        Chaser enemy = new Chaser(points2, enemyName.charAt(enemyName.length() - 1) - '0');
-                        enemySpawns.put(enemy, spawnRate);
+                        Chaser chaser = new Chaser(null, enemyName.charAt(enemyName.length() - 1) - '0');
+                        enemySpawns.put(chaser, spawnRate);
+                        break;
+                    case "rifle":
+                        Rifle rifle = new Rifle(null, enemyName.charAt(enemyName.length() - 1) - '0');
+                        enemySpawns.put(rifle, spawnRate);
                         break;
                 }
             }
@@ -66,8 +64,8 @@ public class Room extends Polygon {
     void draw(Graphics2D g2d) {
         super.draw(g2d);
         super.fill(g2d);
-        for (Line line : projectiles) {
-            line.draw(g2d);
+        for (Projectile projectile : projectiles) {
+            projectile.draw(g2d);
         }
         for (Entity entity : entities) {
             entity.draw(g2d);

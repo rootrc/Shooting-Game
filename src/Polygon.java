@@ -1,5 +1,3 @@
-
-
 import java.awt.Color;
 import java.awt.Graphics2D;
 
@@ -7,17 +5,19 @@ class Polygon {
     int length;
     Point[] points;
     Line[] lines;
-    Point centroid;
+    Point centroid = new Point(0, 0);
     Color color = Color.black;
 
     Polygon(Point[] points) {
+        if (points == null) {
+            return;
+        }
         this.length = points.length;
         this.points = points.clone();
         lines = new Line[length];
         for (int i = 0; i < length; i++) {
             lines[i] = new Line(points[i], points[(i + 1) % length]);
         }
-        centroid = new Point(0, 0);
         computeCentroid();
     }
 
@@ -124,7 +124,7 @@ class Polygon {
         centroid.y += y;
     }
 
-    private Point computeCentroid() {
+    Point computeCentroid() {
         double signedArea = 0.0;
         double a = 0.0;
         for (Line line : lines) {
@@ -172,4 +172,12 @@ class Polygon {
         }
         return new Polygon(points);
     }
+
+    // static Point[] emptyPointArray() {
+    //     Point[] points = new Point[2];
+    //     for (int i = 0; i < 2; i++) {
+    //         points[i] = new Point(0, 0);
+    //     }
+    //     return points;
+    // }
 }

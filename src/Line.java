@@ -98,17 +98,6 @@ class Line {
                 || y > Math.max(line.p1.y, line.p2.y + 1 / doublePrecision)) {
             return false;
         }
-        // System.out.print(x + " ");
-        // System.out.println(y);
-        // System.out.print(this.p1.x + " ");
-        // System.out.println(this.p1.y);
-        // System.out.print(this.p2.x + " ");
-        // System.out.println(this.p2.y);
-        // System.out.print(line.p1.x + " ");
-        // System.out.println(line.p1.y);
-        // System.out.print(line.p2.x + " ");
-        // System.out.println(line.p2.y);
-        // System.out.println();
 
         return true;
     }

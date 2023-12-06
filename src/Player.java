@@ -7,8 +7,8 @@ import java.util.TimerTask;
 class Player extends Entity {
     boolean a, d, s, w;
     boolean shoot, shooting;
-    int moveSpeed = 8;
-    int speed = moveSpeed;
+    int speed;
+    int moveSpeed;
     int xMovement, yMovement;
     Weapon weapon;
     Weapon weapon1;
@@ -16,10 +16,14 @@ class Player extends Entity {
 
     Player(Point[] points) {
         super(points);
+        moveSpeed = 8;
+        speed = moveSpeed;
         weapon1 = new Weapon("gun");
+        weapon1.projectile.isPlayer = true;
         weapon2 = new Weapon("sniper");
+        weapon2.projectile.isPlayer = true;
         weapon = weapon1;
-        health = 3;
+        health = 5;
         color = Color.blue;
         corpseLength = 100;
     }

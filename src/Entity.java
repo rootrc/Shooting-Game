@@ -26,6 +26,9 @@ class Entity extends Polygon {
 
     void process() {
         for (Projectile projectile : Game.getInstance().room.projectiles) {
+            if (this.getClass() != Player.class && !projectile.isPlayer) {
+                continue;
+            }
             if (this.intersects(projectile) && health != Integer.MAX_VALUE) {
                 health -= projectile.damage;
                 if (health <= 0) {
@@ -50,6 +53,7 @@ class Entity extends Polygon {
             corpse.health = Integer.MAX_VALUE;
             TimerTask timertask = new TimerTask() {
                 int frame = 0;
+
                 public void run() {
                     frame++;
                     if (frame == corpse.corpseLength) {

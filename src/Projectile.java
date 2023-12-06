@@ -2,6 +2,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 class Projectile extends Line {
+    boolean isPlayer;
     int damage;
     int piercing;
     int random;
@@ -23,8 +24,10 @@ class Bullet extends Projectile {
 
     public Bullet clone() {
         Bullet bullet = new Bullet(p1, p2);
+        bullet.isPlayer = isPlayer;
         bullet.damage = damage;
         bullet.piercing = piercing;
+        bullet.random = random;
         bullet.speed = speed;
         return bullet;
     }
