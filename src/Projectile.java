@@ -4,6 +4,7 @@ import java.util.TimerTask;
 class Projectile extends Line {
     int damage;
     int piercing;
+    int random;
 
     Projectile(Point p1, Point p2) {
         super(p1, p2);

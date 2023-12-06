@@ -32,6 +32,7 @@ class Weapon {
                     projectile.setWidth(Integer.parseInt(data.next()));
                     projectile.length = Integer.parseInt(data.next());
                     projectile.speed = Integer.parseInt(data.next());
+                    projectile.random = Integer.parseInt(data.next());
                     this.projectile = projectile;
                     break;
             }
@@ -42,6 +43,7 @@ class Weapon {
     }
 
     void shoot(Point centroid, double direction) {
+        direction += Math.PI / projectile.random * Math.random() - Math.PI / 2 / projectile.random; 
         projectile.p1 = centroid.translate(-projectile.length * Math.cos(direction),
                 projectile.length * Math.sin(direction));
         projectile.p2 = centroid.translate(-2 * projectile.length * Math.cos(direction),

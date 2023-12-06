@@ -25,23 +25,28 @@ class Player extends Entity {
     }
 
     void process() {
-        super.process();
-        for (Entity entity : Game.getInstance().room.entities) {
-            if (this == entity || entity.health == Integer.MAX_VALUE) {
-                continue;
-            }
-            if (this.intersects(entity)) {
-                health--;
-                entity.health--;
-                if (health <= 0) {
-                    this.death();
+        TimerTask timertask = new TimerTask() {
+            public void run() {
+                Player.super.process();
+                for (Entity entity : Game.getInstance().room.entities) {
+                    if (Player.this == entity || entity.health == Integer.MAX_VALUE) {
+                        continue;
+                    }
+                    if (Player.this.intersects(entity)) {
+                        health--;
+                        entity.health--;
+                        if (health <= 0) {
+                            Player.this.death();
+                        }
+                        if (entity.health <= 0) {
+                            entity.death();
+                        }
+                    }
                 }
-                if (entity.health <= 0) {
-                    entity.death();
-                }
+                move();
             }
-        }
-        move();
+        };
+        timer.schedule(timertask, 0, Game.getInstance().delay);
     }
 
     void move() {
@@ -66,6 +71,8 @@ class Player extends Entity {
     }
 
     void death() {
+        timer.cancel();
+        timer.purge();
         Game.getInstance().room.entities.remove(this);
         Entity corpse = this.clone();
         corpse.color = Color.black;

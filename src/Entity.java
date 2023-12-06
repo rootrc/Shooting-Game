@@ -3,6 +3,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 class Entity extends Polygon {
+    Timer timer = new Timer();
     double direction;
     int health;
     int corpseLength;
@@ -41,6 +42,8 @@ class Entity extends Polygon {
     void death() {
         Game.getInstance().room.entities.remove(this);
         if (Enemy.class.isAssignableFrom(this.getClass()) || this.getClass() == Player.class) {
+            timer.cancel();
+            timer.purge();
             Timer timer = new Timer();
             Entity corpse = this.clone();
             corpse.color = Color.black;

@@ -31,7 +31,6 @@ class Game {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Timer timer = new Timer(delay, new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
-                Game.getInstance().room.process();
                 panel.repaint();
             }
         });
@@ -45,6 +44,7 @@ class Game {
     }
 
     public static void main(String[] args) {
+        Game.getInstance().room.process();
     }
 
     // https://stackoverflow.com/questions/37758061/rotate-a-buffered-image-in-java

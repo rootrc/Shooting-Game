@@ -1,7 +1,10 @@
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 class Enemy extends Entity {
     int id;
@@ -52,11 +55,16 @@ class Chaser extends Enemy {
     }
 
     void process() {
-        super.process();
-        Point playerCentroid = Game.getInstance().room.player.centroid;
-        double radian = new Line(centroid, playerCentroid).caculateRadian();
-        rotate(direction - radian);
-        direction = radian;
-        move(- moveSpeed * Math.cos(direction), moveSpeed * Math.sin(direction));
+        TimerTask timertask = new TimerTask() {
+            public void run() {
+                Chaser.super.process(); 
+                Point playerCentroid = Game.getInstance().room.player.centroid;
+                double radian = new Line(centroid, playerCentroid).caculateRadian();
+                rotate(direction - radian);
+                direction = radian;
+                move(- moveSpeed * Math.cos(direction), moveSpeed * Math.sin(direction));
+            }
+        };
+        timer.schedule(timertask, 0, Game.getInstance().delay);
     }
 }
