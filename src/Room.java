@@ -38,6 +38,10 @@ public class Room extends Polygon {
                         Rifle rifle = new Rifle(null, enemyName.charAt(enemyName.length() - 1) - '0');
                         enemySpawns.put(rifle, spawnRate);
                         break;
+                    case "sniper":
+                        Sniper sniper = new Sniper(null, enemyName.charAt(enemyName.length() - 1) - '0');
+                        enemySpawns.put(sniper, spawnRate);
+                        break;
                 }
             }
 
@@ -52,9 +56,9 @@ public class Room extends Polygon {
         TimerTask timertask = new TimerTask() {
             public void run() {
                 for (Map.Entry<Enemy, Double> e : enemySpawns.entrySet()) {
-                    if (Math.random() * e.getValue() <= 1) {
-                        addEnemy(e.getKey());
-                    }
+                if (Math.random() * e.getValue() <= 1) {
+                addEnemy(e.getKey());
+                }
                 }
             }
         };
@@ -71,6 +75,7 @@ public class Room extends Polygon {
             entity.draw(g2d);
             entity.fill(g2d);
         }
+        g2d.drawString(String.valueOf(player.health), 15, 20);
     }
 
     void addEnemy(Enemy enemy) {
@@ -101,6 +106,11 @@ public class Room extends Polygon {
         enemy = enemy.translate(x, y);
         entities.add(enemy);
         enemy.process();
+    }
+
+    Polygon boundingBox(int width) {
+        return new Polygon(new Point[] { points[0].translate(width, width), points[1].translate(-width, width),
+                points[2].translate(-width, -width), points[3].translate(width, -width) });
     }
 
     void keyPressed(KeyEvent e) {
