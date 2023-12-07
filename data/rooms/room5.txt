@@ -1,0 +1,6 @@
+10
+2
+chaser1
+3
+sniper1
+4

@@ -29,6 +29,7 @@ class Weapon {
                     bullet.setWidth(Integer.parseInt(data.next()));
                     bullet.length = Integer.parseInt(data.next());
                     bullet.speed = Integer.parseInt(data.next());
+                    bullet.knockback = Integer.parseInt(data.next());
                     bullet.random = Math.PI / Integer.parseInt(data.next());
                     projectile = bullet;
                     break;
@@ -39,6 +40,7 @@ class Weapon {
                     limitedBullet.setWidth(Integer.parseInt(data.next()));
                     limitedBullet.length = Integer.parseInt(data.next());
                     limitedBullet.speed = Integer.parseInt(data.next());
+                    limitedBullet.knockback = Integer.parseInt(data.next());
                     limitedBullet.duration = Integer.parseInt(data.next());
                     limitedBullet.random = Math.PI / Integer.parseInt(data.next());
                     projectile = limitedBullet;

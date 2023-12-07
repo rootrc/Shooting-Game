@@ -27,13 +27,36 @@ class Entity extends Polygon {
 
     void process() {
         for (Projectile projectile : Game.getInstance().room.projectiles) {
-            if (this.getClass() != Player.class && !projectile.isPlayer) {
+            if (getClass() != Player.class && !projectile.isPlayer) {
                 continue;
             }
-            if (this.intersects(projectile) && health != Integer.MAX_VALUE) {
+            if (intersects(projectile)) {
                 health -= projectile.damage;
-                if (health <= 0) {
-                    this.death();
+                if (!Game.getInstance().room
+                        .intersects(this.translate(-projectile.knockback * Math.cos(projectile.caculateRadian()),
+                                projectile.knockback * Math.sin(projectile.caculateRadian())))) {
+                    move(-projectile.knockback * Math.cos(projectile.caculateRadian()),
+                            projectile.knockback * Math.sin(projectile.caculateRadian()));
+                } else {
+                    int l = 0;
+                    int r = projectile.knockback;
+                    while (l < r) {
+                        int m = (l + r + 1) / 2;
+                        if (!Game.getInstance().room
+                                .intersects(this.translate(-m * Math.cos(projectile.caculateRadian()),
+                                        m * Math.sin(projectile.caculateRadian())))) {
+                            l = m;
+                        } else {
+                            r = m - 1;
+                        }
+                    }
+                    move(-l * Math.cos(projectile.caculateRadian()),
+                            l * Math.sin(projectile.caculateRadian()));
+                }
+                if (health > 0) {
+                    hit();
+                } else {
+                    death();
                 }
                 projectile.piercing--;
                 if (projectile.piercing <= 0) {
@@ -43,29 +66,12 @@ class Entity extends Polygon {
         }
     }
 
+    // for inheritance
+    void hit() {
+
+    }
+
     void death() {
-        Game.getInstance().room.entities.remove(this);
-        if (Enemy.class.isAssignableFrom(this.getClass()) || this.getClass() == Player.class) {
-            timer.cancel();
-            timer.purge();
-            Game.getInstance().room.score += value;
-            Entity corpse = this.clone();
-            corpse.color = Color.black;
-            corpse.health = Integer.MAX_VALUE;
-            Timer timer = new Timer();
-            TimerTask timertask = new TimerTask() {
-                int frame = 0;
-                public void run() {
-                    frame++;
-                    if (frame == corpse.corpseLength) {
-                        Game.getInstance().room.entities.remove(corpse);
-                        timer.cancel();
-                        timer.purge();
-                    }
-                }
-            };
-            Game.getInstance().room.entities.add(corpse);
-            timer.schedule(timertask, 0, Game.getInstance().delay);
-        }
+
     }
 }

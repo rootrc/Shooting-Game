@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.Timer;
 import java.util.TimerTask;
 
 class Enemy extends Entity {
@@ -43,6 +44,50 @@ class Enemy extends Entity {
         moveSpeed = Integer.parseInt(data.next());
     }
 
+    void hit() {
+        Color orginalColor = color;
+        color = new Color(139, 0, 0);
+        Timer timer = new Timer();
+        speed /= 2;
+        moveSpeed /= 2;
+        rotationSpeed /= 2;
+        TimerTask timertask = new TimerTask() {
+            public void run() {
+                Enemy.this.color = orginalColor;
+                speed *= 2;
+                moveSpeed *= 2;
+                rotationSpeed *= 2;
+            }
+        };
+        timer.schedule(timertask, 10 * Game.getInstance().delay);
+    }
+
+    void death() {
+        Game.getInstance().room.entities.remove(this);
+        timer.cancel();
+        timer.purge();
+        Game.getInstance().room.score += value;
+        Polygon corpse = this.clone();
+        corpse.color = new Color(139, 0, 0);
+        Timer timer = new Timer();
+        TimerTask timertask = new TimerTask() {
+            int count = Enemy.this.corpseLength;
+
+            public void run() {
+                count--;
+                corpse.color = new Color(0, 0, 0, 255 * count / Enemy.this.corpseLength);
+                corpse.setBorderColor(new Color(0, 0, 0, 255 * count / Enemy.this.corpseLength));
+                if (count == 0) {
+                    Game.getInstance().room.polygons.remove(corpse);
+                    timer.cancel();
+                    timer.purge();
+                }
+            }
+        };
+        Game.getInstance().room.polygons.add(corpse);
+        timer.schedule(timertask, 10 * Game.getInstance().delay, Game.getInstance().delay);
+    }
+
 }
 
 class Chaser extends Enemy {
@@ -50,7 +95,7 @@ class Chaser extends Enemy {
         super(points);
         this.id = id;
         color = Color.yellow;
-        corpseLength = 100;
+        corpseLength = 200;
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/chaser" + id + ".txt"));
             asdf(data);
@@ -94,7 +139,7 @@ class Rifle extends Enemy {
         super(points);
         this.id = id;
         color = Color.blue;
-        corpseLength = 100;
+        corpseLength = 200;
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/rifle" + id + ".txt"));
             asdf(data);
@@ -136,7 +181,7 @@ class Rifle extends Enemy {
         timertask = new TimerTask() {
             public void run() {
                 Point playerCentroid = Game.getInstance().room.player.centroid;
-                if (new Line(centroid, playerCentroid).length <= shootDistance) { 
+                if (new Line(centroid, playerCentroid).length <= shootDistance) {
                     speed = moveSpeed * weapon.shootMovementSpeed;
                     weapon.shoot(centroid, direction);
                 } else {
@@ -158,7 +203,7 @@ class Sniper extends Enemy {
         super(points);
         this.id = id;
         color = Color.white;
-        corpseLength = 100;
+        corpseLength = 200;
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/sniper" + id + ".txt"));
             asdf(data);
@@ -235,7 +280,7 @@ class Machine extends Enemy {
         super(points);
         this.id = id;
         color = Color.green;
-        corpseLength = 100;
+        corpseLength = 200;
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/machine" + id + ".txt"));
             asdf(data);
@@ -277,7 +322,7 @@ class Machine extends Enemy {
         timertask = new TimerTask() {
             public void run() {
                 Point playerCentroid = Game.getInstance().room.player.centroid;
-                if (new Line(centroid, playerCentroid).length <= shootDistance) { 
+                if (new Line(centroid, playerCentroid).length <= shootDistance) {
                     speed = moveSpeed * weapon.shootMovementSpeed;
                     weapon.shoot(centroid, direction);
                 } else {

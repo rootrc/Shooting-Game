@@ -5,6 +5,7 @@ class Projectile extends Line {
     boolean isPlayer;
     int damage;
     int piercing;
+    int knockback;
     double random;
 
     Projectile(Point p1, Point p2) {
@@ -28,6 +29,7 @@ class Bullet extends Projectile {
         bullet.damage = damage;
         bullet.piercing = piercing;
         bullet.speed = speed;
+        bullet.knockback = knockback;
         bullet.random = random;
         return bullet;
     }
@@ -67,6 +69,7 @@ class LimitedBullet extends Projectile {
         limitedBullet.damage = damage;
         limitedBullet.piercing = piercing;
         limitedBullet.speed = speed;
+        limitedBullet.knockback = knockback;
         limitedBullet.duration = duration;
         limitedBullet.random = random;
         return limitedBullet;

@@ -8,6 +8,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 
 import java.awt.Color;
@@ -20,6 +21,7 @@ public class Room extends Polygon {
     ConcurrentHashMap.KeySetView<Projectile, Boolean> projectiles = ConcurrentHashMap.newKeySet();
     ConcurrentHashMap.KeySetView<Entity, Boolean> entities = ConcurrentHashMap.newKeySet();
     HashMap<Enemy, Double> enemySpawns = new HashMap<>();
+    ConcurrentHashMap.KeySetView<Polygon, Boolean> polygons = ConcurrentHashMap.newKeySet();
     Player player;
     int score;
 
@@ -32,6 +34,7 @@ public class Room extends Polygon {
         player = new Player(
                 new Point[] { new Point(200, 200), new Point(232, 200), new Point(232, 232), new Point(200, 232) });
         entities.add(player);
+        scoreForNextRoom = 0;
         loadRoom(id);
     }
 
@@ -41,7 +44,7 @@ public class Room extends Polygon {
         enemySpawns.clear();
         try {
             Scanner data = new Scanner(new FileReader("data/rooms/room" + id + ".txt"));
-            scoreForNextRoom = Integer.parseInt(data.next());
+            scoreForNextRoom += Integer.parseInt(data.next());
             int N = Integer.parseInt(data.next());
             for (int i = 0; i < N; i++) {
                 String enemyName = data.next();
@@ -92,6 +95,10 @@ public class Room extends Polygon {
     void draw(Graphics2D g2d) {
         super.draw(g2d);
         super.fill(g2d);
+        for (Polygon polygon: polygons) {
+            polygon.draw(g2d);
+            polygon.fill(g2d);
+        }
         for (Projectile projectile : projectiles) {
             projectile.draw(g2d);
         }
@@ -100,6 +107,7 @@ public class Room extends Polygon {
             entity.fill(g2d);
         }
         g2d.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+        g2d.setColor(Color.black);
         g2d.drawString(Integer.toString(player.health), 15, 30);
         g2d.drawString(Integer.toString(score),
                 770 - SwingUtilities.computeStringWidth(g2d.getFontMetrics(), Integer.toString(score)), 30);

@@ -16,7 +16,7 @@ class Player extends Entity {
 
     Player(Point[] points) {
         super(points);
-        moveSpeed = 8;
+        moveSpeed = 6;
         speed = moveSpeed;
         weapon1 = new Weapon("gun");
         weapon1.projectile.isPlayer = true;
@@ -33,16 +33,20 @@ class Player extends Entity {
             public void run() {
                 Player.super.process();
                 for (Entity entity : Game.getInstance().room.entities) {
-                    if (Player.this == entity || entity.health == Integer.MAX_VALUE) {
+                    if (Player.this == entity) {
                         continue;
                     }
                     if (Player.this.intersects(entity)) {
                         health--;
                         entity.health--;
-                        if (health <= 0) {
-                            Player.this.death();
+                        if (health > 0) {
+                            hit();
+                        } else {
+                            death();
                         }
-                        if (entity.health <= 0) {
+                        if (entity.health > 0) {
+                            entity.hit();
+                        } else {
                             entity.death();
                         }
                     }
@@ -74,21 +78,38 @@ class Player extends Entity {
         }
     }
 
+    void hit() {
+        Color orginalColor = color;
+        color = new Color(139, 0, 0);
+        Timer timer = new Timer();
+        speed /= 2;
+        moveSpeed /= 2;
+        TimerTask timertask = new TimerTask() {
+            public void run() {
+                Player.this.color = orginalColor;
+                speed *= 2;
+                moveSpeed *= 2;
+            }
+        };
+        timer.schedule(timertask, 10 * Game.getInstance().delay);
+    }
+
     void death() {
         timer.cancel();
         timer.purge();
         Game.getInstance().room.entities.remove(this);
-        Entity corpse = this.clone();
-        corpse.color = Color.black;
-        corpse.health = Integer.MAX_VALUE;
+        Polygon corpse = this.clone();
+        corpse.color = new Color(139, 0, 0);
         Timer timer = new Timer();
         TimerTask timertask = new TimerTask() {
-            int frame = 0;
+            int count = Player.this.corpseLength;
 
             public void run() {
-                frame++;
-                if (frame == corpse.corpseLength) {
-                    Game.getInstance().room.entities.remove(corpse);
+                count--;
+                corpse.color = new Color(0, 0, 0, 255 * count / Player.this.corpseLength);
+                corpse.setBorderColor(new Color(0, 0, 0, 255 * count / Player.this.corpseLength));
+                if (count == 0) {
+                    Game.getInstance().room.polygons.remove(corpse);
                     System.exit(0);
                     System.exit(0);
                     timer.cancel();
@@ -96,8 +117,8 @@ class Player extends Entity {
                 }
             }
         };
-        Game.getInstance().room.entities.add(corpse);
-        timer.schedule(timertask, 0, Game.getInstance().delay);
+        Game.getInstance().room.polygons.add(corpse);
+        timer.schedule(timertask, 10 * Game.getInstance().delay, Game.getInstance().delay);
     }
 
     void shoot() {

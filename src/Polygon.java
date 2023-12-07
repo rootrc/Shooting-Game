@@ -148,6 +148,15 @@ class Polygon {
         return false;
     }
 
+    Point intersectionPoint(Line line) {
+        for (Line line2 : lines) {
+            if (line2.intersects(line)) {
+                return line2.intersectionPoint(line);
+            }
+        }
+        return null;
+    }
+
     boolean intersects(Polygon polygon) {
         for (Line line1 : lines) {
             for (Line line2 : polygon.lines) {
