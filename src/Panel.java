@@ -10,6 +10,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 class Panel extends JPanel {
+    int xAdjust;
+    int yAdjust;
     Panel() {
         super();
         addKeyListener(new TKeyAdapter());

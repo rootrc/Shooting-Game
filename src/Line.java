@@ -128,8 +128,8 @@ class Line {
     void draw(Graphics2D g2d) {
         g2d.setColor(color);
         g2d.setStroke(new BasicStroke(width));
-        g2d.drawLine((int) Math.round(p1.x), (int) Math.round(p1.y), (int) Math.round(p2.x),
-                (int) Math.round(p2.y));
+        g2d.drawLine((int) Math.round(p1.x) + Game.getInstance().panel.xAdjust, (int) Math.round(p1.y) + Game.getInstance().panel.yAdjust, (int) Math.round(p2.x) + Game.getInstance().panel.xAdjust,
+                (int) Math.round(p2.y) + Game.getInstance().panel.yAdjust);
     }
 
     double caculateRadian() {

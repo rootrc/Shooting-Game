@@ -8,5 +8,5 @@ limitedBullet
 10
 5
 3
-55
+40
 6

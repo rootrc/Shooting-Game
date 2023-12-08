@@ -45,7 +45,6 @@ class Enemy extends Entity {
     }
 
     void hit() {
-        Color orginalColor = color;
         color = new Color(139, 0, 0);
         Timer timer = new Timer();
         speed /= 2;
@@ -75,8 +74,8 @@ class Enemy extends Entity {
 
             public void run() {
                 count--;
-                corpse.color = new Color(0, 0, 0, 255 * count / Enemy.this.corpseLength);
-                corpse.setBorderColor(new Color(0, 0, 0, 255 * count / Enemy.this.corpseLength));
+                corpse.color = new Color(0, 0, 0, -255 * (Enemy.this.corpseLength - count) * (Enemy.this.corpseLength - count) / Enemy.this.corpseLength / Enemy.this.corpseLength + 255);
+                corpse.setBorderColor(new Color(0, 0, 0, -255 * (Enemy.this.corpseLength - count) * (Enemy.this.corpseLength - count) / Enemy.this.corpseLength / Enemy.this.corpseLength + 255));
                 if (count == 0) {
                     Game.getInstance().room.polygons.remove(corpse);
                     timer.cancel();
@@ -85,7 +84,7 @@ class Enemy extends Entity {
             }
         };
         Game.getInstance().room.polygons.add(corpse);
-        timer.schedule(timertask, 10 * Game.getInstance().delay, Game.getInstance().delay);
+        timer.schedule(timertask, 30 * Game.getInstance().delay, Game.getInstance().delay);
     }
 
 }
@@ -94,8 +93,9 @@ class Chaser extends Enemy {
     Chaser(Point[] points, int id) {
         super(points);
         this.id = id;
-        color = Color.yellow;
-        corpseLength = 200;
+        orginalColor = Color.yellow;
+        color = orginalColor;
+        corpseLength = 600;
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/chaser" + id + ".txt"));
             asdf(data);
@@ -138,8 +138,9 @@ class Rifle extends Enemy {
     Rifle(Point[] points, int id) {
         super(points);
         this.id = id;
-        color = Color.blue;
-        corpseLength = 200;
+        orginalColor = Color.blue;
+        color = orginalColor;
+        corpseLength = 600;
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/rifle" + id + ".txt"));
             asdf(data);
@@ -202,8 +203,9 @@ class Sniper extends Enemy {
     Sniper(Point[] points, int id) {
         super(points);
         this.id = id;
-        color = Color.white;
-        corpseLength = 200;
+        orginalColor = Color.white;
+        color = orginalColor;
+        corpseLength = 600;
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/sniper" + id + ".txt"));
             asdf(data);
@@ -279,8 +281,9 @@ class Machine extends Enemy {
     Machine(Point[] points, int id) {
         super(points);
         this.id = id;
-        color = Color.green;
-        corpseLength = 200;
+        orginalColor = Color.green;
+        color = orginalColor;
+        corpseLength = 700;
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/machine" + id + ".txt"));
             asdf(data);

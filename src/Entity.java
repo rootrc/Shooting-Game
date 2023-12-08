@@ -1,12 +1,12 @@
 import java.awt.Color;
 import java.util.Timer;
-import java.util.TimerTask;
 
 class Entity extends Polygon {
     Timer timer = new Timer();
     double direction;
     int health;
     int value;
+    Color orginalColor;
     int corpseLength;
 
     Entity(Point[] points) {

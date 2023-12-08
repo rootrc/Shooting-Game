@@ -23,8 +23,8 @@ class Point {
     void draw(Graphics2D g2d) {
         g2d.setColor(color);
         g2d.setStroke(new BasicStroke(width));
-        g2d.drawLine((int) Math.round(this.x), (int) Math.round(this.y), (int) Math.round(this.x),
-                (int) Math.round(this.y));
+        g2d.drawLine((int) Math.round(this.x) + Game.getInstance().panel.xAdjust, (int) Math.round(this.y) + Game.getInstance().panel.yAdjust, (int) Math.round(this.x) + Game.getInstance().panel.xAdjust,
+                (int) Math.round(this.y) + Game.getInstance().panel.yAdjust);
     }
 
     public Point clone() {

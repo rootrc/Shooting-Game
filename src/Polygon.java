@@ -49,8 +49,8 @@ class Polygon {
         int[] xPoints = new int[length];
         int[] yPoints = new int[length];
         for (int i = 0; i < length; i++) {
-            xPoints[i] = (int) Math.round(points[i].x);
-            yPoints[i] = (int) Math.round(points[i].y);
+            xPoints[i] = (int) Math.round(points[i].x + Game.getInstance().panel.xAdjust);
+            yPoints[i] = (int) Math.round(points[i].y+ Game.getInstance().panel.yAdjust);
         }
         g2d.setColor(color);
         g2d.fillPolygon(xPoints, yPoints, length);

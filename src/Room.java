@@ -108,9 +108,9 @@ public class Room extends Polygon {
         }
         g2d.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
         g2d.setColor(Color.black);
-        g2d.drawString(Integer.toString(player.health), 15, 30);
+        g2d.drawString(Integer.toString(player.health), 15 + Game.getInstance().panel.xAdjust, 30 + Game.getInstance().panel.yAdjust);
         g2d.drawString(Integer.toString(score),
-                770 - SwingUtilities.computeStringWidth(g2d.getFontMetrics(), Integer.toString(score)), 30);
+                770 - SwingUtilities.computeStringWidth(g2d.getFontMetrics(), Integer.toString(score)) + Game.getInstance().panel.xAdjust, 30 + Game.getInstance().panel.yAdjust);
     }
 
     void addEnemy(Enemy enemy) {

@@ -7,8 +7,8 @@ import java.util.TimerTask;
 class Player extends Entity {
     boolean a, d, s, w;
     boolean shoot, shooting;
-    int speed;
-    int moveSpeed;
+    double speed;
+    double moveSpeed;
     int xMovement, yMovement;
     Weapon weapon;
     Weapon weapon1;
@@ -23,8 +23,9 @@ class Player extends Entity {
         weapon2 = new Weapon("sniper");
         weapon2.projectile.isPlayer = true;
         weapon = weapon1;
-        health = 5;
-        color = Color.blue;
+        health = 10;
+        orginalColor = Color.blue;
+        color = orginalColor;
         corpseLength = 100;
     }
 
@@ -79,11 +80,10 @@ class Player extends Entity {
     }
 
     void hit() {
-        Color orginalColor = color;
         color = new Color(139, 0, 0);
-        Timer timer = new Timer();
         speed /= 2;
         moveSpeed /= 2;
+        Timer timer = new Timer();
         TimerTask timertask = new TimerTask() {
             public void run() {
                 Player.this.color = orginalColor;
@@ -92,6 +92,22 @@ class Player extends Entity {
             }
         };
         timer.schedule(timertask, 10 * Game.getInstance().delay);
+        Timer timer2 = new Timer();
+        timertask = new TimerTask() {
+            int count = 0;
+
+            public void run() {
+                count++;
+                Game.getInstance().panel.xAdjust = (int) (6 * Math.random()) - 3;
+                Game.getInstance().panel.yAdjust = (int) (6 * Math.random()) - 3;
+                if (count == 10) {
+                    Game.getInstance().panel.xAdjust = 0;
+                    Game.getInstance().panel.yAdjust = 0;
+                    timer2.cancel();
+                }
+            }
+        };
+        timer2.schedule(timertask, 0, Game.getInstance().delay);
     }
 
     void death() {
@@ -103,11 +119,10 @@ class Player extends Entity {
         Timer timer = new Timer();
         TimerTask timertask = new TimerTask() {
             int count = Player.this.corpseLength;
-
             public void run() {
                 count--;
-                corpse.color = new Color(0, 0, 0, 255 * count / Player.this.corpseLength);
-                corpse.setBorderColor(new Color(0, 0, 0, 255 * count / Player.this.corpseLength));
+                corpse.color = new Color(0, 0, 0, -255 * (Player.this.corpseLength - count) * (Player.this.corpseLength - count) / Player.this.corpseLength / Player.this.corpseLength + 255);
+                corpse.setBorderColor(new Color(0, 0, 0, -255 * (Player.this.corpseLength - count) * (Player.this.corpseLength - count) / Player.this.corpseLength / Player.this.corpseLength + 255));
                 if (count == 0) {
                     Game.getInstance().room.polygons.remove(corpse);
                     System.exit(0);
@@ -119,6 +134,21 @@ class Player extends Entity {
         };
         Game.getInstance().room.polygons.add(corpse);
         timer.schedule(timertask, 10 * Game.getInstance().delay, Game.getInstance().delay);
+        Timer timer2 = new Timer();
+        timertask = new TimerTask() {
+            int count = 0;
+            public void run() {
+                count++;
+                Game.getInstance().panel.xAdjust = (int) (10 * Math.random()) - 5;
+                Game.getInstance().panel.yAdjust = (int) (10 * Math.random()) - 5;
+                if (count == 10) {
+                    Game.getInstance().panel.xAdjust = 0;
+                    Game.getInstance().panel.yAdjust = 0;
+                    timer2.cancel();
+                }
+            }
+        };
+        timer2.schedule(timertask, 0, Game.getInstance().delay);
     }
 
     void shoot() {

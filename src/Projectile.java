@@ -81,8 +81,8 @@ class LimitedBullet extends Projectile {
         TimerTask timertask = new TimerTask() {
             int count = 0;
             public void run() {
-                limitedBullet.p1.x -= speed * Math.cos(direction);
-                limitedBullet.p1.y += speed * Math.sin(direction);
+                limitedBullet.p1.x -= (speed + (double) limitedBullet.length / (limitedBullet.duration * limitedBullet.duration) * (2 * count - 1)) * Math.cos(direction);
+                limitedBullet.p1.y += (speed + (double) limitedBullet.length / (limitedBullet.duration * limitedBullet.duration) * (2 * count - 1)) * Math.sin(direction);
                 limitedBullet.p2.x -= speed * Math.cos(direction);
                 limitedBullet.p2.y += speed * Math.sin(direction);
                 count++;
