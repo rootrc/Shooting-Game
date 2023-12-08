@@ -21,7 +21,7 @@ class Player extends Entity {
         super(points);
         moveSpeed = 5;
         speed = moveSpeed;
-        health = 10;
+        health = 100;
         orginalColor = Color.blue;
         color = orginalColor;
         corpseLength = 200;
@@ -184,6 +184,7 @@ class Player extends Entity {
                 attemptMovement(weapon.recoil, direction);
                 muzzleFlashing = true;
                 double muzzleDirection = direction;
+                Timer timer = new Timer();
                 TimerTask timertask = new TimerTask() {
                     int count = 0;
 
@@ -195,7 +196,8 @@ class Player extends Entity {
                                 (20 + weapon.projectile.length / 2) * Math.sin(muzzleDirection));
                         if (count == 3) {
                             muzzleFlashing = false;
-                            cancel();
+                            timer.cancel();
+                            timer.purge();
                         }
                     }
                 };

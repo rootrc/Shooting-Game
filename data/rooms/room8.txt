@@ -1,10 +1,10 @@
 10
 4
 chaser1
-8
+16
 rifle1
-8
+16
 sniper1
-5
+4
 machine1
-5
+4

@@ -1,0 +1,8 @@
+15
+3
+rifle1
+5
+rifle2
+4
+machine1
+10

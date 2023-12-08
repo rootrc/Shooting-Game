@@ -1,6 +1,8 @@
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 class Weapon {
 
@@ -46,7 +48,7 @@ class Weapon {
                     limitedBullet.duration = Integer.parseInt(data.next());
                     projectile = limitedBullet;
                     break;
-                }
+            }
         } catch (IOException e) {
             System.out.println("Weapon Loading Error");
             System.exit(-1);
@@ -54,14 +56,11 @@ class Weapon {
     }
 
     void shoot(Point centroid, double direction) {
-        direction +=  random * Math.random() - random / 2;
+        direction += random * Math.random() - random / 2;
         projectile.p1 = centroid.translate(-20 * Math.cos(direction),
                 20 * Math.sin(direction));
         projectile.p2 = centroid.translate((-20 - projectile.length) * Math.cos(direction),
                 (20 + projectile.length) * Math.sin(direction));
         projectile.shoot(direction);
-        if (shotCount != 1) {
-            System.out.println("hi");
-        }
     }
 }

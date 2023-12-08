@@ -1,7 +1,5 @@
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.util.Timer;
-import java.util.concurrent.ConcurrentHashMap;
 
 class Entity extends Polygon {
     Timer timer = new Timer();

@@ -24,7 +24,6 @@ public class Room extends Polygon {
     ConcurrentHashMap.KeySetView<Polygon, Boolean> polygons = ConcurrentHashMap.newKeySet();
     Player player;
     int score;
-
     int scoreForNextRoom;
     
     Room(Point[] points, int id) {
@@ -44,7 +43,7 @@ public class Room extends Polygon {
         enemySpawns.clear();
         try {
             Scanner data = new Scanner(new FileReader("data/rooms/room" + id + ".txt"));
-            scoreForNextRoom += Integer.parseInt(data.next());
+            scoreForNextRoom += Integer.parseInt(data.next()) * 10;
             int N = Integer.parseInt(data.next());
             for (int i = 0; i < N; i++) {
                 String enemyName = data.next();
@@ -65,6 +64,10 @@ public class Room extends Polygon {
                     case "machine":
                         Machine machine = new Machine(null, enemyName.charAt(enemyName.length() - 1) - '0');
                         enemySpawns.put(machine, spawnRate);
+                        break;
+                    case "sharp":
+                        Sharp sharp = new Sharp(null, enemyName.charAt(enemyName.length() - 1) - '0');
+                        enemySpawns.put(sharp, spawnRate);
                         break;
                 }
             }

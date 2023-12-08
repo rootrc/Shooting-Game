@@ -45,7 +45,7 @@ class Enemy extends Entity {
                 data.nextLine();
             }
         }
-        value = Integer.parseInt(data.next());
+        value = Integer.parseInt(data.next()) * 10;
         health = Integer.parseInt(data.next());
         moveSpeed = Double.parseDouble(data.next());
     }
@@ -58,9 +58,11 @@ class Enemy extends Entity {
     }
 
     void shoot() {
+        weapon.shoot(centroid, direction);
         attemptMovement(weapon.recoil, direction);
         muzzleFlashing = true;
         double muzzleDirection = direction;
+        Timer timer = new Timer();
         TimerTask timertask = new TimerTask() {
             int count = 0;
 
@@ -72,12 +74,51 @@ class Enemy extends Entity {
                         (20 + weapon.projectile.length / 2) * Math.sin(muzzleDirection));
                 if (count == 3) {
                     muzzleFlashing = false;
-                    cancel();
+                    timer.cancel();
+                    timer.purge();
                 }
             }
         };
         timer.schedule(timertask, 0, Game.getInstance().delay);
-        weapon.shoot(centroid, direction);
+        if (weapon.shotCount == 1) {
+            return;
+        }
+        Timer timer2 = new Timer();
+        TimerTask timertask2 = new TimerTask() {
+            int count = 0;
+
+            public void run() {
+                count++;
+                attemptMovement(weapon.recoil, direction);
+                muzzleFlashing = true;
+                double muzzleDirection = direction;
+                Timer timer = new Timer();
+                TimerTask timertask = new TimerTask() {
+                    int count = 0;
+
+                    public void run() {
+                        count++;
+                        muzzleFlash.p1 = centroid.clone();
+                        muzzleFlash.p2 = centroid.translate(
+                                -(20 + weapon.projectile.length / 2) * Math.cos(muzzleDirection),
+                                (20 + weapon.projectile.length / 2) * Math.sin(muzzleDirection));
+                        if (count == 3) {
+                            muzzleFlashing = false;
+                            timer.cancel();
+                            timer.purge();
+                        }
+                    }
+                };
+                timer.schedule(timertask, 0, Game.getInstance().delay);
+                weapon.shoot(centroid, direction);
+                if (count == weapon.shotCount - 1) {
+                    timer2.cancel();
+                    timer2.purge();
+                }
+            }
+        };
+        timer2.schedule(timertask2, weapon.shotCooldown * Game.getInstance().delay,
+                weapon.shotCooldown * Game.getInstance().delay);
     }
 
     void hit() {
@@ -350,6 +391,84 @@ class Machine extends Enemy {
                 direction = radian;
                 if (line.length >= moveDistance) {
                     move(-speed * Math.cos(direction), speed * Math.sin(direction));
+                }
+            }
+        };
+        timer.schedule(timertask, 0, Game.getInstance().delay);
+        timertask = new TimerTask() {
+            public void run() {
+                Point playerCentroid = Game.getInstance().room.player.centroid;
+                if (new Line(centroid, playerCentroid).length <= shootDistance) {
+                    speed = moveSpeed * weapon.shootMovementSpeed;
+                    shoot();
+                } else {
+                    speed = moveSpeed;
+                }
+            }
+        };
+        timer.schedule(timertask, 0, weapon.cooldown);
+    }
+}
+
+class Sharp extends Enemy {
+    int shootDistance;
+    int moveDistance;
+    int strafing;
+
+    Sharp(Point[] points, int id) {
+        super(points);
+        this.id = id;
+        orginalColor = Color.gray;
+        color = orginalColor;
+        corpseLength = 1000;
+        if (Math.random() < 0.5) {
+            strafing = 1;
+        } else {
+            strafing = -1;
+        }
+        try {
+            Scanner data = new Scanner(new FileReader("data/enemies/sharp" + id + ".txt"));
+            asdf(data);
+            weapon = new Weapon("sharp" + id);
+            shootDistance = (int) (Integer.parseInt(data.next()) * (0.1 * Math.random() + 1));
+            moveDistance = (int) (Integer.parseInt(data.next()) * (0.1 * Math.random() + 0.9));
+        } catch (IOException e) {
+            System.out.println("Enemy Loading Error");
+            System.exit(-1);
+        }
+    }
+
+    Sharp translate(double x, double y) {
+        Point[] points = new Point[length];
+        for (int i = 0; i < length; i++) {
+            points[i] = this.points[i].translate(x, y);
+        }
+        Sharp sharp = new Sharp(points, id);
+        return sharp;
+    }
+
+    void process() {
+        TimerTask timertask = new TimerTask() {
+            public void run() {
+                Sharp.super.process();
+                Point playerCentroid = Game.getInstance().room.player.centroid;
+                Line line = new Line(centroid, playerCentroid);
+                double radian = line.caculateRadian();
+                rotate(direction - radian);
+                direction = radian;
+                if (line.length >= moveDistance) {
+                    move(-2 * speed / 3 * Math.cos(direction), 2 * speed / 3 * Math.sin(direction));
+                    if (Game.getInstance().room.intersects(translate(-speed * Math.cos(direction + strafing * Math.PI / 2), speed * Math.sin(direction + strafing * Math.PI / 2)))) {
+                        strafing *= -1;
+                    }
+                    move(-speed / 3 * Math.cos(direction + strafing * Math.PI / 2), speed / 3 * Math.sin(direction + strafing * Math.PI / 2));
+                } else {
+                    if (Game.getInstance().room.intersects(translate(-speed * Math.cos(direction + strafing * Math.PI / 2), speed * Math.sin(direction + strafing * Math.PI / 2)))) {
+                        strafing *= -1;
+                    } else if (Math.random() < 0.05) {
+                        strafing *= -1;
+                    }
+                    move(-speed * Math.cos(direction + strafing * Math.PI / 2), speed * Math.sin(direction + strafing * Math.PI / 2));
                 }
             }
         };
