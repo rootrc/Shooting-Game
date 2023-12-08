@@ -32,7 +32,7 @@ public class Room extends Polygon {
         color = Color.white;
         score = 0;
         player = new Player(
-                new Point[] { new Point(200, 200), new Point(232, 200), new Point(232, 232), new Point(200, 232) });
+                new Point[] { new Point(300, 300), new Point(332, 300), new Point(332, 332), new Point(300, 332) });
         entities.add(player);
         scoreForNextRoom = 0;
         loadRoom(id);
@@ -108,7 +108,7 @@ public class Room extends Polygon {
         }
         g2d.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
         g2d.setColor(Color.black);
-        g2d.drawString(Integer.toString(player.health), 15 + Game.getInstance().panel.xAdjust, 30 + Game.getInstance().panel.yAdjust);
+        g2d.drawString(Integer.toString(Math.max(player.health, 0)), 15 + Game.getInstance().panel.xAdjust, 30 + Game.getInstance().panel.yAdjust);
         g2d.drawString(Integer.toString(score),
                 770 - SwingUtilities.computeStringWidth(g2d.getFontMetrics(), Integer.toString(score)) + Game.getInstance().panel.xAdjust, 30 + Game.getInstance().panel.yAdjust);
     }

@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.Timer;
@@ -10,23 +11,35 @@ class Player extends Entity {
     double speed;
     double moveSpeed;
     int xMovement, yMovement;
+    Line muzzleFlash;
+    boolean muzzleFlashing;
     Weapon weapon;
     Weapon weapon1;
     Weapon weapon2;
 
     Player(Point[] points) {
         super(points);
-        moveSpeed = 6;
+        moveSpeed = 5;
         speed = moveSpeed;
-        weapon1 = new Weapon("gun");
-        weapon1.projectile.isPlayer = true;
-        weapon2 = new Weapon("sniper");
-        weapon2.projectile.isPlayer = true;
-        weapon = weapon1;
         health = 10;
         orginalColor = Color.blue;
         color = orginalColor;
-        corpseLength = 100;
+        corpseLength = 200;
+        muzzleFlash = new Line(new Point(0, 0), new Point(0, 0));
+        muzzleFlash.color = new Color(247, 241, 181);
+        muzzleFlash.width = 8;
+        weapon1 = new Weapon("player_gun");
+        weapon1.projectile.isPlayer = true;
+        weapon2 = new Weapon("player_sniper");
+        weapon2.projectile.isPlayer = true;
+        weapon = weapon1;
+    }
+
+    void draw(Graphics2D g2d) {
+        if (muzzleFlashing) {
+            muzzleFlash.draw(g2d);
+        }
+        super.draw(g2d);
     }
 
     void process() {
@@ -98,8 +111,8 @@ class Player extends Entity {
 
             public void run() {
                 count++;
-                Game.getInstance().panel.xAdjust = (int) (6 * Math.random()) - 3;
-                Game.getInstance().panel.yAdjust = (int) (6 * Math.random()) - 3;
+                Game.getInstance().panel.xAdjust = (int) (10 * Math.random()) - 5;
+                Game.getInstance().panel.yAdjust = (int) (10 * Math.random()) - 5;
                 if (count == 10) {
                     Game.getInstance().panel.xAdjust = 0;
                     Game.getInstance().panel.yAdjust = 0;
@@ -119,10 +132,15 @@ class Player extends Entity {
         Timer timer = new Timer();
         TimerTask timertask = new TimerTask() {
             int count = Player.this.corpseLength;
+
             public void run() {
                 count--;
-                corpse.color = new Color(0, 0, 0, -255 * (Player.this.corpseLength - count) * (Player.this.corpseLength - count) / Player.this.corpseLength / Player.this.corpseLength + 255);
-                corpse.setBorderColor(new Color(0, 0, 0, -255 * (Player.this.corpseLength - count) * (Player.this.corpseLength - count) / Player.this.corpseLength / Player.this.corpseLength + 255));
+                corpse.color = new Color(0, 0, 0,
+                        -255 * (Player.this.corpseLength - count) * (Player.this.corpseLength - count)
+                                / Player.this.corpseLength / Player.this.corpseLength + 255);
+                corpse.setBorderColor(new Color(0, 0, 0,
+                        -255 * (Player.this.corpseLength - count) * (Player.this.corpseLength - count)
+                                / Player.this.corpseLength / Player.this.corpseLength + 255));
                 if (count == 0) {
                     Game.getInstance().room.polygons.remove(corpse);
                     System.exit(0);
@@ -137,11 +155,12 @@ class Player extends Entity {
         Timer timer2 = new Timer();
         timertask = new TimerTask() {
             int count = 0;
+
             public void run() {
                 count++;
-                Game.getInstance().panel.xAdjust = (int) (10 * Math.random()) - 5;
-                Game.getInstance().panel.yAdjust = (int) (10 * Math.random()) - 5;
-                if (count == 10) {
+                Game.getInstance().panel.xAdjust = (int) (50 * Math.random()) - 25;
+                Game.getInstance().panel.yAdjust = (int) (50 * Math.random()) - 25;
+                if (count == 30) {
                     Game.getInstance().panel.xAdjust = 0;
                     Game.getInstance().panel.yAdjust = 0;
                     timer2.cancel();
@@ -162,6 +181,34 @@ class Player extends Entity {
                     return;
                 }
                 weapon.shoot(centroid, direction);
+                attemptMovement(weapon.recoil, direction);
+                muzzleFlashing = true;
+                double muzzleDirection = direction;
+                TimerTask timertask = new TimerTask() {
+                    int count = 0;
+
+                    public void run() {
+                        count++;
+                        muzzleFlash.p1 = centroid.clone();
+                        muzzleFlash.p2 = centroid.translate(
+                                -(20 + weapon.projectile.length / 2) * Math.cos(muzzleDirection),
+                                (20 + weapon.projectile.length / 2) * Math.sin(muzzleDirection));
+                        if (count == 3) {
+                            muzzleFlashing = false;
+                            cancel();
+                        }
+                    }
+                };
+                timer.schedule(timertask, 0, Game.getInstance().delay);
+                TimerTask timertask2 = new TimerTask() {
+                    public void run() {
+                        Game.getInstance().panel.xAdjust = 0;
+                        Game.getInstance().panel.yAdjust = 0;
+                    }
+                };
+                Game.getInstance().panel.xAdjust = (int) (6 * Math.random()) - 3;
+                Game.getInstance().panel.yAdjust = (int) (6 * Math.random()) - 3;
+                timer.schedule(timertask2, Game.getInstance().delay);
             }
         };
         timer.schedule(timertask, 0, weapon.cooldown);
@@ -169,6 +216,9 @@ class Player extends Entity {
     }
 
     void keyPressed(KeyEvent e) {
+        if (health <= 0) {
+            return;
+        }
         int key = e.getKeyCode();
         switch (key) {
             case KeyEvent.VK_W:
@@ -215,6 +265,9 @@ class Player extends Entity {
     }
 
     void keyReleased(KeyEvent e) {
+        if (health <= 0) {
+            return;
+        }
         int key = e.getKeyCode();
         switch (key) {
             case KeyEvent.VK_W:

@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
@@ -7,6 +8,8 @@ import java.util.TimerTask;
 
 class Enemy extends Entity {
     int id;
+    Line muzzleFlash;
+    boolean muzzleFlashing;
     double speed;
     double moveSpeed;
     double rotationSpeed;
@@ -23,6 +26,9 @@ class Enemy extends Entity {
     }
 
     void asdf(Scanner data) throws IOException {
+        muzzleFlash = new Line(new Point(0, 0), new Point(0, 0));
+        muzzleFlash.color = new Color(247, 241, 181);
+        muzzleFlash.width = 8;
         if (points == null) {
             length = Integer.parseInt(data.next());
             this.points = new Point[length];
@@ -41,7 +47,37 @@ class Enemy extends Entity {
         }
         value = Integer.parseInt(data.next());
         health = Integer.parseInt(data.next());
-        moveSpeed = Integer.parseInt(data.next());
+        moveSpeed = Double.parseDouble(data.next());
+    }
+
+    void draw(Graphics2D g2d) {
+        if (muzzleFlashing) {
+            muzzleFlash.draw(g2d);
+        }
+        super.draw(g2d);
+    }
+
+    void shoot() {
+        attemptMovement(weapon.recoil, direction);
+        muzzleFlashing = true;
+        double muzzleDirection = direction;
+        TimerTask timertask = new TimerTask() {
+            int count = 0;
+
+            public void run() {
+                count++;
+                muzzleFlash.p1 = centroid.clone();
+                muzzleFlash.p2 = centroid.translate(
+                        -(20 + weapon.projectile.length / 2) * Math.cos(muzzleDirection),
+                        (20 + weapon.projectile.length / 2) * Math.sin(muzzleDirection));
+                if (count == 3) {
+                    muzzleFlashing = false;
+                    cancel();
+                }
+            }
+        };
+        timer.schedule(timertask, 0, Game.getInstance().delay);
+        weapon.shoot(centroid, direction);
     }
 
     void hit() {
@@ -74,8 +110,10 @@ class Enemy extends Entity {
 
             public void run() {
                 count--;
-                corpse.color = new Color(0, 0, 0, -255 * (Enemy.this.corpseLength - count) * (Enemy.this.corpseLength - count) / Enemy.this.corpseLength / Enemy.this.corpseLength + 255);
-                corpse.setBorderColor(new Color(0, 0, 0, -255 * (Enemy.this.corpseLength - count) * (Enemy.this.corpseLength - count) / Enemy.this.corpseLength / Enemy.this.corpseLength + 255));
+                corpse.color = new Color(0, 0, 0, -255 * (Enemy.this.corpseLength - count)
+                        * (Enemy.this.corpseLength - count) / Enemy.this.corpseLength / Enemy.this.corpseLength + 255);
+                corpse.setBorderColor(new Color(0, 0, 0, -255 * (Enemy.this.corpseLength - count)
+                        * (Enemy.this.corpseLength - count) / Enemy.this.corpseLength / Enemy.this.corpseLength + 255));
                 if (count == 0) {
                     Game.getInstance().room.polygons.remove(corpse);
                     timer.cancel();
@@ -131,7 +169,6 @@ class Chaser extends Enemy {
 }
 
 class Rifle extends Enemy {
-    Weapon weapon;
     int shootDistance;
     int moveDistance;
 
@@ -147,9 +184,7 @@ class Rifle extends Enemy {
             weapon = new Weapon("rifle" + id);
             shootDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 1));
             moveDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 0.8));
-        } catch (
-
-        IOException e) {
+        } catch (IOException e) {
             System.out.println("Enemy Loading Error");
             System.exit(-1);
         }
@@ -184,7 +219,7 @@ class Rifle extends Enemy {
                 Point playerCentroid = Game.getInstance().room.player.centroid;
                 if (new Line(centroid, playerCentroid).length <= shootDistance) {
                     speed = moveSpeed * weapon.shootMovementSpeed;
-                    weapon.shoot(centroid, direction);
+                    shoot();
                 } else {
                     speed = moveSpeed;
                 }
@@ -195,7 +230,6 @@ class Rifle extends Enemy {
 }
 
 class Sniper extends Enemy {
-    Weapon weapon;
     int shootDistance;
     int moveDistance;
     int runDistance;
@@ -213,9 +247,7 @@ class Sniper extends Enemy {
             shootDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 1));
             moveDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 0.8));
             runDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 0.9));
-        } catch (
-
-        IOException e) {
+        } catch (IOException e) {
             System.out.println("Enemy Loading Error");
             System.exit(-1);
         }
@@ -241,6 +273,9 @@ class Sniper extends Enemy {
                 direction = radian;
                 if (line.length >= moveDistance) {
                     move(-speed * Math.cos(direction), speed * Math.sin(direction));
+                } else if (Sniper.super.translate(speed * Math.cos(direction), -speed * Math.sin(direction))
+                        .intersects(Game.getInstance().room)) {
+                    move(-moveSpeed * Math.cos(direction), moveSpeed * Math.sin(direction));
                 } else if (runDistance >= line.length) {
                     if (!Sniper.super.translate(speed * Math.cos(direction), -speed * Math.sin(direction))
                             .intersects(Game.getInstance().room.boundingBox(20))) {
@@ -263,7 +298,7 @@ class Sniper extends Enemy {
                         || Sniper.super.translate(speed * Math.cos(direction), -speed * Math.sin(direction))
                                 .intersects(Game.getInstance().room.boundingBox(20))) {
                     speed = moveSpeed * weapon.shootMovementSpeed;
-                    weapon.shoot(centroid, direction);
+                    shoot();
                 } else {
                     speed = moveSpeed;
                 }
@@ -274,7 +309,6 @@ class Sniper extends Enemy {
 }
 
 class Machine extends Enemy {
-    Weapon weapon;
     int shootDistance;
     int moveDistance;
 
@@ -290,9 +324,7 @@ class Machine extends Enemy {
             weapon = new Weapon("machine" + id);
             shootDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 1));
             moveDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 0.8));
-        } catch (
-
-        IOException e) {
+        } catch (IOException e) {
             System.out.println("Enemy Loading Error");
             System.exit(-1);
         }
@@ -327,7 +359,7 @@ class Machine extends Enemy {
                 Point playerCentroid = Game.getInstance().room.player.centroid;
                 if (new Line(centroid, playerCentroid).length <= shootDistance) {
                     speed = moveSpeed * weapon.shootMovementSpeed;
-                    weapon.shoot(centroid, direction);
+                    shoot();
                 } else {
                     speed = moveSpeed;
                 }

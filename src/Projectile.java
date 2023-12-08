@@ -6,7 +6,6 @@ class Projectile extends Line {
     int damage;
     int piercing;
     int knockback;
-    double random;
 
     Projectile(Point p1, Point p2) {
         super(p1, p2);
@@ -30,7 +29,6 @@ class Bullet extends Projectile {
         bullet.piercing = piercing;
         bullet.speed = speed;
         bullet.knockback = knockback;
-        bullet.random = random;
         return bullet;
     }
 
@@ -71,8 +69,7 @@ class LimitedBullet extends Projectile {
         limitedBullet.speed = speed;
         limitedBullet.knockback = knockback;
         limitedBullet.duration = duration;
-        limitedBullet.random = random;
-        return limitedBullet;
+        return limitedBullet;    
     }
 
     void shoot(double direction) {

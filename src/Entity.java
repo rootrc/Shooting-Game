@@ -1,5 +1,7 @@
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.util.Timer;
+import java.util.concurrent.ConcurrentHashMap;
 
 class Entity extends Polygon {
     Timer timer = new Timer();
@@ -32,27 +34,7 @@ class Entity extends Polygon {
             }
             if (intersects(projectile)) {
                 health -= projectile.damage;
-                if (!Game.getInstance().room
-                        .intersects(this.translate(-projectile.knockback * Math.cos(projectile.caculateRadian()),
-                                projectile.knockback * Math.sin(projectile.caculateRadian())))) {
-                    move(-projectile.knockback * Math.cos(projectile.caculateRadian()),
-                            projectile.knockback * Math.sin(projectile.caculateRadian()));
-                } else {
-                    int l = 0;
-                    int r = projectile.knockback;
-                    while (l < r) {
-                        int m = (l + r + 1) / 2;
-                        if (!Game.getInstance().room
-                                .intersects(this.translate(-m * Math.cos(projectile.caculateRadian()),
-                                        m * Math.sin(projectile.caculateRadian())))) {
-                            l = m;
-                        } else {
-                            r = m - 1;
-                        }
-                    }
-                    move(-l * Math.cos(projectile.caculateRadian()),
-                            l * Math.sin(projectile.caculateRadian()));
-                }
+                attemptMovement(-projectile.knockback, projectile.caculateRadian());
                 if (health > 0) {
                     hit();
                 } else {
@@ -66,9 +48,33 @@ class Entity extends Polygon {
         }
     }
 
+    void attemptMovement(int distance, double direction) {
+        if (!Game.getInstance().room
+                .intersects(this.translate(distance * Math.cos(direction),
+                        -distance * Math.sin(direction)))) {
+            move(distance * Math.cos(direction),
+                    -distance * Math.sin(direction));
+        } else {
+            int l = 0;
+            int r = distance;
+            while (l < r) {
+                int m = (l + r + 1) / 2;
+                if (!Game.getInstance().room
+                        .intersects(this.translate(m * Math.cos(direction),
+                                -m * Math.sin(direction)))) {
+                    l = m;
+                } else {
+                    r = m - 1;
+                }
+            }
+            move(l * Math.cos(direction),
+                    -l * Math.sin(direction));
+        }
+    }
+
     // for inheritance
     void hit() {
-
+   
     }
 
     void death() {

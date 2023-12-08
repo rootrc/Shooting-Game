@@ -5,21 +5,24 @@ import java.util.Scanner;
 class Weapon {
 
     int cooldown;
-    int shots;
+    int shotCount;
     int shotCooldown;
     double shootMovementSpeed;
-
+    int recoil;
+    double random;
     Projectile projectile;
 
     Weapon(String name) {
         try {
             Scanner data = new Scanner(new FileReader("data/weapons/" + name + ".txt"));
             cooldown = Integer.parseInt(data.next()) * 100;
-            shots = Integer.parseInt(data.next());
-            if (shots != 1) {
+            shotCount = Integer.parseInt(data.next());
+            if (shotCount != 1) {
                 shotCooldown = Integer.parseInt(data.next());
             }
             shootMovementSpeed = Double.parseDouble(data.next());
+            recoil = Integer.parseInt(data.next());
+            random = Math.PI / Integer.parseInt(data.next());
             String projectileType = data.next();
             switch (projectileType) {
                 case "bullet":
@@ -30,7 +33,6 @@ class Weapon {
                     bullet.length = Integer.parseInt(data.next());
                     bullet.speed = Integer.parseInt(data.next());
                     bullet.knockback = Integer.parseInt(data.next());
-                    bullet.random = Math.PI / Integer.parseInt(data.next());
                     projectile = bullet;
                     break;
                 case "limitedBullet":
@@ -42,7 +44,6 @@ class Weapon {
                     limitedBullet.speed = Integer.parseInt(data.next());
                     limitedBullet.knockback = Integer.parseInt(data.next());
                     limitedBullet.duration = Integer.parseInt(data.next());
-                    limitedBullet.random = Math.PI / Integer.parseInt(data.next());
                     projectile = limitedBullet;
                     break;
                 }
@@ -53,11 +54,14 @@ class Weapon {
     }
 
     void shoot(Point centroid, double direction) {
-        direction +=  projectile.random * Math.random() - projectile.random / 2;
+        direction +=  random * Math.random() - random / 2;
         projectile.p1 = centroid.translate(-20 * Math.cos(direction),
                 20 * Math.sin(direction));
         projectile.p2 = centroid.translate((-20 - projectile.length) * Math.cos(direction),
                 (20 + projectile.length) * Math.sin(direction));
         projectile.shoot(direction);
+        if (shotCount != 1) {
+            System.out.println("hi");
+        }
     }
 }

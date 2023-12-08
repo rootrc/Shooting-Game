@@ -50,7 +50,7 @@ class Polygon {
         int[] yPoints = new int[length];
         for (int i = 0; i < length; i++) {
             xPoints[i] = (int) Math.round(points[i].x + Game.getInstance().panel.xAdjust);
-            yPoints[i] = (int) Math.round(points[i].y+ Game.getInstance().panel.yAdjust);
+            yPoints[i] = (int) Math.round(points[i].y + Game.getInstance().panel.yAdjust);
         }
         g2d.setColor(color);
         g2d.fillPolygon(xPoints, yPoints, length);
@@ -148,14 +148,16 @@ class Polygon {
         return false;
     }
 
-    Point intersectionPoint(Line line) {
-        for (Line line2 : lines) {
-            if (line2.intersects(line)) {
-                return line2.intersectionPoint(line);
-            }
-        }
-        return null;
-    }
+    // HashSet<Point> intersectionPoint(Line line) {
+    //     HashSet<Point> res = new HashSet<>();
+    //     for (Line line2 : lines) {
+    //         Point point = line2.intersectionPoint(line);
+    //         if (point != null) {
+    //             res.add(line2.intersectionPoint(line));
+    //         }
+    //     }
+    //     return res;
+    // }
 
     boolean intersects(Polygon polygon) {
         for (Line line1 : lines) {
@@ -171,6 +173,12 @@ class Polygon {
     void rotate(double radian) {
         for (Point point : points) {
             point.rotate(radian, centroid);
+        }
+    }
+
+    void rotate(double radian, Point pivot) {
+        for (Point point : points) {
+            point.rotate(radian, pivot);
         }
     }
 
