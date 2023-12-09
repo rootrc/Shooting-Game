@@ -22,6 +22,7 @@ public class Room extends Polygon {
     ConcurrentHashMap.KeySetView<Entity, Boolean> entities = ConcurrentHashMap.newKeySet();
     HashMap<Enemy, Double> enemySpawns = new HashMap<>();
     ConcurrentHashMap.KeySetView<Polygon, Boolean> polygons = ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.KeySetView<Particle, Boolean> particles = ConcurrentHashMap.newKeySet();
     Player player;
     int score;
     int scoreForNextRoom;
@@ -101,6 +102,9 @@ public class Room extends Polygon {
         for (Polygon polygon: polygons) {
             polygon.draw(g2d);
             polygon.fill(g2d);
+        }
+        for (Particle particle: particles) {
+            particle.draw(g2d);
         }
         for (Projectile projectile : projectiles) {
             projectile.draw(g2d);

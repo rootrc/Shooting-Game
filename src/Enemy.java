@@ -60,6 +60,9 @@ class Enemy extends Entity {
     void shoot() {
         weapon.shoot(centroid, direction);
         attemptMovement(weapon.recoil, direction);
+        Casing casing = new Casing(centroid, direction + Math.PI / 2 + Math.PI / 10 * Math.random() - Math.PI / 20, 20, 40, 4, 30, 100);
+        casing.color = new Color(175, 156, 96);
+        casing.width = 3;
         muzzleFlashing = true;
         double muzzleDirection = direction;
         Timer timer = new Timer();

@@ -164,6 +164,7 @@ class Player extends Entity {
                     Game.getInstance().panel.xAdjust = 0;
                     Game.getInstance().panel.yAdjust = 0;
                     timer2.cancel();
+                    timer2.purge();
                 }
             }
         };
@@ -182,6 +183,10 @@ class Player extends Entity {
                 }
                 weapon.shoot(centroid, direction);
                 attemptMovement(weapon.recoil, direction);
+                Casing casing = new Casing(centroid,
+                        direction + Math.PI / 2 + Math.PI / 10 * Math.random() - Math.PI / 20, 25, 50, 4, 40, 200);
+                casing.color = new Color(175, 156, 96);
+                casing.width = 3;
                 muzzleFlashing = true;
                 double muzzleDirection = direction;
                 Timer timer = new Timer();
