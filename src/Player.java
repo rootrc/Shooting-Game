@@ -35,6 +35,31 @@ class Player extends Entity {
         weapon = weapon1;
     }
 
+    public Player clone() {
+        Point[] points = new Point[length];
+        for (int i = 0; i < length; i++) {
+            points[i] = this.points[i].clone();
+        }
+        Player player = new Player(points);
+        player.a = a;
+        player.d = d;
+        player.s = s;
+        player.w = w;
+        player.shoot = shoot;
+        player.shooting = shooting;
+        player.shooting = shooting;
+        player.speed = speed;
+        player.moveSpeed = moveSpeed;
+        player.xMovement = xMovement;
+        player.yMovement = yMovement;
+        player.muzzleFlash = muzzleFlash;
+        player.muzzleFlashing = muzzleFlashing;
+        player.weapon = weapon;
+        player.weapon1 = weapon1;
+        player.weapon2 = weapon2;
+        return new Player(points);
+    }
+
     void draw(Graphics2D g2d) {
         if (muzzleFlashing) {
             muzzleFlash.draw(g2d);
@@ -73,7 +98,7 @@ class Player extends Entity {
     void move() {
         Point mouseLocation = Game.getInstance().panel.mouseLocation();
         double radian = new Line(centroid, mouseLocation).caculateRadian();
-        Polygon polygon = this.clone();
+        Polygon polygon = clone();
         if (xMovement == 0 || yMovement == 0) {
             polygon.move(xMovement * speed, yMovement * speed);
         } else {
@@ -126,7 +151,7 @@ class Player extends Entity {
         timer.cancel();
         timer.purge();
         Game.getInstance().room.entities.remove(this);
-        Polygon corpse = this.clone();
+        Polygon corpse = clone();
         corpse.color = new Color(139, 0, 0);
         Timer timer = new Timer();
         TimerTask timertask = new TimerTask() {
@@ -181,7 +206,7 @@ class Player extends Entity {
                     return;
                 }
                 weapon.shoot(centroid, direction);
-                attemptMovement(weapon.recoil, direction);
+                attemptMove(weapon.recoil, direction);
                 Casing casing = new Casing(centroid,
                         direction + Math.PI / 2 + Math.PI / 10 * Math.random() - Math.PI / 20, 25, 50, 4, 40, 200);
                 casing.color = new Color(175, 156, 96);
@@ -194,10 +219,9 @@ class Player extends Entity {
 
                     public void run() {
                         count++;
-                        muzzleFlash.p1 = centroid.clone();
-                        muzzleFlash.p2 = centroid.translate(
-                                -(20 + weapon.projectile.length / 2) * Math.cos(muzzleDirection),
-                                (20 + weapon.projectile.length / 2) * Math.sin(muzzleDirection));
+                        muzzleFlash.setP1(centroid.clone());
+                        muzzleFlash
+                                .setP2(centroid.directionTranslate(20 + weapon.projectile.length / 2, muzzleDirection));
                         if (count == 3) {
                             muzzleFlashing = false;
                             timer.cancel();

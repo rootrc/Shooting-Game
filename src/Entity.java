@@ -1,7 +1,7 @@
 import java.awt.Color;
 import java.util.Timer;
 
-class Entity extends Polygon {
+abstract class Entity extends Polygon {
     Timer timer = new Timer();
     double direction;
     int health;
@@ -13,48 +13,27 @@ class Entity extends Polygon {
         super(points);
     }
 
-    public Entity clone() {
-        Point[] points = new Point[length];
-        for (int i = 0; i < length; i++) {
-            points[i] = this.points[i].clone();
-        }
-        Entity entity = new Entity(points);
-        entity.color = color;
-        entity.health = health;
-        entity.corpseLength = corpseLength;
-        return entity;
-    }
-
-    void attemptMovement(int distance, double direction) {
+    void attemptMove(int distance, double direction) {
         if (!Game.getInstance().room
-                .intersects(this.translate(distance * Math.cos(direction),
-                        -distance * Math.sin(direction)))) {
-            move(distance * Math.cos(direction),
-                    -distance * Math.sin(direction));
+                .intersects(directionTranslate(-distance, direction))) {
+                    directionMove(-distance, direction);
         } else {
             int l = 0;
             int r = distance;
             while (l < r) {
                 int m = (l + r + 1) / 2;
                 if (!Game.getInstance().room
-                        .intersects(this.translate(m * Math.cos(direction),
-                                -m * Math.sin(direction)))) {
+                        .intersects(directionTranslate(-m, direction))) {
                     l = m;
                 } else {
                     r = m - 1;
                 }
             }
-            move(l * Math.cos(direction),
-                    -l * Math.sin(direction));
+            directionMove(-l, direction);
         }
     }
-
-    // for inheritance
-    void hit() {
-
-    }
-
-    void death() {
-
-    }
+    
+    public abstract Entity clone();
+    abstract void hit();
+    abstract void death();
 }

@@ -1,12 +1,11 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-class Polygon {
+class Polygon extends Geo<Polygon> {
     int length;
     Point[] points;
     Line[] lines;
     Point centroid = new Point(0, 0);
-    Color color = Color.black;
 
     Polygon(Point[] points) {
         if (points == null) {
@@ -21,22 +20,14 @@ class Polygon {
         computeCentroid();
     }
 
-    void setBorderColor(Color color) {
-        for (Line line : lines) {
-            line.color = color;
+    public Polygon clone() {
+        Point[] points = new Point[length];
+        for (int i = 0; i < length; i++) {
+            points[i] = this.points[i].clone();
         }
-        for (Point point : points) {
-            point.color = color;
-        }
-    }
-
-    void setWidth(int width) {
-        for (Line line : lines) {
-            line.width = width;
-        }
-        for (Point point : points) {
-            point.width = width;
-        }
+        Polygon polygon = new Polygon(points);
+        polygon.setColor(color);
+        return polygon;
     }
 
     void draw(Graphics2D g2d) {
@@ -49,94 +40,41 @@ class Polygon {
         int[] xPoints = new int[length];
         int[] yPoints = new int[length];
         for (int i = 0; i < length; i++) {
-            xPoints[i] = (int) Math.round(points[i].x + Game.getInstance().panel.xAdjust);
-            yPoints[i] = (int) Math.round(points[i].y + Game.getInstance().panel.yAdjust);
+            xPoints[i] = (int) Math.round(points[i].getX() + Game.getInstance().panel.xAdjust);
+            yPoints[i] = (int) Math.round(points[i].getY() + Game.getInstance().panel.yAdjust);
         }
         g2d.setColor(color);
         g2d.fillPolygon(xPoints, yPoints, length);
-    }
-
-    public Polygon clone() {
-        Point[] points = new Point[length];
-        for (int i = 0; i < length; i++) {
-            points[i] = this.points[i].clone();
-        }
-        Polygon polygon = new Polygon(points);
-        polygon.color = color; 
-        return polygon;
-    }
-
-    Polygon translate(int x, int y) {
-        Point[] points = new Point[length];
-        for (int i = 0; i < length; i++) {
-            points[i] = this.points[i].translate(x, y);
-        }
-        Polygon polygon = new Polygon(points);
-        polygon.color = color; 
-        return new Polygon(points);
-    }
-
-    Polygon translate(double x, double y) {
-        Point[] points = new Point[length];
-        for (int i = 0; i < length; i++) {
-            points[i] = this.points[i].translate(x, y);
-        }
-        Polygon polygon = new Polygon(points);
-        polygon.color = color; 
-        return new Polygon(points);
-    }
-
-    void move(int x, int y) {
-        moveX(x);
-        moveY(y);
-    }
-
-    void move(double x, double y) {
-        moveX(x);
-        moveY(y);
-    }
-
-    void moveX(int x) {
-        for (Point point : points) {
-            point.moveX(x);
-        }
-        centroid.x += x;
     }
 
     void moveX(double x) {
         for (Point point : points) {
             point.moveX(x);
         }
-        centroid.x += x;
-    }
-
-    void moveY(int y) {
-        for (Point point : points) {
-            point.moveY(y);
-        }
-        centroid.y += y;
+        centroid.moveX(x);
     }
 
     void moveY(double y) {
         for (Point point : points) {
             point.moveY(y);
         }
-        centroid.y += y;
+        centroid.moveY(y);
     }
 
-    Point computeCentroid() {
-        double signedArea = 0.0;
-        double a = 0.0;
+    void setBorderColor(Color color) {
         for (Line line : lines) {
-            a = line.p1.x * line.p2.y - line.p2.x * line.p1.y;
-            signedArea += a;
-            centroid.x += (line.p1.x + line.p2.x) * a;
-            centroid.y += (line.p1.y + line.p2.y) * a;
+            line.setBorderColor(color);
         }
-        signedArea /= 2;
-        centroid.x /= 6.0 * signedArea;
-        centroid.y /= 6.0 * signedArea;
-        return centroid;
+    }
+
+    void setColor(Color color) {
+        this.color = color;
+    }
+
+    void setWidth(int width) {
+        for (Line line : lines) {
+            line.setWidth(width);
+        }
     }
 
     boolean intersects(Line line) {
@@ -147,17 +85,6 @@ class Polygon {
         }
         return false;
     }
-
-    // HashSet<Point> intersectionPoint(Line line) {
-    //     HashSet<Point> res = new HashSet<>();
-    //     for (Line line2 : lines) {
-    //         Point point = line2.intersectionPoint(line);
-    //         if (point != null) {
-    //             res.add(line2.intersectionPoint(line));
-    //         }
-    //     }
-    //     return res;
-    // }
 
     boolean intersects(Polygon polygon) {
         for (Line line1 : lines) {
@@ -170,31 +97,34 @@ class Polygon {
         return false;
     }
 
-    void rotate(double radian) {
-        for (Point point : points) {
-            point.rotate(radian, centroid);
-        }
-    }
-
     void rotate(double radian, Point pivot) {
         for (Point point : points) {
             point.rotate(radian, pivot);
         }
     }
 
+    void rotate(double radian) {
+        rotate(radian, centroid);
+    }
+
     Polygon getRotation(double radian) {
-        Point[] points = new Point[length];
-        for (int i = 0; i < length; i++) {
-            points[i] = this.points[i].getRotation(radian, centroid);
-        }
+        Polygon polygon = clone();
+        polygon.rotate(radian);
         return new Polygon(points);
     }
 
-    // static Point[] emptyPointArray() {
-    //     Point[] points = new Point[2];
-    //     for (int i = 0; i < 2; i++) {
-    //         points[i] = new Point(0, 0);
-    //     }
-    //     return points;
-    // }
+    Point computeCentroid() {
+        double signedArea = 0.0;
+        double a = 0.0;
+        for (Line line : lines) {
+            a = line.getP1().getX() * line.getP2().getY() - line.getP2().getX() * line.getP1().getY();
+            signedArea += a;
+            centroid.moveX((line.getP1().getX() + line.getP2().getX()) * a);
+            centroid.moveY((line.getP1().getY() + line.getP2().getY()) * a);
+        }
+        signedArea /= 2;
+        centroid.setX(centroid.getX() / (6.0 * signedArea));
+        centroid.setY(centroid.getY() / (6.0 * signedArea));
+        return centroid;
+    }
 }

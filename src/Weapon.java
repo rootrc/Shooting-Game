@@ -1,9 +1,6 @@
-import java.awt.Color;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
-import java.util.Timer;
-import java.util.TimerTask;
 
 class Weapon {
 
@@ -58,10 +55,8 @@ class Weapon {
 
     void shoot(Point centroid, double direction) {
         direction += random * Math.random() - random / 2;
-        projectile.p1 = centroid.translate(-20 * Math.cos(direction),
-                20 * Math.sin(direction));
-        projectile.p2 = centroid.translate((-20 - projectile.length) * Math.cos(direction),
-                (20 + projectile.length) * Math.sin(direction));
+        projectile.setP1(centroid.directionTranslate(20, direction));
+        projectile.setP2(centroid.directionTranslate(20 + projectile.length, direction));
         projectile.shoot(direction);
     }
 }

@@ -7,8 +7,6 @@ import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.swing.JButton;
 import javax.swing.SwingUtilities;
 
 import java.awt.Color;
@@ -20,13 +18,13 @@ public class Room extends Polygon {
     Timer timer = new Timer();
     ConcurrentHashMap.KeySetView<Projectile, Boolean> projectiles = ConcurrentHashMap.newKeySet();
     ConcurrentHashMap.KeySetView<Entity, Boolean> entities = ConcurrentHashMap.newKeySet();
-    HashMap<Enemy, Double> enemySpawns = new HashMap<>();
+    HashMap<Enemy<?>, Double> enemySpawns = new HashMap<>();
     ConcurrentHashMap.KeySetView<Polygon, Boolean> polygons = ConcurrentHashMap.newKeySet();
     ConcurrentHashMap.KeySetView<Particle, Boolean> particles = ConcurrentHashMap.newKeySet();
     Player player;
     int score;
     int scoreForNextRoom;
-    
+
     Room(Point[] points, int id) {
         super(points);
         color = Color.white;
@@ -38,7 +36,7 @@ public class Room extends Polygon {
         loadRoom(id);
     }
 
-    //temporary
+    // temporary
     void loadRoom(int id) {
         this.id = id;
         enemySpawns.clear();
@@ -83,7 +81,7 @@ public class Room extends Polygon {
         player.process();
         TimerTask timertask = new TimerTask() {
             public void run() {
-                for (Map.Entry<Enemy, Double> e : enemySpawns.entrySet()) {
+                for (Map.Entry<Enemy<?>, Double> e : enemySpawns.entrySet()) {
                     if (Math.random() * e.getValue() < 1) {
                         addEnemy(e.getKey());
                     }
@@ -99,11 +97,11 @@ public class Room extends Polygon {
     void draw(Graphics2D g2d) {
         super.draw(g2d);
         super.fill(g2d);
-        for (Polygon polygon: polygons) {
+        for (Polygon polygon : polygons) {
             polygon.draw(g2d);
             polygon.fill(g2d);
         }
-        for (Particle particle: particles) {
+        for (Particle particle : particles) {
             particle.draw(g2d);
         }
         for (Projectile projectile : projectiles) {
@@ -115,34 +113,37 @@ public class Room extends Polygon {
         }
         g2d.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
         g2d.setColor(Color.black);
-        g2d.drawString(Integer.toString(Math.max(player.health, 0)), 15 + Game.getInstance().panel.xAdjust, 30 + Game.getInstance().panel.yAdjust);
+        g2d.drawString(Integer.toString(Math.max(player.health, 0)), 15 + Game.getInstance().panel.xAdjust,
+                30 + Game.getInstance().panel.yAdjust);
         g2d.drawString(Integer.toString(score),
-                770 - SwingUtilities.computeStringWidth(g2d.getFontMetrics(), Integer.toString(score)) + Game.getInstance().panel.xAdjust, 30 + Game.getInstance().panel.yAdjust);
+                770 - SwingUtilities.computeStringWidth(g2d.getFontMetrics(), Integer.toString(score))
+                        + Game.getInstance().panel.xAdjust,
+                30 + Game.getInstance().panel.yAdjust);
     }
 
-    void addEnemy(Enemy enemy) {
+    void addEnemy(Enemy<?> enemy) {
         double x, y;
         if (Math.random() < 0.5) {
-            x = (777 - 20 - enemy.points[0].x) * Math.random() + 10;
-            if (30 < x && x < 777 - 50 - enemy.points[0].x) {
+            x = (777 - 20 - enemy.points[0].getX()) * Math.random() + 10;
+            if (30 < x && x < 777 - 50 - enemy.points[0].getX()) {
                 if (Math.random() < 0.5) {
                     y = (50 - 10) * Math.random() + 10;
                 } else {
-                    y = (50 - 10) * Math.random() + 700 - (50 - 10) - 10 - enemy.points[0].y;
+                    y = (50 - 10) * Math.random() + 700 - (50 - 10) - 10 - enemy.points[0].getY();
                 }
             } else {
-                y = (700 - 20 - enemy.points[0].y) * Math.random() + 10;
+                y = (700 - 20 - enemy.points[0].getY()) * Math.random() + 10;
             }
         } else {
-            y = (700 - 20 - enemy.points[0].y) * Math.random() + 10;
-            if (50 < y && y < 700 - 50 - enemy.points[0].y) {
+            y = (700 - 20 - enemy.points[0].getY()) * Math.random() + 10;
+            if (50 < y && y < 700 - 50 - enemy.points[0].getY()) {
                 if (Math.random() < 0.5) {
                     x = (50 - 10) * Math.random() + 10;
                 } else {
-                    x = (50 - 10) * Math.random() + 777 - (50 - 10) - 10 - enemy.points[0].x;
+                    x = (50 - 10) * Math.random() + 777 - (50 - 10) - 10 - enemy.points[0].getX();
                 }
             } else {
-                x = (777 - 20 - enemy.points[0].x) * Math.random() + 10;
+                x = (777 - 20 - enemy.points[0].getX()) * Math.random() + 10;
             }
         }
         enemy = enemy.translate(x, y);

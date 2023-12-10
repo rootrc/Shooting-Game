@@ -1,7 +1,7 @@
 import java.util.Timer;
 import java.util.TimerTask;
 
-class Projectile extends Line {
+abstract class Projectile extends Line {
     boolean isPlayer;
     int damage;
     int piercing;
@@ -11,9 +11,9 @@ class Projectile extends Line {
         super(p1, p2);
     }
 
-    // for inheritance
-    void shoot(double direction) {
-    }
+    abstract public Projectile clone();
+
+    abstract void shoot(double direction);
 }
 
 class Bullet extends Projectile {
@@ -24,7 +24,7 @@ class Bullet extends Projectile {
     }
 
     public Bullet clone() {
-        Bullet bullet = new Bullet(p1, p2);
+        Bullet bullet = new Bullet(getP1(), getP2());
         bullet.isPlayer = isPlayer;
         bullet.damage = damage;
         bullet.piercing = piercing;
@@ -34,22 +34,18 @@ class Bullet extends Projectile {
     }
 
     void shoot(double direction) {
-        Bullet bullet = this.clone();
+        Bullet bullet = clone();
         Timer timer = new Timer();
         TimerTask timertask = new TimerTask() {
             public void run() {
-                bullet.p1.x -= speed * Math.cos(direction);
-                bullet.p1.y += speed * Math.sin(direction);
-                bullet.p2.x -= speed * Math.cos(direction);
-                bullet.p2.y += speed * Math.sin(direction);
-                if (Game.getInstance().room.intersects(new Line(bullet.p2, bullet.p2
-                        .translate(-bullet.speed * Math.cos(direction),
-                                bullet.speed * Math.sin(direction))))) {
+                bullet.directionMove(speed, direction);
+                if (Game.getInstance().room.intersects(new Line(bullet.getP2(), bullet.getP2()
+                        .directionTranslate(-bullet.speed, direction)))) {
                     Game.getInstance().room.projectiles.remove(bullet);
                     timer.cancel();
                     timer.purge();
-                } else if (!(Game.getInstance().room.points[0].x < p2.x && p2.x < Game.getInstance().room.points[2].x
-                        && Game.getInstance().room.points[0].y < p2.y && p2.y < Game.getInstance().room.points[2].y)) {
+                } else if (!(Game.getInstance().room.points[0].getX() < getP2().getX() && getP2().getX() < Game.getInstance().room.points[2].getX()
+                        && Game.getInstance().room.points[0].getY() < getP2().getY() && getP2().getY() < Game.getInstance().room.points[2].getY())) {
                     Game.getInstance().room.projectiles.remove(bullet);
                     timer.cancel();
                     timer.purge();
@@ -59,10 +55,9 @@ class Bullet extends Projectile {
                         continue;
                     }
                     if (entity.intersects(
-                            new Line(bullet.p2, bullet.p2.translate(-bullet.speed * Math.cos(direction),
-                                    bullet.speed * Math.sin(direction))))) {
+                            new Line(bullet.getP2(), bullet.getP2().directionTranslate(-bullet.speed, direction)))) {
                         entity.health -= bullet.damage;
-                        entity.attemptMovement(-bullet.knockback, bullet.caculateRadian());
+                        entity.attemptMove(-bullet.knockback, bullet.caculateRadian());
                         if (entity.health > 0) {
                             entity.hit();
                         } else {
@@ -92,7 +87,7 @@ class LimitedBullet extends Projectile {
     }
 
     public LimitedBullet clone() {
-        LimitedBullet limitedBullet = new LimitedBullet(p1, p2);
+        LimitedBullet limitedBullet = new LimitedBullet(getP1(), getP2());
         limitedBullet.isPlayer = isPlayer;
         limitedBullet.damage = damage;
         limitedBullet.piercing = piercing;
@@ -104,26 +99,22 @@ class LimitedBullet extends Projectile {
 
     void shoot(double direction) {
         Timer timer = new Timer();
-        LimitedBullet limitedBullet = this.clone();
+        LimitedBullet limitedBullet = clone();
         TimerTask timertask = new TimerTask() {
             int count = 0;
 
             public void run() {
-                limitedBullet.p1.x -= (speed + (double) limitedBullet.length
-                        / (limitedBullet.duration * limitedBullet.duration) * (2 * count - 1)) * Math.cos(direction);
-                limitedBullet.p1.y += (speed + (double) limitedBullet.length
-                        / (limitedBullet.duration * limitedBullet.duration) * (2 * count - 1)) * Math.sin(direction);
-                limitedBullet.p2.x -= speed * Math.cos(direction);
-                limitedBullet.p2.y += speed * Math.sin(direction);
+                limitedBullet.getP1().directionMove(speed + (double) limitedBullet.length
+                        / (limitedBullet.duration * limitedBullet.duration) * (2 * count - 1), direction);
+                limitedBullet.getP2().directionMove(speed, direction);
                 count++;
-                if (Game.getInstance().room.intersects(new Line(limitedBullet.p2, limitedBullet.p2
-                        .translate(-limitedBullet.speed * Math.cos(direction),
-                                limitedBullet.speed * Math.sin(direction))))) {
+                if (Game.getInstance().room.intersects(new Line(limitedBullet.getP2(), limitedBullet.getP2()
+                        .directionTranslate(-limitedBullet.speed, direction)))) {
                     Game.getInstance().room.projectiles.remove(limitedBullet);
                     timer.cancel();
                     timer.purge();
-                } else if (!(Game.getInstance().room.points[0].x < p2.x && p2.x < Game.getInstance().room.points[2].x
-                        && Game.getInstance().room.points[0].y < p2.y && p2.y < Game.getInstance().room.points[2].y)) {
+                } else if (!(Game.getInstance().room.points[0].getX() < getP2().getX() && getP2().getX() < Game.getInstance().room.points[2].getX()
+                        && Game.getInstance().room.points[0].getY() < getP2().getY() && getP2().getY() < Game.getInstance().room.points[2].getY())) {
                     Game.getInstance().room.projectiles.remove(limitedBullet);
                     timer.cancel();
                     timer.purge();
@@ -137,10 +128,10 @@ class LimitedBullet extends Projectile {
                         continue;
                     }
                     if (entity.intersects(
-                            new Line(limitedBullet.p2, limitedBullet.p2.translate(-limitedBullet.speed * Math.cos(direction),
-                                    limitedBullet.speed * Math.sin(direction))))) {
+                            new Line(limitedBullet.getP2(),
+                                    limitedBullet.getP2().directionTranslate(-limitedBullet.speed, direction)))) {
                         entity.health -= limitedBullet.damage;
-                        entity.attemptMovement(-limitedBullet.knockback, limitedBullet.caculateRadian());
+                        entity.attemptMove(-limitedBullet.knockback, limitedBullet.caculateRadian());
                         if (entity.health > 0) {
                             entity.hit();
                         } else {
