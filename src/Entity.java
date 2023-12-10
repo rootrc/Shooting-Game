@@ -25,27 +25,6 @@ class Entity extends Polygon {
         return entity;
     }
 
-    void process() {
-        for (Projectile projectile : Game.getInstance().room.projectiles) {
-            if (getClass() != Player.class && !projectile.isPlayer) {
-                continue;
-            }
-            if (intersects(projectile)) {
-                health -= projectile.damage;
-                attemptMovement(-projectile.knockback, projectile.caculateRadian());
-                if (health > 0) {
-                    hit();
-                } else {
-                    death();
-                }
-                projectile.piercing--;
-                if (projectile.piercing <= 0) {
-                    Game.getInstance().room.projectiles.remove(projectile);
-                }
-            }
-        }
-    }
-
     void attemptMovement(int distance, double direction) {
         if (!Game.getInstance().room
                 .intersects(this.translate(distance * Math.cos(direction),
@@ -72,7 +51,7 @@ class Entity extends Polygon {
 
     // for inheritance
     void hit() {
-   
+
     }
 
     void death() {

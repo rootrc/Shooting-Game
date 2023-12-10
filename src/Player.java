@@ -45,7 +45,6 @@ class Player extends Entity {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Player.super.process();
                 for (Entity entity : Game.getInstance().room.entities) {
                     if (Player.this == entity) {
                         continue;

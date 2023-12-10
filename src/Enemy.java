@@ -20,11 +20,7 @@ class Enemy extends Entity {
         super(points);
     }
 
-    // for inheritance
-    Enemy translate(double x, double y) {
-        return this;
-    }
-
+    
     void asdf(Scanner data) throws IOException {
         muzzleFlash = new Line(new Point(0, 0), new Point(0, 0));
         muzzleFlash.color = new Color(247, 241, 181);
@@ -49,7 +45,15 @@ class Enemy extends Entity {
         health = Integer.parseInt(data.next());
         moveSpeed = Double.parseDouble(data.next());
     }
+    // for inheritance
+    void process() {
+        
+    }
 
+    // for inheritance
+    Enemy translate(double x, double y) {
+        return this;
+    }
     void draw(Graphics2D g2d) {
         if (muzzleFlashing) {
             muzzleFlash.draw(g2d);
@@ -200,7 +204,6 @@ class Chaser extends Enemy {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Chaser.super.process();
                 Point playerCentroid = Game.getInstance().room.player.centroid;
                 double radian = new Line(centroid, playerCentroid).caculateRadian();
                 rotate(direction - radian);
@@ -246,7 +249,6 @@ class Rifle extends Enemy {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Rifle.super.process();
                 Point playerCentroid = Game.getInstance().room.player.centroid;
                 Line line = new Line(centroid, playerCentroid);
                 double radian = line.caculateRadian();
@@ -309,7 +311,6 @@ class Sniper extends Enemy {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Sniper.super.process();
                 Point playerCentroid = Game.getInstance().room.player.centroid;
                 Line line = new Line(centroid, playerCentroid);
                 double radian = line.caculateRadian();
@@ -318,11 +319,11 @@ class Sniper extends Enemy {
                 if (line.length >= moveDistance) {
                     move(-speed * Math.cos(direction), speed * Math.sin(direction));
                 } else if (Sniper.super.translate(speed * Math.cos(direction), -speed * Math.sin(direction))
-                        .intersects(Game.getInstance().room)) {
+                        .intersects(Game.getInstance().room.boundingBox(20))) {
                     move(-moveSpeed * Math.cos(direction), moveSpeed * Math.sin(direction));
                 } else if (runDistance >= line.length) {
                     if (!Sniper.super.translate(speed * Math.cos(direction), -speed * Math.sin(direction))
-                            .intersects(Game.getInstance().room.boundingBox(20))) {
+                            .intersects(Game.getInstance().room.boundingBox(30))) {
                         move(speed * Math.cos(direction), -speed * Math.sin(direction));
                     }
                 }
@@ -340,7 +341,7 @@ class Sniper extends Enemy {
                 }
                 if (runDistance <= length && length <= shootDistance
                         || Sniper.super.translate(speed * Math.cos(direction), -speed * Math.sin(direction))
-                                .intersects(Game.getInstance().room.boundingBox(20))) {
+                                .intersects(Game.getInstance().room.boundingBox(30))) {
                     speed = moveSpeed * weapon.shootMovementSpeed;
                     shoot();
                 } else {
@@ -386,7 +387,6 @@ class Machine extends Enemy {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Machine.super.process();
                 Point playerCentroid = Game.getInstance().room.player.centroid;
                 Line line = new Line(centroid, playerCentroid);
                 double radian = line.caculateRadian();
@@ -453,7 +453,6 @@ class Sharp extends Enemy {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Sharp.super.process();
                 Point playerCentroid = Game.getInstance().room.player.centroid;
                 Line line = new Line(centroid, playerCentroid);
                 double radian = line.caculateRadian();

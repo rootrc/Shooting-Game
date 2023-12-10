@@ -10,7 +10,8 @@ class Projectile extends Line {
     Projectile(Point p1, Point p2) {
         super(p1, p2);
     }
-    //for inheritance
+
+    // for inheritance
     void shoot(double direction) {
     }
 }
@@ -33,18 +34,47 @@ class Bullet extends Projectile {
     }
 
     void shoot(double direction) {
-        Timer timer = new Timer();
         Bullet bullet = this.clone();
+        Timer timer = new Timer();
         TimerTask timertask = new TimerTask() {
             public void run() {
                 bullet.p1.x -= speed * Math.cos(direction);
                 bullet.p1.y += speed * Math.sin(direction);
                 bullet.p2.x -= speed * Math.cos(direction);
                 bullet.p2.y += speed * Math.sin(direction);
-                if (Game.getInstance().room.intersects(bullet)) {
+                if (Game.getInstance().room.intersects(new Line(bullet.p2, bullet.p2
+                        .translate(-bullet.speed * Math.cos(direction),
+                                bullet.speed * Math.sin(direction))))) {
                     Game.getInstance().room.projectiles.remove(bullet);
                     timer.cancel();
                     timer.purge();
+                } else if (!(Game.getInstance().room.points[0].x < p2.x && p2.x < Game.getInstance().room.points[2].x
+                        && Game.getInstance().room.points[0].y < p2.y && p2.y < Game.getInstance().room.points[2].y)) {
+                    Game.getInstance().room.projectiles.remove(bullet);
+                    timer.cancel();
+                    timer.purge();
+                }
+                for (Entity entity : Game.getInstance().room.entities) {
+                    if (entity.getClass() != Player.class && !bullet.isPlayer) {
+                        continue;
+                    }
+                    if (entity.intersects(
+                            new Line(bullet.p2, bullet.p2.translate(-bullet.speed * Math.cos(direction),
+                                    bullet.speed * Math.sin(direction))))) {
+                        entity.health -= bullet.damage;
+                        entity.attemptMovement(-bullet.knockback, bullet.caculateRadian());
+                        if (entity.health > 0) {
+                            entity.hit();
+                        } else {
+                            entity.death();
+                        }
+                        bullet.piercing--;
+                        if (bullet.piercing <= 0) {
+                            Game.getInstance().room.projectiles.remove(bullet);
+                            timer.cancel();
+                            timer.purge();
+                        }
+                    }
                 }
             }
         };
@@ -69,7 +99,7 @@ class LimitedBullet extends Projectile {
         limitedBullet.speed = speed;
         limitedBullet.knockback = knockback;
         limitedBullet.duration = duration;
-        return limitedBullet;    
+        return limitedBullet;
     }
 
     void shoot(double direction) {
@@ -77,16 +107,52 @@ class LimitedBullet extends Projectile {
         LimitedBullet limitedBullet = this.clone();
         TimerTask timertask = new TimerTask() {
             int count = 0;
+
             public void run() {
-                limitedBullet.p1.x -= (speed + (double) limitedBullet.length / (limitedBullet.duration * limitedBullet.duration) * (2 * count - 1)) * Math.cos(direction);
-                limitedBullet.p1.y += (speed + (double) limitedBullet.length / (limitedBullet.duration * limitedBullet.duration) * (2 * count - 1)) * Math.sin(direction);
+                limitedBullet.p1.x -= (speed + (double) limitedBullet.length
+                        / (limitedBullet.duration * limitedBullet.duration) * (2 * count - 1)) * Math.cos(direction);
+                limitedBullet.p1.y += (speed + (double) limitedBullet.length
+                        / (limitedBullet.duration * limitedBullet.duration) * (2 * count - 1)) * Math.sin(direction);
                 limitedBullet.p2.x -= speed * Math.cos(direction);
                 limitedBullet.p2.y += speed * Math.sin(direction);
                 count++;
-                if (Game.getInstance().room.intersects(limitedBullet) || count == limitedBullet.duration) {
+                if (Game.getInstance().room.intersects(new Line(limitedBullet.p2, limitedBullet.p2
+                        .translate(-limitedBullet.speed * Math.cos(direction),
+                                limitedBullet.speed * Math.sin(direction))))) {
                     Game.getInstance().room.projectiles.remove(limitedBullet);
                     timer.cancel();
                     timer.purge();
+                } else if (!(Game.getInstance().room.points[0].x < p2.x && p2.x < Game.getInstance().room.points[2].x
+                        && Game.getInstance().room.points[0].y < p2.y && p2.y < Game.getInstance().room.points[2].y)) {
+                    Game.getInstance().room.projectiles.remove(limitedBullet);
+                    timer.cancel();
+                    timer.purge();
+                } else if (count == limitedBullet.duration) {
+                    Game.getInstance().room.projectiles.remove(limitedBullet);
+                    timer.cancel();
+                    timer.purge();
+                }
+                for (Entity entity : Game.getInstance().room.entities) {
+                    if (entity.getClass() != Player.class && !limitedBullet.isPlayer) {
+                        continue;
+                    }
+                    if (entity.intersects(
+                            new Line(limitedBullet.p2, limitedBullet.p2.translate(-limitedBullet.speed * Math.cos(direction),
+                                    limitedBullet.speed * Math.sin(direction))))) {
+                        entity.health -= limitedBullet.damage;
+                        entity.attemptMovement(-limitedBullet.knockback, limitedBullet.caculateRadian());
+                        if (entity.health > 0) {
+                            entity.hit();
+                        } else {
+                            entity.death();
+                        }
+                        limitedBullet.piercing--;
+                        if (limitedBullet.piercing <= 0) {
+                            Game.getInstance().room.projectiles.remove(limitedBullet);
+                            timer.cancel();
+                            timer.purge();
+                        }
+                    }
                 }
             }
         };
