@@ -1,13 +1,12 @@
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.awt.Graphics2D;
 import java.util.Timer;
 import java.util.TimerTask;
 
 import Geo.Line;
 import Geo.Point;
-import Geo.Polygon;
 
 class Player extends Entity {
     private boolean a, d, s, w;
@@ -27,14 +26,12 @@ class Player extends Entity {
         setColor(orginalColor);
         corpseTime = 200;
         weapon1 = new Weapon(this, "player_gun");
-        weapon1.projectile.isPlayer = true;
         weapon2 = new Weapon(this, "player_sniper");
-        weapon2.projectile.isPlayer = true;
         weapon = weapon1;
     }
 
     public Player clone() {
-        Player player = new Player(room, getPoints());
+        Player player = new Player(getRoom(), getPoints());
         player.a = a;
         player.d = d;
         player.s = s;
@@ -59,7 +56,7 @@ class Player extends Entity {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                for (Entity entity : room.entities) {
+                for (Entity entity : getRoom().entities) {
                     if (Player.this == entity) {
                         continue;
                     }
@@ -94,7 +91,7 @@ class Player extends Entity {
             player.move(xMovement * speed / Math.sqrt(2), yMovement * speed / Math.sqrt(2));
         }
         player.rotate(direction - radian);
-        if (!room.intersects(player)) {
+        if (!getRoom().intersects(player)) {
             if (xMovement == 0 || yMovement == 0) {
                 super.move(xMovement * speed, yMovement * speed);
             } else {
@@ -124,11 +121,11 @@ class Player extends Entity {
 
             public void run() {
                 count++;
-                room.xAdjust = (int) (10 * Math.random()) - 5;
-                room.yAdjust = (int) (10 * Math.random()) - 5;
+                getRoom().xAdjust = (int) (10 * Math.random()) - 5;
+                getRoom().yAdjust = (int) (10 * Math.random()) - 5;
                 if (count == 10) {
-                    room.xAdjust = 0;
-                    room.yAdjust = 0;
+                    getRoom().xAdjust = 0;
+                    getRoom().yAdjust = 0;
                     timer2.cancel();
                 }
             }
@@ -139,12 +136,12 @@ class Player extends Entity {
     protected void death() {
         timer.cancel();
         timer.purge();
-        room.entities.remove(this);
+        getRoom().entities.remove(this);
         new Corpse(this, corpseTime);
     }
 
     private void shoot() {
-        speed = (int) (moveSpeed * weapon.shootMoveSpeed);
+        speed = (int) (moveSpeed * weapon.getShootMoveSpeed());
         Timer timer = new Timer();
         TimerTask timertask = new TimerTask() {
             public void run() {
@@ -158,16 +155,16 @@ class Player extends Entity {
                 Timer timer = new Timer();
                 TimerTask timertask = new TimerTask() {
                     public void run() {
-                        room.xAdjust = 0;
-                        room.yAdjust = 0;
+                        getRoom().xAdjust = 0;
+                        getRoom().yAdjust = 0;
                     }
                 };
-                room.xAdjust = (int) (6 * Math.random()) - 3;
-                room.yAdjust = (int) (6 * Math.random()) - 3;
+                getRoom().xAdjust = (int) (6 * Math.random()) - 3;
+                getRoom().yAdjust = (int) (6 * Math.random()) - 3;
                 timer.schedule(timertask, Game.delay);
             }
         };
-        timer.schedule(timertask, 0, weapon.cooldown);
+        timer.schedule(timertask, 0, weapon.getCooldown());
         shooting = true;
     }
 

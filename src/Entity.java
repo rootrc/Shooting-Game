@@ -2,19 +2,17 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Timer;
 
-import Geo.Line;
 import Geo.Point;
 import Geo.Polygon;
 
 abstract class Entity extends Polygon {
-    Room room;
-    Timer timer = new Timer();
-    Weapon weapon;
-    double direction;
-    int health;
-    int value;
-    Color orginalColor;
-    int corpseTime;
+    private Room room;
+    protected Timer timer = new Timer();
+    protected Weapon weapon;
+    protected double direction;
+    protected int health;
+    protected Color orginalColor;
+    protected int corpseTime;
 
     Entity(Room room, Point[] points) {
         super(points);
@@ -37,8 +35,8 @@ abstract class Entity extends Polygon {
         return super.getPoints();
     }
 
-    void attemptMove(int distance, double direction) {
-        if (!room
+    protected void attemptMove(int distance, double direction) {
+        if (!getRoom()
                 .intersects(directionTranslate(-distance, direction))) {
             directionMove(-distance, direction);
         } else {
@@ -46,7 +44,7 @@ abstract class Entity extends Polygon {
             int r = distance;
             while (l < r) {
                 int m = (l + r + 1) / 2;
-                if (!room
+                if (!getRoom()
                         .intersects(directionTranslate(-m, direction))) {
                     l = m;
                 } else {
@@ -55,6 +53,14 @@ abstract class Entity extends Polygon {
             }
             directionMove(-l, direction);
         }
+    }
+
+    protected Room getRoom() {
+        return room;
+    }
+
+    protected Point getCentroid() {
+        return super.getCentroid();
     }
 
     public abstract Entity clone();

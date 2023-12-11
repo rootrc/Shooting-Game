@@ -9,13 +9,13 @@ import Geo.Point;
 
 class Weapon {
     private Entity entity;
-    int cooldown;
+    private int cooldown;
     private int shotCount;
     private int shotCooldown;
-    double shootMoveSpeed;
+    private double shootMoveSpeed;
     private int recoil;
     private double accuracy;
-    Projectile projectile;
+    private Projectile projectile;
 
     public Weapon(Entity entity, String name) {
         this.entity = entity;
@@ -32,7 +32,7 @@ class Weapon {
             String projectileType = Game.parseStr(data);
             switch (projectileType) {
                 case "bullet":
-                    Bullet bullet = new Bullet(entity.room);
+                    Bullet bullet = new Bullet(entity.getRoom());
                     bullet.damage = Game.parseInt(data);
                     bullet.piercing = Game.parseInt(data);
                     bullet.setWidth(Game.parseInt(data));
@@ -42,7 +42,7 @@ class Weapon {
                     projectile = bullet;
                     break;
                 case "limitedBullet":
-                    LimitedBullet limitedBullet = new LimitedBullet(entity.room);
+                    LimitedBullet limitedBullet = new LimitedBullet(entity.getRoom());
                     limitedBullet.damage = Game.parseInt(data);
                     limitedBullet.piercing = Game.parseInt(data);
                     limitedBullet.setWidth(Game.parseInt(data));
@@ -56,6 +56,9 @@ class Weapon {
         } catch (IOException e) {
             System.out.println("Weapon Loading Error");
             System.exit(-1);
+        }
+        if (name.contains("player")) {
+            projectile.isPlayer = true;
         }
     }
 
@@ -84,11 +87,19 @@ class Weapon {
     private void shot(Point centroid, double direction) {
         direction += accuracy * Math.random() - accuracy / 2;
         entity.attemptMove(recoil, direction);
-        Casing casing = new Casing(entity.room, entity.getCentroid(),
+        Casing casing = new Casing(entity.getRoom(), centroid,
                 direction + Math.PI / 2 + Math.PI / 10 * Math.random() - Math.PI / 20, 25, 50, 4, 40, 200);
         casing.setBorderColor(new Color(175, 156, 96));
         casing.setWidth(3);
-        new MuzzleFlash(entity);
+        new MuzzleFlash(entity, projectile.length);
         projectile.shoot(centroid, direction);
+    }
+
+    int getCooldown() {
+        return cooldown;
+    }
+
+    double getShootMoveSpeed() {
+        return shootMoveSpeed;
     }
 }

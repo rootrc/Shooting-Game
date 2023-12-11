@@ -8,15 +8,15 @@ import java.util.TimerTask;
 
 import Geo.Line;
 import Geo.Point;
-import Geo.Polygon;
 
 abstract class Enemy<T extends Enemy<T>> extends Entity {
-    int id;
-    double speed;
-    double moveSpeed;
-    double rotationSpeed;
+    protected int id;
+    protected double speed;
+    protected double moveSpeed;
+    protected double rotationSpeed;
+    private int value;
 
-    Enemy(Room room, Point[] points) {
+    private Enemy(Room room, Point[] points) {
         super(room, points);
     }
 
@@ -42,8 +42,23 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
     }
 
     protected void shoot() {
-        speed = moveSpeed * weapon.shootMoveSpeed;
+        speed = moveSpeed * weapon.getShootMoveSpeed();
         weapon.shoot();
+    }
+
+    protected double turnToPlayer() {
+        Point playerCentroid = getRoom().player.getCentroid();
+        Line line = new Line(getCentroid(), playerCentroid);
+        double radian = line.caculateRadian();
+        rotate(direction - radian);
+        direction = radian;
+        return line.getLength();
+    }
+
+    protected double distanceToPlayer() {
+        Point playerCentroid = getRoom().player.getCentroid();
+        Line line = new Line(getCentroid(), playerCentroid);
+        return line.getLength();
     }
 
     protected void hit() {
@@ -64,10 +79,10 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
     }
 
     protected void death() {
-        room.entities.remove(this);
+        getRoom().entities.remove(this);
         timer.cancel();
         timer.purge();
-        room.score += value;
+        getRoom().increaseScore(value);
         new Corpse(this, corpseTime);
     }
 
@@ -79,6 +94,10 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
         T t = clone();
         t.move(x, y);
         return t;
+    }
+
+    void directionMove() {
+        directionMove(speed, direction);
     }
 
     public abstract T clone();
@@ -109,18 +128,15 @@ class Chaser extends Enemy<Chaser> {
     }
 
     public Chaser clone() {
-        Chaser chaser = new Chaser(room, getPoints(), id);
+        Chaser chaser = new Chaser(getRoom(), getPoints(), id);
         return chaser;
     }
 
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = room.player.getCentroid();
-                double radian = new Line(getCentroid(), playerCentroid).caculateRadian();
-                rotate(direction - radian);
-                direction = radian;
-                directionMove(moveSpeed, direction);
+                turnToPlayer();
+                directionMove();
             }
         };
         timer.schedule(timertask, 0, Game.delay);
@@ -128,8 +144,8 @@ class Chaser extends Enemy<Chaser> {
 }
 
 class Rifle extends Enemy<Rifle> {
-    double shootDistance;
-    double moveDistance;
+    private double shootDistance;
+    private double moveDistance;
 
     Rifle(Room room, int id) {
         super(room, id);
@@ -154,7 +170,7 @@ class Rifle extends Enemy<Rifle> {
     }
 
     public Rifle clone() {
-        Rifle rifle = new Rifle(room, getPoints(), id);
+        Rifle rifle = new Rifle(getRoom(), getPoints(), id);
         rifle.shootDistance = shootDistance;
         rifle.moveDistance = moveDistance;
         return rifle;
@@ -163,13 +179,9 @@ class Rifle extends Enemy<Rifle> {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = room.player.getCentroid();
-                Line line = new Line(getCentroid(), playerCentroid);
-                double radian = line.caculateRadian();
-                rotate(direction - radian);
-                direction = radian;
-                if (line.getLength() >= moveDistance) {
-                    directionMove(speed, direction);
+                double distance = turnToPlayer();
+                if (distance >= moveDistance) {
+                    directionMove();
                 }
             }
         };
@@ -181,22 +193,22 @@ class Rifle extends Enemy<Rifle> {
     protected void shoot() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = room.player.getCentroid();
-                if (new Line(getCentroid(), playerCentroid).getLength() <= shootDistance) {
+                double distance = distanceToPlayer();
+                if (distance <= shootDistance) {
                     Rifle.super.shoot();
                 } else {
                     speed = moveSpeed;
                 }
             }
         };
-        timer.schedule(timertask, 0, weapon.cooldown);
+        timer.schedule(timertask, 0, weapon.getCooldown());
     }
 }
 
 class Sniper extends Enemy<Sniper> {
-    double shootDistance;
-    double moveDistance;
-    double runDistance;
+    private double shootDistance;
+    private double moveDistance;
+    private double runDistance;
 
     Sniper(Room room, int id) {
         super(room, id);
@@ -222,7 +234,7 @@ class Sniper extends Enemy<Sniper> {
     }
 
     public Sniper clone() {
-        Sniper sniper = new Sniper(room, getPoints(), id);
+        Sniper sniper = new Sniper(getRoom(), getPoints(), id);
         sniper.shootDistance = shootDistance;
         sniper.moveDistance = moveDistance;
         sniper.runDistance = runDistance;
@@ -232,19 +244,15 @@ class Sniper extends Enemy<Sniper> {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = room.player.getCentroid();
-                Line line = new Line(getCentroid(), playerCentroid);
-                double radian = line.caculateRadian();
-                rotate(direction - radian);
-                direction = radian;
-                if (line.getLength() >= moveDistance) {
-                    directionMove(speed, direction);
+                double distance = turnToPlayer();
+                if (distance >= moveDistance) {
+                    directionMove();
                 } else if (Sniper.this.directionTranslate(-speed, direction)
-                        .intersects(room.boundingBox(20))) {
+                        .intersects(getRoom().boundingBox(20))) {
                     directionMove(moveSpeed, direction);
-                } else if (runDistance >= line.getLength()) {
+                } else if (runDistance >= distance) {
                     if (!Sniper.this.directionTranslate(-speed, direction)
-                            .intersects(room.boundingBox(30))) {
+                            .intersects(getRoom().boundingBox(30))) {
                         directionMove(-speed, direction);
                     }
                 }
@@ -258,28 +266,27 @@ class Sniper extends Enemy<Sniper> {
     protected void shoot() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = room.player.getCentroid();
-                double length = new Line(getCentroid(), playerCentroid).getLength();
-                if (length > shootDistance) {
+                double distance = distanceToPlayer();
+                if (distance > shootDistance) {
                     speed = moveSpeed;
                     return;
                 }
-                if (runDistance <= length && length <= shootDistance
+                if (runDistance <= distance && distance <= shootDistance
                         || Sniper.this.directionTranslate(-speed, direction)
-                                .intersects(room.boundingBox(30))) {
+                                .intersects(getRoom().boundingBox(30))) {
                     Sniper.super.shoot();
                 } else {
                     speed = moveSpeed;
                 }
             }
         };
-        timer.schedule(timertask, 0, weapon.cooldown);
+        timer.schedule(timertask, 0, weapon.getCooldown());
     }
 }
 
 class Machine extends Enemy<Machine> {
-    double shootDistance;
-    double moveDistance;
+    private double shootDistance;
+    private double moveDistance;
 
     Machine(Room room, int id) {
         super(room, id);
@@ -304,7 +311,7 @@ class Machine extends Enemy<Machine> {
     }
 
     public Machine clone() {
-        Machine machine = new Machine(room, getPoints(), id);
+        Machine machine = new Machine(getRoom(), getPoints(), id);
         machine.shootDistance = shootDistance;
         machine.moveDistance = moveDistance;
         return machine;
@@ -313,38 +320,35 @@ class Machine extends Enemy<Machine> {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = room.player.getCentroid();
-                Line line = new Line(getCentroid(), playerCentroid);
-                double radian = line.caculateRadian();
-                rotate(direction - radian);
-                direction = radian;
-                if (line.getLength() >= moveDistance) {
-                    directionMove(speed, direction);
+                double distance = turnToPlayer();
+                if (distance >= moveDistance) {
+                    directionMove();
                 }
             }
         };
         timer.schedule(timertask, 0, Game.delay);
         shoot();
     }
+
     protected void shoot() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = room.player.getCentroid();
-                if (new Line(getCentroid(), playerCentroid).getLength() <= shootDistance) {
+                double distance = distanceToPlayer();
+                if (distance <= shootDistance) {
                     Machine.super.shoot();
                 } else {
                     speed = moveSpeed;
                 }
             }
         };
-        timer.schedule(timertask, 0, weapon.cooldown);
+        timer.schedule(timertask, 0, weapon.getCooldown());
     }
 }
 
 class Sharp extends Enemy<Sharp> {
-    double shootDistance;
-    double moveDistance;
-    int strafing;
+    private double shootDistance;
+    private double moveDistance;
+    private int strafing;
 
     Sharp(Room room, int id) {
         super(room, id);
@@ -374,7 +378,7 @@ class Sharp extends Enemy<Sharp> {
     }
 
     public Sharp clone() {
-        Sharp sharp = new Sharp(room, getPoints(), id);
+        Sharp sharp = new Sharp(getRoom(), getPoints(), id);
         sharp.shootDistance = shootDistance;
         sharp.moveDistance = moveDistance;
         sharp.strafing = strafing;
@@ -384,20 +388,16 @@ class Sharp extends Enemy<Sharp> {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = room.player.getCentroid();
-                Line line = new Line(getCentroid(), playerCentroid);
-                double radian = line.caculateRadian();
-                rotate(direction - radian);
-                direction = radian;
-                if (line.getLength() >= moveDistance) {
+                double distance = turnToPlayer();
+                if (distance >= moveDistance) {
                     directionMove(2 * speed / 3, direction);
-                    if (room
+                    if (getRoom()
                             .intersects(directionTranslate(speed, direction + strafing * Math.PI / 2))) {
                         strafing *= -1;
                     }
                     directionMove(speed / 3, direction);
                 } else {
-                    if (room
+                    if (getRoom()
                             .intersects(directionTranslate(speed, direction + strafing * Math.PI / 2))) {
                         strafing *= -1;
                     } else if (Math.random() < 0.05) {
@@ -410,17 +410,18 @@ class Sharp extends Enemy<Sharp> {
         timer.schedule(timertask, 0, Game.delay);
         shoot();
     }
+
     protected void shoot() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = room.player.getCentroid();
-                if (new Line(getCentroid(), playerCentroid).getLength() <= shootDistance) {
+                double distance = distanceToPlayer();
+                if (distance <= shootDistance) {
                     shoot();
                 } else {
                     speed = moveSpeed;
                 }
             }
         };
-        timer.schedule(timertask, 0, weapon.cooldown);
+        timer.schedule(timertask, 0, weapon.getCooldown());
     }
 }

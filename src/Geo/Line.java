@@ -6,8 +6,8 @@ import java.awt.Graphics2D;
 
 public class Line extends Geo<Line> {
     final private double doublePrecision = 1000000;
-    private Point p1;
-    private Point p2;
+    protected Point p1;
+    protected Point p2;
     private double length;
 
     public Line(Point p1, Point p2) {
@@ -37,10 +37,10 @@ public class Line extends Geo<Line> {
     protected void draw(Graphics2D g2d, int x, int y) {
         g2d.setColor(color);
         g2d.setStroke(new BasicStroke(width));
-        g2d.drawLine((int) Math.round(p1.getX()) + x,
-                (int) Math.round(p1.getY()) + y,
-                (int) Math.round(p2.getX()) + x,
-                (int) Math.round(p2.getY()) + y);
+        g2d.drawLine((int) Math.round(p1.x) + x,
+                (int) Math.round(p1.y) + y,
+                (int) Math.round(p2.x) + x,
+                (int) Math.round(p2.y) + y);
     }
 
     public Point getP1() {
@@ -86,29 +86,29 @@ public class Line extends Geo<Line> {
     }
 
     protected boolean intersects(Line line) {
-        double d = (p1.getX() - p2.getX()) * (line.p1.getY() - line.p2.getY())
-                - (p1.getY() - p2.getY()) * (line.p1.getX() - line.p2.getX());
+        double d = (p1.x - p2.x) * (line.p1.y - line.p2.y)
+                - (p1.y - p2.y) * (line.p1.x - line.p2.x);
         if (d == 0) {
             return false;
         }
-        double pre = (p1.getX() * p2.getY() - p1.getY() * p2.getX()),
-                post = (line.p1.getX() * line.p2.getY() - line.p1.getY() * line.p2.getX());
+        double pre = (p1.x * p2.y - p1.y * p2.x),
+                post = (line.p1.x * line.p2.y - line.p1.y * line.p2.x);
         double x = Math
-                .round((pre * (line.p1.getX() - line.p2.getX()) - (p1.getX() - p2.getX()) * post) / d * doublePrecision)
+                .round((pre * (line.p1.x - line.p2.x) - (p1.x - p2.x) * post) / d * doublePrecision)
                 / doublePrecision;
         double y = Math
-                .round((pre * (line.p1.getY() - line.p2.getY()) - (p1.getY() - p2.getY()) * post) / d * doublePrecision)
+                .round((pre * (line.p1.y - line.p2.y) - (p1.y - p2.y) * post) / d * doublePrecision)
                 / doublePrecision;
-        if (x < Math.min(p1.getX(), p2.getX()) - 1 / doublePrecision
-                || x > Math.max(p1.getX(), p2.getX() + 1 / doublePrecision)
-                || x < Math.min(line.p1.getX(), line.p2.getX()) - 1 / doublePrecision
-                || x > Math.max(line.p1.getX(), line.p2.getX() + 1 / doublePrecision)) {
+        if (x < Math.min(p1.x, p2.x) - 1 / doublePrecision
+                || x > Math.max(p1.x, p2.x + 1 / doublePrecision)
+                || x < Math.min(line.p1.x, line.p2.x) - 1 / doublePrecision
+                || x > Math.max(line.p1.x, line.p2.x + 1 / doublePrecision)) {
             return false;
         }
-        if (y < Math.min(p1.getY(), p2.getY()) - 1 / doublePrecision
-                || y > Math.max(p1.getY(), p2.getY() + 1 / doublePrecision)
-                || y < Math.min(line.p1.getY(), line.p2.getY()) - 1 / doublePrecision
-                || y > Math.max(line.p1.getY(), line.p2.getY() + 1 / doublePrecision)) {
+        if (y < Math.min(p1.y, p2.y) - 1 / doublePrecision
+                || y > Math.max(p1.y, p2.y + 1 / doublePrecision)
+                || y < Math.min(line.p1.y, line.p2.y) - 1 / doublePrecision
+                || y > Math.max(line.p1.y, line.p2.y + 1 / doublePrecision)) {
             return false;
         }
 
@@ -116,29 +116,29 @@ public class Line extends Geo<Line> {
     }
 
     protected Point intersectionPoint(Line line) {
-        double d = (p1.getX() - p2.getX()) * (line.p1.getY() - line.p2.getY())
-                - (p1.getY() - p2.getY()) * (line.p1.getX() - line.p2.getX());
+        double d = (p1.x - p2.x) * (line.p1.y - line.p2.y)
+                - (p1.y - p2.y) * (line.p1.x - line.p2.x);
         if (d == 0) {
             return null;
         }
-        double pre = (p1.getX() * p2.getY() - p1.getY() * p2.getX()),
-                post = (line.p1.getX() * line.p2.getY() - line.p1.getY() * line.p2.getX());
+        double pre = (p1.x * p2.y - p1.y * p2.x),
+                post = (line.p1.x * line.p2.y - line.p1.y * line.p2.x);
         double x = Math
-                .round((pre * (line.p1.getX() - line.p2.getX()) - (p1.getX() - p2.getX()) * post) / d * doublePrecision)
+                .round((pre * (line.p1.x - line.p2.x) - (p1.x - p2.x) * post) / d * doublePrecision)
                 / doublePrecision;
         double y = Math
-                .round((pre * (line.p1.getY() - line.p2.getY()) - (p1.getY() - p2.getY()) * post) / d * doublePrecision)
+                .round((pre * (line.p1.y - line.p2.y) - (p1.y - p2.y) * post) / d * doublePrecision)
                 / doublePrecision;
-        if (x < Math.min(p1.getX(), p2.getX()) - 1 / doublePrecision
-                || x > Math.max(p1.getX(), p2.getX() + 1 / doublePrecision)
-                || x < Math.min(line.p1.getX(), line.p2.getX()) - 1 / doublePrecision
-                || x > Math.max(line.p1.getX(), line.p2.getX() + 1 / doublePrecision)) {
+        if (x < Math.min(p1.x, p2.x) - 1 / doublePrecision
+                || x > Math.max(p1.x, p2.x + 1 / doublePrecision)
+                || x < Math.min(line.p1.x, line.p2.x) - 1 / doublePrecision
+                || x > Math.max(line.p1.x, line.p2.x + 1 / doublePrecision)) {
             return null;
         }
-        if (y < Math.min(p1.getY(), p2.getY()) - 1 / doublePrecision
-                || y > Math.max(p1.getY(), p2.getY() + 1 / doublePrecision)
-                || y < Math.min(line.p1.getY(), line.p2.getY()) - 1 / doublePrecision
-                || y > Math.max(line.p1.getY(), line.p2.getY() + 1 / doublePrecision)) {
+        if (y < Math.min(p1.y, p2.y) - 1 / doublePrecision
+                || y > Math.max(p1.y, p2.y + 1 / doublePrecision)
+                || y < Math.min(line.p1.y, line.p2.y) - 1 / doublePrecision
+                || y > Math.max(line.p1.y, line.p2.y + 1 / doublePrecision)) {
             return null;
         }
         return new Point(x, y);
@@ -146,11 +146,11 @@ public class Line extends Geo<Line> {
 
     private double caculateLength() {
         return Math.sqrt(
-                (p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
+                (p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
     }
 
     public double caculateRadian() {
-        return -Math.atan2(p1.getY() - p2.getY(), p1.getX() - p2.getX());
+        return -Math.atan2(p1.y - p2.y, p1.x - p2.x);
     }
 
 }

@@ -5,8 +5,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 public class Point extends Geo<Point> {
-    private double x;
-    private double y;
+    protected double x;
+    protected double y;
 
     public Point(int x, int y) {
         this((double) x, (double) y);

@@ -50,8 +50,8 @@ public class Polygon extends Geo<Polygon> {
         int[] xPoints = new int[length];
         int[] yPoints = new int[length];
         for (int i = 0; i < length; i++) {
-            xPoints[i] = (int) Math.round(points[i].getX() + x);
-            yPoints[i] = (int) Math.round(points[i].getY() + y);
+            xPoints[i] = (int) Math.round(points[i].x + x);
+            yPoints[i] = (int) Math.round(points[i].y + y);
         }
         g2d.setColor(color);
         g2d.fillPolygon(xPoints, yPoints, length);
@@ -143,18 +143,18 @@ public class Polygon extends Geo<Polygon> {
         double signedArea = 0.0;
         double a = 0.0;
         for (Line line : lines) {
-            a = line.getP1().getX() * line.getP2().getY() - line.getP2().getX() * line.getP1().getY();
+            a = line.p1.x * line.p2.y - line.p2.x * line.p1.y;
             signedArea += a;
-            centroid.moveX((line.getP1().getX() + line.getP2().getX()) * a);
-            centroid.moveY((line.getP1().getY() + line.getP2().getY()) * a);
+            centroid.moveX((line.p1.x + line.p2.x) * a);
+            centroid.moveY((line.p1.y + line.p2.y) * a);
         }
         signedArea /= 2;
-        centroid.setX(centroid.getX() / (6.0 * signedArea));
-        centroid.setY(centroid.getY() / (6.0 * signedArea));
+        centroid.setX(centroid.x / (6.0 * signedArea));
+        centroid.setY(centroid.y / (6.0 * signedArea));
         return centroid;
     }
 
-    public Point getCentroid() {
+    protected Point getCentroid() {
         return centroid;
     }
 }

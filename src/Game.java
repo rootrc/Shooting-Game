@@ -1,8 +1,8 @@
 import java.awt.Color;
-import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.util.Scanner;
 
@@ -11,12 +11,12 @@ import javax.swing.Timer;
 
 import Geo.Point;
 
-class Game {
+public class Game {
     final static int delay = 20;
     private static Game instance = new Game();
-    JFrame frame;
-    Panel panel;
-    Room room;
+    public JFrame frame;
+    public Panel panel;
+    public Room room;
 
     private Game() {
         frame = new JFrame();

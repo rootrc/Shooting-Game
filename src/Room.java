@@ -1,21 +1,21 @@
-import java.awt.event.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.io.FileReader;
 import java.io.IOException;
+import javax.swing.SwingUtilities;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.concurrent.ConcurrentHashMap;
-import javax.swing.SwingUtilities;
 
-import Geo.Line;
 import Geo.Point;
 import Geo.Polygon;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
 
 public class Room extends Polygon {
     private int id;
@@ -29,7 +29,7 @@ public class Room extends Polygon {
     Player player;
     int xAdjust;
     int yAdjust;
-    int score;
+    private int score;
     private int scoreForNextRoom;
 
     Room(Point[] points, int id) {
@@ -167,6 +167,10 @@ public class Room extends Polygon {
                 && point.getX() + point.getWidth() / 2 < getPoint(2).getX()
                 && getPoint(0).getY() < point.getY() - point.getWidth() / 2
                 && point.getY() + point.getWidth() / 2 < getPoint(2).getY();
+    }
+
+    void increaseScore(int value) {
+        score += value;
     }
 
     void keyPressed(KeyEvent e) {

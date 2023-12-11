@@ -6,14 +6,15 @@ import java.util.TimerTask;
 import Geo.Point;
 
 abstract class Particle extends Point {
-    protected Room room;
+    private Room room;
+    protected Timer timer = new Timer();
     protected double direction;
 
     Particle(Room room, Point point, double direction) {
         super(point.getX(), point.getY());
         this.room = room;
         this.direction = direction;
-        room.particles.add(this);
+        getRoom().particles.add(this);
         process();
     }
 
@@ -21,15 +22,15 @@ abstract class Particle extends Point {
         super.draw(g2d, x, y);
     }
 
-    void attemptMove(double distance, double direction) {
-        if (room.inside(directionTranslate(-distance, direction))) {
+    protected void attemptMove(double distance, double direction) {
+        if (getRoom().inside(directionTranslate(-distance, direction))) {
             directionMove(-distance, direction);
         } else {
             int l = 0;
             int r = (int) distance;
             while (l < r) {
                 int m = (l + r + 1) / 2;
-                if (room.inside(directionTranslate(-distance, direction))) {
+                if (getRoom().inside(directionTranslate(-distance, direction))) {
                     l = m;
                 } else {
                     r = m - 1;
@@ -37,6 +38,10 @@ abstract class Particle extends Point {
             }
             directionMove(-l, direction);
         }
+    }
+
+    protected Room getRoom() {
+        return room;
     }
 
     abstract void process();
@@ -60,7 +65,6 @@ class Casing extends Particle {
     }
 
     void process() {
-        Timer timer = new Timer();
         TimerTask timertask = new TimerTask() {
             int count = 0;
 
@@ -99,7 +103,7 @@ class Casing extends Particle {
                 Casing.this.setBorderColor(new Color(175, 156, 96, -255 * count
                         * count / (time3 * time3) + 255));
                 if (count == time3) {
-                    room.particles.remove(Casing.this);
+                    getRoom().particles.remove(Casing.this);
                     timer3.cancel();
                     timer3.purge();
                 }

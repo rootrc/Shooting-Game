@@ -12,7 +12,7 @@ class Corpse extends Polygon {
 
     Corpse(Entity entity, int time) {
         super(entity.getPoints());
-        this.room = entity.room;
+        this.room = entity.getRoom();
         this.time = time;
         process();
     }

@@ -6,7 +6,7 @@ import Geo.Line;
 import Geo.Point;
 
 abstract class Projectile extends Line {
-    protected Room room;
+    private Room room;
     protected Timer timer = new Timer();
     protected boolean isPlayer;
     protected int damage;
@@ -31,11 +31,16 @@ abstract class Projectile extends Line {
         super.setWidth(width);
     }
 
+    protected Room getRoom() {
+        return room;
+    }
+
     abstract public Projectile clone();
 
     abstract void shoot(Point centroid, double direction);
 
     abstract void process();
+
 }
 
 class Bullet extends Projectile {
@@ -50,7 +55,7 @@ class Bullet extends Projectile {
     }
 
     public Bullet clone() {
-        Bullet bullet = new Bullet(room, getP1(), getP2());
+        Bullet bullet = new Bullet(getRoom(), getP1(), getP2());
         bullet.setBorderColor(getBorderColor());
         bullet.setWidth(getWidth());
         bullet.length = length;
@@ -74,23 +79,23 @@ class Bullet extends Projectile {
         TimerTask timertask = new TimerTask() {
             public void run() {
                 Bullet.this.directionMove(speed, direction);
-                if (room.intersects(new Line(Bullet.this.getP2(), Bullet.this.getP2()
+                if (getRoom().intersects(new Line(Bullet.this.p2, Bullet.this.p2
                         .directionTranslate(-Bullet.this.speed, direction)))) {
-                    room.projectiles.remove(Bullet.this);
+                    getRoom().projectiles.remove(Bullet.this);
                     timer.cancel();
                     timer.purge();
-                } else if (!room.inside(getP2())) {
-                    room.projectiles.remove(Bullet.this);
+                } else if (!getRoom().inside(getP2())) {
+                    getRoom().projectiles.remove(Bullet.this);
                     timer.cancel();
                     timer.purge();
                 }
-                for (Entity entity : room.entities) {
+                for (Entity entity : getRoom().entities) {
                     if (entity.getClass() != Player.class && !Bullet.this.isPlayer) {
                         continue;
                     }
                     if (entity.intersects(
-                            new Line(Bullet.this.getP2(),
-                                    Bullet.this.getP2().directionTranslate(-Bullet.this.speed, direction)))) {
+                            new Line(Bullet.this.p2,
+                                    Bullet.this.p2.directionTranslate(-Bullet.this.speed, direction)))) {
                         entity.health -= Bullet.this.damage;
                         entity.attemptMove(-Bullet.this.knockback, Bullet.this.caculateRadian());
                         if (entity.health > 0) {
@@ -100,7 +105,7 @@ class Bullet extends Projectile {
                         }
                         Bullet.this.piercing--;
                         if (Bullet.this.piercing <= 0) {
-                            room.projectiles.remove(Bullet.this);
+                            getRoom().projectiles.remove(Bullet.this);
                             timer.cancel();
                             timer.purge();
                         }
@@ -108,7 +113,7 @@ class Bullet extends Projectile {
                 }
             }
         };
-        room.projectiles.add(this);
+        getRoom().projectiles.add(this);
         timer.schedule(timertask, 0, Game.delay);
     }
 }
@@ -126,7 +131,7 @@ class LimitedBullet extends Projectile {
     }
 
     public LimitedBullet clone() {
-        LimitedBullet limitedBullet = new LimitedBullet(room, getP1(), getP2());
+        LimitedBullet limitedBullet = new LimitedBullet(getRoom(), getP1(), getP2());
         limitedBullet.setBorderColor(getBorderColor());
         limitedBullet.setWidth(getWidth());
         limitedBullet.length = length;
@@ -152,31 +157,31 @@ class LimitedBullet extends Projectile {
             int count = 0;
 
             public void run() {
-                LimitedBullet.this.getP1().directionMove(speed + (double) LimitedBullet.this.length
+                LimitedBullet.this.p1.directionMove(speed + (double) LimitedBullet.this.length
                         / (LimitedBullet.this.duration * LimitedBullet.this.duration) * (2 * count - 1), direction);
-                LimitedBullet.this.getP2().directionMove(speed, direction);
+                LimitedBullet.this.p2.directionMove(speed, direction);
                 count++;
-                if (room.intersects(new Line(LimitedBullet.this.getP2(), LimitedBullet.this.getP2()
+                if (getRoom().intersects(new Line(LimitedBullet.this.p2, LimitedBullet.this.p2
                         .directionTranslate(-LimitedBullet.this.speed, direction)))) {
-                    room.projectiles.remove(LimitedBullet.this);
+                    getRoom().projectiles.remove(LimitedBullet.this);
                     timer.cancel();
                     timer.purge();
-                } else if (!room.inside(getP2())) {
-                    room.projectiles.remove(LimitedBullet.this);
+                } else if (!getRoom().inside(getP2())) {
+                    getRoom().projectiles.remove(LimitedBullet.this);
                     timer.cancel();
                     timer.purge();
                 } else if (count == LimitedBullet.this.duration) {
-                    room.projectiles.remove(LimitedBullet.this);
+                    getRoom().projectiles.remove(LimitedBullet.this);
                     timer.cancel();
                     timer.purge();
                 }
-                for (Entity entity : room.entities) {
+                for (Entity entity : getRoom().entities) {
                     if (entity.getClass() != Player.class && !LimitedBullet.this.isPlayer) {
                         continue;
                     }
                     if (entity.intersects(
-                            new Line(LimitedBullet.this.getP2(),
-                                    LimitedBullet.this.getP2().directionTranslate(-LimitedBullet.this.speed,
+                            new Line(LimitedBullet.this.p2,
+                                    LimitedBullet.this.p2.directionTranslate(-LimitedBullet.this.speed,
                                             direction)))) {
                         entity.health -= LimitedBullet.this.damage;
                         entity.attemptMove(-LimitedBullet.this.knockback, LimitedBullet.this.caculateRadian());
@@ -187,7 +192,7 @@ class LimitedBullet extends Projectile {
                         }
                         LimitedBullet.this.piercing--;
                         if (LimitedBullet.this.piercing <= 0) {
-                            room.projectiles.remove(LimitedBullet.this);
+                            getRoom().projectiles.remove(LimitedBullet.this);
                             timer.cancel();
                             timer.purge();
                         }
@@ -195,7 +200,7 @@ class LimitedBullet extends Projectile {
                 }
             }
         };
-        room.projectiles.add(this);
+        getRoom().projectiles.add(this);
         timer.schedule(timertask, 0, Game.delay);
     }
 }

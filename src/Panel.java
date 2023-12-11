@@ -1,17 +1,18 @@
 import java.awt.Color;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.MouseInfo;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import javax.swing.JPanel;
 
 import Geo.Point;
-class Panel extends JPanel {
+
+public class Panel extends JPanel {
     Panel() {
         super();
         addKeyListener(new TKeyAdapter());
@@ -21,7 +22,7 @@ class Panel extends JPanel {
         setLayout(null);
     }
     Point mouseLocation() {
-        return new Point(MouseInfo.getPointerInfo().getLocation().getX() - Game.getInstance().frame.getLocationOnScreen().getX() - 8, MouseInfo.getPointerInfo().getLocation().getY() - Game.getInstance().frame.getLocationOnScreen().getY() - 30);
+        return new Point(MouseInfo.getPointerInfo().getLocation().x - Game.getInstance().frame.getLocationOnScreen().x - 8, MouseInfo.getPointerInfo().getLocation().y - Game.getInstance().frame.getLocationOnScreen().y - 30);
     }
 
     @Override

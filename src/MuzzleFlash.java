@@ -14,11 +14,11 @@ class MuzzleFlash extends Line {
     private double length;
 
 
-    MuzzleFlash(Entity entity) {
-        this.room = entity.room;
-        this.centroid = entity.getCentroid().clone();
-        this.direction = entity.direction;
-        this.length = entity.weapon.projectile.length;
+    MuzzleFlash(Entity entity, double length) {
+        room = entity.getRoom();
+        centroid = entity.getCentroid().clone();
+        direction = entity.direction;
+        this.length = length;
         setBorderColor(new Color(247, 241, 181));
         setWidth(8);
         process();
