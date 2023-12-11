@@ -3,21 +3,23 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 abstract class Particle extends Point {
+    Room room;
     double direction;
 
-    Particle(Point point, double direction) {
+    Particle(Room room, Point point, double direction) {
         super(point.getX(), point.getY());
+        this.room = room;
         this.direction = direction;
-        Game.getInstance().room.particles.add(this);
+        room.particles.add(this);
         process();
     }
 
     void attemptMove(double distance, double direction) {
         Point point = directionTranslate(-distance, direction);
-        if (Game.getInstance().room.points[0].getX() < point.getX() - width / 2
-                && point.getX() + width / 2 < Game.getInstance().room.points[2].getX()
-                && Game.getInstance().room.points[0].getY() < point.getY() - width / 2
-                && point.getY() + width / 2 < Game.getInstance().room.points[2].getY()) {
+        if (room.points[0].getX() < point.getX() - width / 2
+                && point.getX() + width / 2 < room.points[2].getX()
+                && room.points[0].getY() < point.getY() - width / 2
+                && point.getY() + width / 2 < room.points[2].getY()) {
             directionMove(-distance, direction);
         } else {
             int l = 0;
@@ -25,10 +27,10 @@ abstract class Particle extends Point {
             while (l < r) {
                 int m = (l + r + 1) / 2;
                 point = directionTranslate(-distance, direction);
-                if (Game.getInstance().room.points[0].getX() < point.getX() - width / 2
-                        && point.getX() + width / 2 < Game.getInstance().room.points[2].getX()
-                        && Game.getInstance().room.points[0].getY() < point.getY() - width / 2
-                        && point.getY() + width / 2 < Game.getInstance().room.points[2].getY()) {
+                if (room.points[0].getX() < point.getX() - width / 2
+                        && point.getX() + width / 2 < room.points[2].getX()
+                        && room.points[0].getY() < point.getY() - width / 2
+                        && point.getY() + width / 2 < room.points[2].getY()) {
                     l = m;
                 } else {
                     r = m - 1;
@@ -48,8 +50,9 @@ class Casing extends Particle {
     int time2;
     int time3;
 
-    Casing(Point point, double direction, double distance1, double distance2, int time1, int time2, int time3) {
-        super(point, direction);
+    Casing(Room room, Point point, double direction, double distance1, double distance2, int time1, int time2,
+            int time3) {
+        super(room, point, direction);
         this.distance1 = distance1;
         this.distance2 = distance2;
         this.time1 = time1;
@@ -72,7 +75,7 @@ class Casing extends Particle {
                 }
             }
         };
-        timer.schedule(timertask, 0, Game.getInstance().delay);
+        timer.schedule(timertask, 0, Game.delay);
         Timer timer2 = new Timer();
         TimerTask timertask2 = new TimerTask() {
             int count = time1;
@@ -87,7 +90,7 @@ class Casing extends Particle {
                 }
             }
         };
-        timer2.schedule(timertask2, 0, Game.getInstance().delay);
+        timer2.schedule(timertask2, 0, Game.delay);
         Timer timer3 = new Timer();
         TimerTask timertask3 = new TimerTask() {
             int count = 0;
@@ -97,12 +100,12 @@ class Casing extends Particle {
                 color = new Color(175, 156, 96, -255 * count
                         * count / (time3 * time3) + 255);
                 if (count == time3) {
-                    Game.getInstance().room.particles.remove(Casing.this);
+                    room.particles.remove(Casing.this);
                     timer3.cancel();
                     timer3.purge();
                 }
             }
         };
-        timer3.schedule(timertask3, 0, Game.getInstance().delay);
+        timer3.schedule(timertask3, 0, Game.delay);
     }
 }

@@ -17,20 +17,20 @@ class Player extends Entity {
     Weapon weapon1;
     Weapon weapon2;
 
-    Player(Point[] points) {
-        super(points);
+    Player(Room room, Point[] points) {
+        super(room, points);
         moveSpeed = 5;
         speed = moveSpeed;
         health = 100;
         orginalColor = Color.blue;
         color = orginalColor;
         corpseLength = 200;
-        muzzleFlash = new Line(new Point(0, 0), new Point(0, 0));
+        muzzleFlash = new Line();
         muzzleFlash.color = new Color(247, 241, 181);
         muzzleFlash.width = 8;
-        weapon1 = new Weapon("player_gun");
+        weapon1 = new Weapon(this, "player_gun");
         weapon1.projectile.isPlayer = true;
-        weapon2 = new Weapon("player_sniper");
+        weapon2 = new Weapon(this, "player_sniper");
         weapon2.projectile.isPlayer = true;
         weapon = weapon1;
     }
@@ -40,7 +40,7 @@ class Player extends Entity {
         for (int i = 0; i < length; i++) {
             points[i] = this.points[i].clone();
         }
-        Player player = new Player(points);
+        Player player = new Player(room, points);
         player.a = a;
         player.d = d;
         player.s = s;
@@ -57,7 +57,7 @@ class Player extends Entity {
         player.weapon = weapon;
         player.weapon1 = weapon1;
         player.weapon2 = weapon2;
-        return new Player(points);
+        return player;
     }
 
     void draw(Graphics2D g2d) {
@@ -70,7 +70,7 @@ class Player extends Entity {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                for (Entity entity : Game.getInstance().room.entities) {
+                for (Entity entity : room.entities) {
                     if (Player.this == entity) {
                         continue;
                     }
@@ -92,7 +92,7 @@ class Player extends Entity {
                 move();
             }
         };
-        timer.schedule(timertask, 0, Game.getInstance().delay);
+        timer.schedule(timertask, 0, Game.delay);
     }
 
     void move() {
@@ -105,7 +105,7 @@ class Player extends Entity {
             polygon.move(xMovement * speed / Math.sqrt(2), yMovement * speed / Math.sqrt(2));
         }
         polygon.rotate(direction - radian);
-        if (!Game.getInstance().room.intersects(polygon)) {
+        if (!room.intersects(polygon)) {
             if (xMovement == 0 || yMovement == 0) {
                 super.move(xMovement * speed, yMovement * speed);
             } else {
@@ -128,29 +128,29 @@ class Player extends Entity {
                 moveSpeed *= 2;
             }
         };
-        timer.schedule(timertask, 10 * Game.getInstance().delay);
+        timer.schedule(timertask, 10 * Game.delay);
         Timer timer2 = new Timer();
         timertask = new TimerTask() {
             int count = 0;
 
             public void run() {
                 count++;
-                Game.getInstance().panel.xAdjust = (int) (10 * Math.random()) - 5;
-                Game.getInstance().panel.yAdjust = (int) (10 * Math.random()) - 5;
+                room.xAdjust = (int) (10 * Math.random()) - 5;
+                room.yAdjust = (int) (10 * Math.random()) - 5;
                 if (count == 10) {
-                    Game.getInstance().panel.xAdjust = 0;
-                    Game.getInstance().panel.yAdjust = 0;
+                    room.xAdjust = 0;
+                    room.yAdjust = 0;
                     timer2.cancel();
                 }
             }
         };
-        timer2.schedule(timertask, 0, Game.getInstance().delay);
+        timer2.schedule(timertask, 0, Game.delay);
     }
 
     void death() {
         timer.cancel();
         timer.purge();
-        Game.getInstance().room.entities.remove(this);
+        room.entities.remove(this);
         Polygon corpse = clone();
         corpse.color = new Color(139, 0, 0);
         Timer timer = new Timer();
@@ -166,7 +166,7 @@ class Player extends Entity {
                         -255 * (Player.this.corpseLength - count) * (Player.this.corpseLength - count)
                                 / Player.this.corpseLength / Player.this.corpseLength + 255));
                 if (count == 0) {
-                    Game.getInstance().room.polygons.remove(corpse);
+                    room.polygons.remove(corpse);
                     System.exit(0);
                     System.exit(0);
                     timer.cancel();
@@ -174,25 +174,25 @@ class Player extends Entity {
                 }
             }
         };
-        Game.getInstance().room.polygons.add(corpse);
-        timer.schedule(timertask, 10 * Game.getInstance().delay, Game.getInstance().delay);
+        room.polygons.add(corpse);
+        timer.schedule(timertask, 10 * Game.delay, Game.delay);
         Timer timer2 = new Timer();
         timertask = new TimerTask() {
             int count = 0;
 
             public void run() {
                 count++;
-                Game.getInstance().panel.xAdjust = (int) (50 * Math.random()) - 25;
-                Game.getInstance().panel.yAdjust = (int) (50 * Math.random()) - 25;
+                room.xAdjust = (int) (50 * Math.random()) - 25;
+                room.yAdjust = (int) (50 * Math.random()) - 25;
                 if (count == 30) {
-                    Game.getInstance().panel.xAdjust = 0;
-                    Game.getInstance().panel.yAdjust = 0;
+                    room.xAdjust = 0;
+                    room.yAdjust = 0;
                     timer2.cancel();
                     timer2.purge();
                 }
             }
         };
-        timer2.schedule(timertask, 0, Game.getInstance().delay);
+        timer2.schedule(timertask, 0, Game.delay);
     }
 
     void shoot() {
@@ -207,7 +207,7 @@ class Player extends Entity {
                 }
                 weapon.shoot(centroid, direction);
                 attemptMove(weapon.recoil, direction);
-                Casing casing = new Casing(centroid,
+                Casing casing = new Casing(room, centroid,
                         direction + Math.PI / 2 + Math.PI / 10 * Math.random() - Math.PI / 20, 25, 50, 4, 40, 200);
                 casing.color = new Color(175, 156, 96);
                 casing.width = 3;
@@ -229,16 +229,16 @@ class Player extends Entity {
                         }
                     }
                 };
-                timer.schedule(timertask, 0, Game.getInstance().delay);
+                timer.schedule(timertask, 0, Game.delay);
                 TimerTask timertask2 = new TimerTask() {
                     public void run() {
-                        Game.getInstance().panel.xAdjust = 0;
-                        Game.getInstance().panel.yAdjust = 0;
+                        room.xAdjust = 0;
+                        room.yAdjust = 0;
                     }
                 };
-                Game.getInstance().panel.xAdjust = (int) (6 * Math.random()) - 3;
-                Game.getInstance().panel.yAdjust = (int) (6 * Math.random()) - 3;
-                timer.schedule(timertask2, Game.getInstance().delay);
+                room.xAdjust = (int) (6 * Math.random()) - 3;
+                room.yAdjust = (int) (6 * Math.random()) - 3;
+                timer.schedule(timertask2, Game.delay);
             }
         };
         timer.schedule(timertask, 0, weapon.cooldown);

@@ -3,7 +3,7 @@ import java.io.IOException;
 import java.util.Scanner;
 
 class Weapon {
-
+    Entity entity;
     int cooldown;
     int shotCount;
     int shotCooldown;
@@ -12,7 +12,8 @@ class Weapon {
     double random;
     Projectile projectile;
 
-    Weapon(String name) {
+    Weapon(Entity entity, String name) {
+        this.entity = entity;
         try {
             Scanner data = new Scanner(new FileReader("data/weapons/" + name + ".txt"));
             cooldown = Integer.parseInt(data.next()) * 100;
@@ -26,7 +27,7 @@ class Weapon {
             String projectileType = data.next();
             switch (projectileType) {
                 case "bullet":
-                    Bullet bullet = new Bullet(new Point(0, 0), new Point(0, 0));
+                    Bullet bullet = new Bullet(entity.room);
                     bullet.damage = Integer.parseInt(data.next());
                     bullet.piercing = Integer.parseInt(data.next());
                     bullet.setWidth(Integer.parseInt(data.next()));
@@ -36,7 +37,7 @@ class Weapon {
                     projectile = bullet;
                     break;
                 case "limitedBullet":
-                    LimitedBullet limitedBullet = new LimitedBullet(new Point(0, 0), new Point(0, 0));
+                    LimitedBullet limitedBullet = new LimitedBullet(entity.room);
                     limitedBullet.damage = Integer.parseInt(data.next());
                     limitedBullet.piercing = Integer.parseInt(data.next());
                     limitedBullet.setWidth(Integer.parseInt(data.next()));

@@ -18,10 +18,12 @@ public class Room extends Polygon {
     Timer timer = new Timer();
     ConcurrentHashMap.KeySetView<Projectile, Boolean> projectiles = ConcurrentHashMap.newKeySet();
     ConcurrentHashMap.KeySetView<Entity, Boolean> entities = ConcurrentHashMap.newKeySet();
-    HashMap<Enemy<?>, Double> enemySpawns = new HashMap<>();
+    HashMap<String, Double> enemySpawns = new HashMap<>();
     ConcurrentHashMap.KeySetView<Polygon, Boolean> polygons = ConcurrentHashMap.newKeySet();
     ConcurrentHashMap.KeySetView<Particle, Boolean> particles = ConcurrentHashMap.newKeySet();
     Player player;
+    int xAdjust;
+    int yAdjust;
     int score;
     int scoreForNextRoom;
 
@@ -29,7 +31,7 @@ public class Room extends Polygon {
         super(points);
         color = Color.white;
         score = 0;
-        player = new Player(
+        player = new Player(this, 
                 new Point[] { new Point(300, 300), new Point(332, 300), new Point(332, 332), new Point(300, 332) });
         entities.add(player);
         scoreForNextRoom = 0;
@@ -47,28 +49,7 @@ public class Room extends Polygon {
             for (int i = 0; i < N; i++) {
                 String enemyName = data.next();
                 double spawnRate = Double.parseDouble(data.next()) * 50;
-                switch (enemyName.substring(0, enemyName.length() - 1)) {
-                    case "chaser":
-                        Chaser chaser = new Chaser(null, enemyName.charAt(enemyName.length() - 1) - '0');
-                        enemySpawns.put(chaser, spawnRate);
-                        break;
-                    case "rifle":
-                        Rifle rifle = new Rifle(null, enemyName.charAt(enemyName.length() - 1) - '0');
-                        enemySpawns.put(rifle, spawnRate);
-                        break;
-                    case "sniper":
-                        Sniper sniper = new Sniper(null, enemyName.charAt(enemyName.length() - 1) - '0');
-                        enemySpawns.put(sniper, spawnRate);
-                        break;
-                    case "machine":
-                        Machine machine = new Machine(null, enemyName.charAt(enemyName.length() - 1) - '0');
-                        enemySpawns.put(machine, spawnRate);
-                        break;
-                    case "sharp":
-                        Sharp sharp = new Sharp(null, enemyName.charAt(enemyName.length() - 1) - '0');
-                        enemySpawns.put(sharp, spawnRate);
-                        break;
-                }
+                enemySpawns.put(enemyName, spawnRate);
             }
 
         } catch (IOException e) {
@@ -81,7 +62,7 @@ public class Room extends Polygon {
         player.process();
         TimerTask timertask = new TimerTask() {
             public void run() {
-                for (Map.Entry<Enemy<?>, Double> e : enemySpawns.entrySet()) {
+                for (Map.Entry<String, Double> e : enemySpawns.entrySet()) {
                     if (Math.random() * e.getValue() < 1) {
                         addEnemy(e.getKey());
                     }
@@ -91,7 +72,7 @@ public class Room extends Polygon {
                 }
             }
         };
-        timer.schedule(timertask, 0, Game.getInstance().delay);
+        timer.schedule(timertask, 0, Game.delay);
     }
 
     void draw(Graphics2D g2d) {
@@ -113,16 +94,34 @@ public class Room extends Polygon {
         }
         g2d.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
         g2d.setColor(Color.black);
-        g2d.drawString(Integer.toString(Math.max(player.health, 0)), 15 + Game.getInstance().panel.xAdjust,
-                30 + Game.getInstance().panel.yAdjust);
+        g2d.drawString(Integer.toString(Math.max(player.health, 0)), 15 + xAdjust,
+                30 + yAdjust);
         g2d.drawString(Integer.toString(score),
                 770 - SwingUtilities.computeStringWidth(g2d.getFontMetrics(), Integer.toString(score))
-                        + Game.getInstance().panel.xAdjust,
-                30 + Game.getInstance().panel.yAdjust);
+                        + xAdjust,
+                30 + yAdjust);
     }
 
-    void addEnemy(Enemy<?> enemy) {
+    void addEnemy(String name) {
         double x, y;
+        Enemy<?> enemy = null;
+        switch (name.substring(0, name.length() - 1)) {
+            case "chaser":
+                enemy = new Chaser(this, name.charAt(name.length() - 1) - '0');
+                break;
+            case "rifle":
+                enemy = new Rifle(this, name.charAt(name.length() - 1) - '0');
+                break;
+            case "sniper":
+                enemy = new Sniper(this, name.charAt(name.length() - 1) - '0');
+                break;
+            case "machine":
+                enemy = new Machine(this, name.charAt(name.length() - 1) - '0');
+                break;
+            case "sharp":
+                enemy = new Sharp(this, name.charAt(name.length() - 1) - '0');
+                break;
+        }
         if (Math.random() < 0.5) {
             x = (777 - 20 - enemy.points[0].getX()) * Math.random() + 10;
             if (30 < x && x < 777 - 50 - enemy.points[0].getX()) {

@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.util.Timer;
 
 abstract class Entity extends Polygon {
+    Room room;
     Timer timer = new Timer();
     double direction;
     int health;
@@ -9,20 +10,26 @@ abstract class Entity extends Polygon {
     Color orginalColor;
     int corpseLength;
 
-    Entity(Point[] points) {
+    Entity(Room room, Point[] points) {
         super(points);
+        this.room = room;
+    }
+
+    
+    Entity(Room room) {
+        this.room = room;
     }
 
     void attemptMove(int distance, double direction) {
-        if (!Game.getInstance().room
+        if (!room
                 .intersects(directionTranslate(-distance, direction))) {
-                    directionMove(-distance, direction);
+            directionMove(-distance, direction);
         } else {
             int l = 0;
             int r = distance;
             while (l < r) {
                 int m = (l + r + 1) / 2;
-                if (!Game.getInstance().room
+                if (!room
                         .intersects(directionTranslate(-m, direction))) {
                     l = m;
                 } else {
@@ -32,8 +39,10 @@ abstract class Entity extends Polygon {
             directionMove(-l, direction);
         }
     }
-    
+
     public abstract Entity clone();
+
     abstract void hit();
+
     abstract void death();
 }

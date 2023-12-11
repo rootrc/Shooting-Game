@@ -5,12 +5,23 @@ class Polygon extends Geo<Polygon> {
     int length;
     Point[] points;
     Line[] lines;
-    Point centroid = new Point(0, 0);
+    Point centroid = new Point();
 
     Polygon(Point[] points) {
-        if (points == null) {
-            return;
+        this.length = points.length;
+        this.points = points.clone();
+        lines = new Line[length];
+        for (int i = 0; i < length; i++) {
+            lines[i] = new Line(points[i], points[(i + 1) % length]);
         }
+        computeCentroid();
+    }
+
+    Polygon() {
+
+    }
+
+    void set(Point[] points) {
         this.length = points.length;
         this.points = points.clone();
         lines = new Line[length];
@@ -27,6 +38,7 @@ class Polygon extends Geo<Polygon> {
         }
         Polygon polygon = new Polygon(points);
         polygon.setColor(color);
+        polygon.setWidth(width);
         return polygon;
     }
 
@@ -40,8 +52,8 @@ class Polygon extends Geo<Polygon> {
         int[] xPoints = new int[length];
         int[] yPoints = new int[length];
         for (int i = 0; i < length; i++) {
-            xPoints[i] = (int) Math.round(points[i].getX() + Game.getInstance().panel.xAdjust);
-            yPoints[i] = (int) Math.round(points[i].getY() + Game.getInstance().panel.yAdjust);
+            xPoints[i] = (int) Math.round(points[i].getX() + Game.getInstance().room.xAdjust);
+            yPoints[i] = (int) Math.round(points[i].getY() + Game.getInstance().room.yAdjust);
         }
         g2d.setColor(color);
         g2d.fillPolygon(xPoints, yPoints, length);
@@ -110,7 +122,7 @@ class Polygon extends Geo<Polygon> {
     Polygon getRotation(double radian) {
         Polygon polygon = clone();
         polygon.rotate(radian);
-        return new Polygon(points);
+        return polygon;
     }
 
     Point computeCentroid() {

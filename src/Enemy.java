@@ -16,30 +16,25 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
 
     Weapon weapon;
 
-    Enemy(Point[] points) {
-        super(points);
+    Enemy(Room room, Point[] points) {
+        super(room, points);
+    }
+
+    Enemy(Room room, int id) {
+        super(room);
+        this.id = id;
+        muzzleFlash = new Line();
+        muzzleFlash.setBorderColor(new Color(247, 241, 181));
+        muzzleFlash.setWidth(8);
     }
 
     void scan(Scanner data) throws IOException {
-        muzzleFlash = new Line(new Point(0, 0), new Point(0, 0));
-        muzzleFlash.setBorderColor(new Color(247, 241, 181));
-        muzzleFlash.setWidth(8);
-        if (points == null) {
-            length = Integer.parseInt(data.next());
-            this.points = new Point[length];
-            for (int j = 0; j < length; j++) {
-                this.points[j] = new Point(Double.parseDouble(data.next()), Double.parseDouble(data.next()));
-            }
-            this.lines = new Line[length];
-            for (int i = 0; i < length; i++) {
-                lines[i] = new Line(this.points[i], this.points[(i + 1) % length]);
-            }
-            computeCentroid();
-        } else {
-            for (int j = 0; j <= length; j++) {
-                data.nextLine();
-            }
+        length = Integer.parseInt(data.next());
+        Point[] points = new Point[length];
+        for (int j = 0; j < length; j++) {
+            points[j] = new Point(Double.parseDouble(data.next()), Double.parseDouble(data.next()));
         }
+        set(points);
         value = Integer.parseInt(data.next()) * 10;
         health = Integer.parseInt(data.next());
         moveSpeed = Double.parseDouble(data.next());
@@ -55,7 +50,8 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
     void shoot() {
         weapon.shoot(centroid, direction);
         attemptMove(weapon.recoil, direction);
-        Casing casing = new Casing(centroid, direction + Math.PI / 2 + Math.PI / 10 * Math.random() - Math.PI / 20, 20,
+        Casing casing = new Casing(room, centroid,
+                direction + Math.PI / 2 + Math.PI / 10 * Math.random() - Math.PI / 20, 20,
                 40, 4, 30, 100);
         casing.color = new Color(175, 156, 96);
         casing.width = 3;
@@ -76,7 +72,7 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
                 }
             }
         };
-        timer.schedule(timertask, 0, Game.getInstance().delay);
+        timer.schedule(timertask, 0, Game.delay);
         if (weapon.shotCount == 1) {
             return;
         }
@@ -105,7 +101,7 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
                         }
                     }
                 };
-                timer.schedule(timertask, 0, Game.getInstance().delay);
+                timer.schedule(timertask, 0, Game.delay);
                 weapon.shoot(centroid, direction);
                 if (count == weapon.shotCount - 1) {
                     timer2.cancel();
@@ -113,8 +109,8 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
                 }
             }
         };
-        timer2.schedule(timertask2, weapon.shotCooldown * Game.getInstance().delay,
-                weapon.shotCooldown * Game.getInstance().delay);
+        timer2.schedule(timertask2, weapon.shotCooldown * Game.delay,
+                weapon.shotCooldown * Game.delay);
     }
 
     void hit() {
@@ -131,15 +127,15 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
                 rotationSpeed *= 2;
             }
         };
-        timer.schedule(timertask, 10 * Game.getInstance().delay);
+        timer.schedule(timertask, 10 * Game.delay);
     }
 
     void death() {
-        Game.getInstance().room.entities.remove(this);
+        room.entities.remove(this);
         timer.cancel();
         timer.purge();
-        Game.getInstance().room.score += value;
-        Polygon corpse = this.clone();
+        room.score += value;
+        Polygon corpse = clone();
         corpse.color = new Color(139, 0, 0);
         Timer timer = new Timer();
         TimerTask timertask = new TimerTask() {
@@ -152,14 +148,14 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
                 corpse.setBorderColor(new Color(0, 0, 0, -255 * (Enemy.this.corpseLength - count)
                         * (Enemy.this.corpseLength - count) / Enemy.this.corpseLength / Enemy.this.corpseLength + 255));
                 if (count == 0) {
-                    Game.getInstance().room.polygons.remove(corpse);
+                    room.polygons.remove(corpse);
                     timer.cancel();
                     timer.purge();
                 }
             }
         };
-        Game.getInstance().room.polygons.add(corpse);
-        timer.schedule(timertask, 30 * Game.getInstance().delay, Game.getInstance().delay);
+        room.polygons.add(corpse);
+        timer.schedule(timertask, 30 * Game.delay, Game.delay);
     }
 
     T translate(int x, double y) {
@@ -179,11 +175,11 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
 }
 
 class Chaser extends Enemy<Chaser> {
-    Chaser(Point[] points, int id) {
-        super(points);
-        this.id = id;
+    Chaser(Room room, int id) {
+        super(room, id);
         orginalColor = Color.yellow;
         color = orginalColor;
+        speed = moveSpeed;
         corpseLength = 600;
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/chaser" + id + ".txt"));
@@ -192,7 +188,11 @@ class Chaser extends Enemy<Chaser> {
             System.out.println("Enemy Loading Error");
             System.exit(-1);
         }
-        speed = moveSpeed;
+    }
+
+    Chaser(Room room, Point[] points, int id) {
+        this(room, id);
+        set(points);
     }
 
     public Chaser clone() {
@@ -200,21 +200,21 @@ class Chaser extends Enemy<Chaser> {
         for (int i = 0; i < length; i++) {
             points[i] = this.points[i].clone();
         }
-        Chaser chaser = new Chaser(points, id);
+        Chaser chaser = new Chaser(room, points, id);
         return chaser;
     }
 
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = Game.getInstance().room.player.centroid;
+                Point playerCentroid = room.player.centroid;
                 double radian = new Line(centroid, playerCentroid).caculateRadian();
                 rotate(direction - radian);
                 direction = radian;
                 directionMove(moveSpeed, direction);
             }
         };
-        timer.schedule(timertask, 0, Game.getInstance().delay);
+        timer.schedule(timertask, 0, Game.delay);
     }
 }
 
@@ -222,16 +222,15 @@ class Rifle extends Enemy<Rifle> {
     int shootDistance;
     int moveDistance;
 
-    Rifle(Point[] points, int id) {
-        super(points);
-        this.id = id;
+    Rifle(Room room, int id) {
+        super(room, id);
         orginalColor = Color.blue;
         color = orginalColor;
         corpseLength = 600;
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/rifle" + id + ".txt"));
             scan(data);
-            weapon = new Weapon("rifle" + id);
+            weapon = new Weapon(this, "rifle" + id);
             shootDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 1));
             moveDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 0.8));
         } catch (IOException e) {
@@ -240,12 +239,17 @@ class Rifle extends Enemy<Rifle> {
         }
     }
 
+    Rifle(Room room, Point[] points, int id) {
+        this(room, id);
+        set(points);
+    }
+
     public Rifle clone() {
         Point[] points = new Point[length];
         for (int i = 0; i < length; i++) {
             points[i] = this.points[i].clone();
         }
-        Rifle rifle = new Rifle(points, id);
+        Rifle rifle = new Rifle(room, points, id);
         rifle.shootDistance = shootDistance;
         rifle.moveDistance = moveDistance;
         return rifle;
@@ -254,7 +258,7 @@ class Rifle extends Enemy<Rifle> {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = Game.getInstance().room.player.centroid;
+                Point playerCentroid = room.player.centroid;
                 Line line = new Line(centroid, playerCentroid);
                 double radian = line.caculateRadian();
                 rotate(direction - radian);
@@ -264,10 +268,10 @@ class Rifle extends Enemy<Rifle> {
                 }
             }
         };
-        timer.schedule(timertask, 0, Game.getInstance().delay);
+        timer.schedule(timertask, 0, Game.delay);
         timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = Game.getInstance().room.player.centroid;
+                Point playerCentroid = room.player.centroid;
                 if (new Line(centroid, playerCentroid).length <= shootDistance) {
                     speed = moveSpeed * weapon.shootMovementSpeed;
                     shoot();
@@ -285,16 +289,15 @@ class Sniper extends Enemy<Sniper> {
     int moveDistance;
     int runDistance;
 
-    Sniper(Point[] points, int id) {
-        super(points);
-        this.id = id;
+    Sniper(Room room, int id) {
+        super(room, id);
         orginalColor = Color.white;
         color = orginalColor;
         corpseLength = 600;
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/sniper" + id + ".txt"));
             scan(data);
-            weapon = new Weapon("sniper" + id);
+            weapon = new Weapon(this, "sniper" + id);
             shootDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 1));
             moveDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 0.8));
             runDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 0.9));
@@ -304,12 +307,17 @@ class Sniper extends Enemy<Sniper> {
         }
     }
 
+    Sniper(Room room, Point[] points, int id) {
+        this(room, id);
+        set(points);
+    }
+
     public Sniper clone() {
         Point[] points = new Point[length];
         for (int i = 0; i < length; i++) {
             points[i] = this.points[i].clone();
         }
-        Sniper sniper = new Sniper(points, id);
+        Sniper sniper = new Sniper(room, points, id);
         sniper.shootDistance = shootDistance;
         sniper.moveDistance = moveDistance;
         sniper.runDistance = runDistance;
@@ -319,7 +327,7 @@ class Sniper extends Enemy<Sniper> {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = Game.getInstance().room.player.centroid;
+                Point playerCentroid = room.player.centroid;
                 Line line = new Line(centroid, playerCentroid);
                 double radian = line.caculateRadian();
                 rotate(direction - radian);
@@ -327,21 +335,21 @@ class Sniper extends Enemy<Sniper> {
                 if (line.length >= moveDistance) {
                     directionMove(speed, direction);
                 } else if (Sniper.this.directionTranslate(-speed, direction)
-                        .intersects(Game.getInstance().room.boundingBox(20))) {
+                        .intersects(room.boundingBox(20))) {
                     directionMove(moveSpeed, direction);
                 } else if (runDistance >= line.length) {
                     if (!Sniper.this.directionTranslate(-speed, direction)
-                            .intersects(Game.getInstance().room.boundingBox(30))) {
+                            .intersects(room.boundingBox(30))) {
                         directionMove(-speed, direction);
                     }
                 }
 
             }
         };
-        timer.schedule(timertask, 0, Game.getInstance().delay);
+        timer.schedule(timertask, 0, Game.delay);
         timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = Game.getInstance().room.player.centroid;
+                Point playerCentroid = room.player.centroid;
                 double length = new Line(centroid, playerCentroid).length;
                 if (length > shootDistance) {
                     speed = moveSpeed;
@@ -349,7 +357,7 @@ class Sniper extends Enemy<Sniper> {
                 }
                 if (runDistance <= length && length <= shootDistance
                         || Sniper.this.directionTranslate(-speed, direction)
-                                .intersects(Game.getInstance().room.boundingBox(30))) {
+                                .intersects(room.boundingBox(30))) {
                     speed = moveSpeed * weapon.shootMovementSpeed;
                     shoot();
                 } else {
@@ -365,16 +373,15 @@ class Machine extends Enemy<Machine> {
     int shootDistance;
     int moveDistance;
 
-    Machine(Point[] points, int id) {
-        super(points);
-        this.id = id;
+    Machine(Room room, int id) {
+        super(room, id);
         orginalColor = Color.green;
         color = orginalColor;
         corpseLength = 700;
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/machine" + id + ".txt"));
             scan(data);
-            weapon = new Weapon("machine" + id);
+            weapon = new Weapon(this, "machine" + id);
             shootDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 1));
             moveDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 0.8));
         } catch (IOException e) {
@@ -383,12 +390,17 @@ class Machine extends Enemy<Machine> {
         }
     }
 
+    Machine(Room room, Point[] points, int id) {
+        this(room, id);
+        set(points);
+    }
+
     public Machine clone() {
         Point[] points = new Point[length];
         for (int i = 0; i < length; i++) {
             points[i] = this.points[i].clone();
         }
-        Machine machine = new Machine(points, id);
+        Machine machine = new Machine(room, points, id);
         machine.shootDistance = shootDistance;
         machine.moveDistance = moveDistance;
         return machine;
@@ -397,7 +409,7 @@ class Machine extends Enemy<Machine> {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = Game.getInstance().room.player.centroid;
+                Point playerCentroid = room.player.centroid;
                 Line line = new Line(centroid, playerCentroid);
                 double radian = line.caculateRadian();
                 rotate(direction - radian);
@@ -407,10 +419,10 @@ class Machine extends Enemy<Machine> {
                 }
             }
         };
-        timer.schedule(timertask, 0, Game.getInstance().delay);
+        timer.schedule(timertask, 0, Game.delay);
         timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = Game.getInstance().room.player.centroid;
+                Point playerCentroid = room.player.centroid;
                 if (new Line(centroid, playerCentroid).length <= shootDistance) {
                     speed = moveSpeed * weapon.shootMovementSpeed;
                     shoot();
@@ -428,9 +440,8 @@ class Sharp extends Enemy<Sharp> {
     int moveDistance;
     int strafing;
 
-    Sharp(Point[] points, int id) {
-        super(points);
-        this.id = id;
+    Sharp(Room room, int id) {
+        super(room, id);
         orginalColor = Color.gray;
         color = orginalColor;
         corpseLength = 1000;
@@ -442,7 +453,7 @@ class Sharp extends Enemy<Sharp> {
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/sharp" + id + ".txt"));
             scan(data);
-            weapon = new Weapon("sharp" + id);
+            weapon = new Weapon(this, "sharp" + id);
             shootDistance = (int) (Integer.parseInt(data.next()) * (0.1 * Math.random() + 1));
             moveDistance = (int) (Integer.parseInt(data.next()) * (0.1 * Math.random() + 0.9));
         } catch (IOException e) {
@@ -451,12 +462,17 @@ class Sharp extends Enemy<Sharp> {
         }
     }
 
+    Sharp(Room room, Point[] points, int id) {
+        this(room, id);
+        set(points);
+    }
+
     public Sharp clone() {
         Point[] points = new Point[length];
         for (int i = 0; i < length; i++) {
             points[i] = this.points[i].clone();
         }
-        Sharp sharp = new Sharp(points, id);
+        Sharp sharp = new Sharp(room, points, id);
         sharp.shootDistance = shootDistance;
         sharp.moveDistance = moveDistance;
         sharp.strafing = strafing;
@@ -466,20 +482,20 @@ class Sharp extends Enemy<Sharp> {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = Game.getInstance().room.player.centroid;
+                Point playerCentroid = room.player.centroid;
                 Line line = new Line(centroid, playerCentroid);
                 double radian = line.caculateRadian();
                 rotate(direction - radian);
                 direction = radian;
                 if (line.length >= moveDistance) {
                     directionMove(2 * speed / 3, direction);
-                    if (Game.getInstance().room
+                    if (room
                             .intersects(directionTranslate(speed, direction + strafing * Math.PI / 2))) {
                         strafing *= -1;
                     }
                     directionMove(speed / 3, direction);
                 } else {
-                    if (Game.getInstance().room
+                    if (room
                             .intersects(directionTranslate(speed, direction + strafing * Math.PI / 2))) {
                         strafing *= -1;
                     } else if (Math.random() < 0.05) {
@@ -489,10 +505,10 @@ class Sharp extends Enemy<Sharp> {
                 }
             }
         };
-        timer.schedule(timertask, 0, Game.getInstance().delay);
+        timer.schedule(timertask, 0, Game.delay);
         timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = Game.getInstance().room.player.centroid;
+                Point playerCentroid = room.player.centroid;
                 if (new Line(centroid, playerCentroid).length <= shootDistance) {
                     speed = moveSpeed * weapon.shootMovementSpeed;
                     shoot();

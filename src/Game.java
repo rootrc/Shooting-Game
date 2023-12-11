@@ -8,7 +8,7 @@ import javax.swing.JFrame;
 import javax.swing.Timer;
 
 class Game {
-    final int delay = 20;
+    final static int delay = 20;
     private static Game instance = new Game();
     int gameState;
     JFrame frame;
@@ -28,7 +28,7 @@ class Game {
         frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        Timer timer = new Timer(delay, new ActionListener() {
+        Timer timer = new Timer(Game.delay, new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
                 panel.repaint();
             }
