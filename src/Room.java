@@ -9,6 +9,7 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.SwingUtilities;
 
+import Geo.Line;
 import Geo.Point;
 import Geo.Polygon;
 
@@ -21,8 +22,9 @@ public class Room extends Polygon {
     private Timer timer = new Timer();
     ConcurrentHashMap.KeySetView<Projectile, Boolean> projectiles = ConcurrentHashMap.newKeySet();
     ConcurrentHashMap.KeySetView<Entity, Boolean> entities = ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.KeySetView<MuzzleFlash, Boolean> muzzleFlashes = ConcurrentHashMap.newKeySet();
     private HashMap<String, Double> enemySpawns = new HashMap<>();
-    ConcurrentHashMap.KeySetView<Polygon, Boolean> polygons = ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.KeySetView<Corpse, Boolean> corpses = ConcurrentHashMap.newKeySet();
     ConcurrentHashMap.KeySetView<Particle, Boolean> particles = ConcurrentHashMap.newKeySet();
     Player player;
     int xAdjust;
@@ -32,16 +34,15 @@ public class Room extends Polygon {
 
     Room(Point[] points, int id) {
         super(points);
-        color = Color.white;
+        setColor(Color.white);
         score = 0;
-        player = new Player(this, 
+        player = new Player(this,
                 new Point[] { new Point(300, 300), new Point(332, 300), new Point(332, 332), new Point(300, 332) });
         entities.add(player);
         scoreForNextRoom = 0;
         loadRoom(id);
     }
 
-    // temporary
     void loadRoom(int id) {
         this.id = id;
         enemySpawns.clear();
@@ -81,9 +82,12 @@ public class Room extends Polygon {
     void draw(Graphics2D g2d) {
         super.draw(g2d, xAdjust, yAdjust);
         super.fill(g2d, xAdjust, yAdjust);
-        for (Polygon polygon : polygons) {
-            polygon.draw(g2d, xAdjust, yAdjust);
-            polygon.fill(g2d, xAdjust, yAdjust);
+        for (Corpse corpse : corpses) {
+            corpse.draw(g2d, xAdjust, yAdjust);
+            corpse.fill(g2d, xAdjust, yAdjust);
+        }
+        for (MuzzleFlash muzzleFlash: muzzleFlashes) {
+            muzzleFlash.draw(g2d, xAdjust, yAdjust);
         }
         for (Particle particle : particles) {
             particle.draw(g2d, xAdjust, yAdjust);
@@ -156,6 +160,13 @@ public class Room extends Polygon {
     Polygon boundingBox(int width) {
         return new Polygon(new Point[] { getPoint(0).translate(width, width), getPoint(1).translate(-width, width),
                 getPoint(2).translate(-width, -width), getPoint(3).translate(width, -width) });
+    }
+
+    boolean inside(Point point) {
+        return getPoint(0).getX() < point.getX() - point.getWidth() / 2
+                && point.getX() + point.getWidth() / 2 < getPoint(2).getX()
+                && getPoint(0).getY() < point.getY() - point.getWidth() / 2
+                && point.getY() + point.getWidth() / 2 < getPoint(2).getY();
     }
 
     void keyPressed(KeyEvent e) {

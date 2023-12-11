@@ -19,7 +19,7 @@ public class Polygon extends Geo<Polygon> {
         computeCentroid();
     }
 
-    public Polygon() {
+    protected Polygon() {
 
     }
 
@@ -40,13 +40,13 @@ public class Polygon extends Geo<Polygon> {
         return polygon;
     }
 
-    public void draw(Graphics2D g2d, int x, int y) {
+    protected void draw(Graphics2D g2d, int x, int y) {
         for (int i = 0; i < length; i++) {
             lines[i].draw(g2d, x, y);
         }
     }
 
-    public void fill(Graphics2D g2d, int x, int y) {
+    protected void fill(Graphics2D g2d, int x, int y) {
         int[] xPoints = new int[length];
         int[] yPoints = new int[length];
         for (int i = 0; i < length; i++) {
@@ -71,23 +71,27 @@ public class Polygon extends Geo<Polygon> {
         centroid.moveY(y);
     }
 
-    public void setBorderColor(Color color) {
+    protected void setBorderColor(Color color) {
         for (Line line : lines) {
             line.setBorderColor(color);
         }
     }
 
-    public void setColor(Color color) {
+    protected void setColor(Color color) {
         this.color = color;
     }
 
-    public void setWidth(int width) {
+    protected Color getColor() {
+        return color;
+    }
+
+    protected void setWidth(int width) {
         for (Line line : lines) {
             line.setWidth(width);
         }
     }
 
-    public Point[] getPoints() {
+    protected Point[] getPoints() {
         Point[] points = new Point[length];
         for (int i = 0; i < length; i++) {
             points[i] = this.points[i].clone();
@@ -99,21 +103,21 @@ public class Polygon extends Geo<Polygon> {
         return points[i].clone();
     }
 
-    public boolean intersects(Line line) {
-        for (Line line2 : lines) {
-            if (line2.intersects(line)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public boolean intersects(Polygon polygon) {
         for (Line line1 : lines) {
             for (Line line2 : polygon.lines) {
                 if (line1.intersects(line2)) {
                     return true;
                 }
+            }
+        }
+        return false;
+    }
+
+    public boolean intersects(Line line) {
+        for (Line line2 : lines) {
+            if (line2.intersects(line)) {
+                return true;
             }
         }
         return false;

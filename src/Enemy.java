@@ -12,13 +12,9 @@ import Geo.Polygon;
 
 abstract class Enemy<T extends Enemy<T>> extends Entity {
     int id;
-    Line muzzleFlash;
-    boolean muzzleFlashing;
     double speed;
     double moveSpeed;
     double rotationSpeed;
-
-    Weapon weapon;
 
     Enemy(Room room, Point[] points) {
         super(room, points);
@@ -27,9 +23,6 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
     Enemy(Room room, int id) {
         super(room);
         this.id = id;
-        muzzleFlash = new Line();
-        muzzleFlash.setBorderColor(new Color(247, 241, 181));
-        muzzleFlash.setWidth(8);
     }
 
     void scan(Scanner data) throws IOException {
@@ -44,10 +37,7 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
         moveSpeed = Double.parseDouble(data.next());
     }
 
-    public void draw(Graphics2D g2d, int x, int y) {
-        if (muzzleFlashing) {
-            muzzleFlash.draw(g2d, x, y);
-        }
+    protected void draw(Graphics2D g2d, int x, int y) {
         super.draw(g2d, x, y);
     }
 
@@ -57,26 +47,9 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
         Casing casing = new Casing(room, getCentroid(),
                 direction + Math.PI / 2 + Math.PI / 10 * Math.random() - Math.PI / 20, 20,
                 40, 4, 30, 100);
-        casing.color = new Color(175, 156, 96);
-        casing.width = 3;
-        muzzleFlashing = true;
-        double muzzleDirection = direction;
-        Timer timer = new Timer();
-        TimerTask timertask = new TimerTask() {
-            int count = 0;
-
-            public void run() {
-                count++;
-                muzzleFlash.setP1(getCentroid().clone());
-                muzzleFlash.setP2(getCentroid().directionTranslate(20 + weapon.projectile.getLength() / 2, muzzleDirection));
-                if (count == 3) {
-                    muzzleFlashing = false;
-                    timer.cancel();
-                    timer.purge();
-                }
-            }
-        };
-        timer.schedule(timertask, 0, Game.delay);
+        casing.setBorderColor(new Color(175, 156, 96));
+        casing.setWidth(3);
+        new MuzzleFlash(this);
         if (weapon.shotCount == 1) {
             return;
         }
@@ -87,25 +60,7 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
             public void run() {
                 count++;
                 attemptMove(weapon.recoil, direction);
-                muzzleFlashing = true;
-                double muzzleDirection = direction;
-                Timer timer = new Timer();
-                TimerTask timertask = new TimerTask() {
-                    int count = 0;
-
-                    public void run() {
-                        count++;
-                        muzzleFlash.setP1(getCentroid().clone());
-                        muzzleFlash
-                                .setP2(getCentroid().directionTranslate(20 + weapon.projectile.getLength() / 2, muzzleDirection));
-                        if (count == 3) {
-                            muzzleFlashing = false;
-                            timer.cancel();
-                            timer.purge();
-                        }
-                    }
-                };
-                timer.schedule(timertask, 0, Game.delay);
+                new MuzzleFlash(Enemy.this);
                 weapon.shoot(getCentroid(), direction);
                 if (count == weapon.shotCount - 1) {
                     timer2.cancel();
@@ -118,7 +73,7 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
     }
 
     void hit() {
-        color = new Color(139, 0, 0);
+        setColor(new Color(139, 0, 0));
         Timer timer = new Timer();
         speed /= 2;
         moveSpeed /= 2;
@@ -139,27 +94,7 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
         timer.cancel();
         timer.purge();
         room.score += value;
-        Polygon corpse = clone();
-        corpse.color = new Color(139, 0, 0);
-        Timer timer = new Timer();
-        TimerTask timertask = new TimerTask() {
-            int count = Enemy.this.corpseLength;
-
-            public void run() {
-                count--;
-                corpse.color = new Color(0, 0, 0, -255 * (Enemy.this.corpseLength - count)
-                        * (Enemy.this.corpseLength - count) / Enemy.this.corpseLength / Enemy.this.corpseLength + 255);
-                corpse.setBorderColor(new Color(0, 0, 0, -255 * (Enemy.this.corpseLength - count)
-                        * (Enemy.this.corpseLength - count) / Enemy.this.corpseLength / Enemy.this.corpseLength + 255));
-                if (count == 0) {
-                    room.polygons.remove(corpse);
-                    timer.cancel();
-                    timer.purge();
-                }
-            }
-        };
-        room.polygons.add(corpse);
-        timer.schedule(timertask, 30 * Game.delay, Game.delay);
+        new Corpse(this, corpseTime);
     }
 
     public T translate(int x, int y) {
@@ -182,9 +117,9 @@ class Chaser extends Enemy<Chaser> {
     Chaser(Room room, int id) {
         super(room, id);
         orginalColor = Color.yellow;
-        color = orginalColor;
+        setColor(orginalColor);
         speed = moveSpeed;
-        corpseLength = 600;
+        corpseTime = 600;
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/chaser" + id + ".txt"));
             scan(data);
@@ -225,8 +160,8 @@ class Rifle extends Enemy<Rifle> {
     Rifle(Room room, int id) {
         super(room, id);
         orginalColor = Color.blue;
-        color = orginalColor;
-        corpseLength = 600;
+        setColor(orginalColor);
+        corpseTime = 600;
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/rifle" + id + ".txt"));
             scan(data);
@@ -288,8 +223,8 @@ class Sniper extends Enemy<Sniper> {
     Sniper(Room room, int id) {
         super(room, id);
         orginalColor = Color.white;
-        color = orginalColor;
-        corpseLength = 600;
+        setColor(orginalColor);
+        corpseTime = 600;
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/sniper" + id + ".txt"));
             scan(data);
@@ -368,8 +303,8 @@ class Machine extends Enemy<Machine> {
     Machine(Room room, int id) {
         super(room, id);
         orginalColor = Color.green;
-        color = orginalColor;
-        corpseLength = 700;
+        setColor(orginalColor);
+        corpseTime = 700;
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/machine" + id + ".txt"));
             scan(data);
@@ -431,8 +366,8 @@ class Sharp extends Enemy<Sharp> {
     Sharp(Room room, int id) {
         super(room, id);
         orginalColor = Color.gray;
-        color = orginalColor;
-        corpseLength = 1000;
+        setColor(orginalColor);
+        corpseTime = 1000;
         if (Math.random() < 0.5) {
             strafing = 1;
         } else {

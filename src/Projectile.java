@@ -1,3 +1,4 @@
+import java.awt.Graphics2D;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -21,6 +22,14 @@ abstract class Projectile extends Line {
         this.room = room;
     }
 
+    protected void draw(Graphics2D g2d, int x, int y) {
+        super.draw(g2d, x, y);
+    }
+
+    protected void setWidth(int width) {
+        super.setWidth(width);
+    }
+
     abstract public Projectile clone();
 
     abstract void shoot(Point centroid, double direction, double random);
@@ -41,8 +50,8 @@ class Bullet extends Projectile {
 
     public Bullet clone() {
         Bullet bullet = new Bullet(room, getP1(), getP2());
-        bullet.setBorderColor(color);
-        bullet.setWidth(width);
+        bullet.setBorderColor(getBorderColor());
+        bullet.setWidth(getWidth());
         bullet.length = length;
         bullet.isPlayer = isPlayer;
         bullet.damage = damage;
@@ -70,9 +79,7 @@ class Bullet extends Projectile {
                     room.projectiles.remove(Bullet.this);
                     timer.cancel();
                     timer.purge();
-                } else if (!(room.getPoints()[0].getX() < getP2().getX() && getP2().getX() < room.getPoints()[2].getX()
-                        && room.getPoints()[0].getY() < getP2().getY()
-                        && getP2().getY() < room.getPoints()[2].getY())) {
+                } else if (!room.inside(getP2())) {
                     room.projectiles.remove(Bullet.this);
                     timer.cancel();
                     timer.purge();
@@ -120,8 +127,8 @@ class LimitedBullet extends Projectile {
 
     public LimitedBullet clone() {
         LimitedBullet limitedBullet = new LimitedBullet(room, getP1(), getP2());
-        limitedBullet.color = color;
-        limitedBullet.width = width;
+        limitedBullet.setBorderColor(getBorderColor());
+        limitedBullet.setWidth(getWidth());
         limitedBullet.length = length;
         limitedBullet.isPlayer = isPlayer;
         limitedBullet.damage = damage;
@@ -155,8 +162,7 @@ class LimitedBullet extends Projectile {
                     room.projectiles.remove(LimitedBullet.this);
                     timer.cancel();
                     timer.purge();
-                } else if (!(room.getPoint(0).getX() < getP2().getX() && getP2().getX() < room.getPoint(2).getX()
-                        && room.getPoint(0).getY() < getP2().getY() && getP2().getY() < room.getPoint(2).getY())) {
+                } else if (!room.inside(getP2())) {
                     room.projectiles.remove(LimitedBullet.this);
                     timer.cancel();
                     timer.purge();

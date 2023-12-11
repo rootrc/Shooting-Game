@@ -16,12 +16,12 @@ public class Line extends Geo<Line> {
         length = caculateLength();
     }
 
-    public Line() {
+    protected Line() {
         p1 = new Point();
         p2 = new Point();
     }
 
-    public void set(Point p1, Point p2) {
+    protected void set(Point p1, Point p2) {
         this.p1 = p1;
         this.p2 = p2;
         length = caculateLength();
@@ -34,7 +34,7 @@ public class Line extends Geo<Line> {
         return line;
     }
 
-    public void draw(Graphics2D g2d, int x, int y) {
+    protected void draw(Graphics2D g2d, int x, int y) {
         g2d.setColor(color);
         g2d.setStroke(new BasicStroke(width));
         g2d.drawLine((int) Math.round(p1.getX()) + x,
@@ -57,14 +57,10 @@ public class Line extends Geo<Line> {
 
     public void setP1(Point point) {
         p1 = point;
-        // length = Math.sqrt(
-        //         (p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
     }
 
     public void setP2(Point point) {
         p2 = point;
-        // length = Math.sqrt(
-        //         (p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
     }
 
     protected void moveX(double x) {
@@ -77,13 +73,13 @@ public class Line extends Geo<Line> {
         p2.moveY(y);
     }
 
-    public void setBorderColor(Color color) {
+    protected void setBorderColor(Color color) {
         this.color = color;
         p1.setBorderColor(color);
         p2.setBorderColor(color);
     }
 
-    public void setWidth(int width) {
+    protected void setWidth(int width) {
         this.width = width;
         p1.setWidth(width);
         p1.setWidth(width);

@@ -17,7 +17,7 @@ public class Point extends Geo<Point> {
         this.y = y;
     }
 
-    public Point() {
+    protected Point() {
 
     }
 
@@ -37,7 +37,7 @@ public class Point extends Geo<Point> {
         return point;
     }
 
-    public void draw(Graphics2D g2d, int x, int y) {
+    protected void draw(Graphics2D g2d, int x, int y) {
         g2d.setColor(color);
         g2d.setStroke(new BasicStroke(width));
         g2d.drawLine((int) Math.round(this.x) + x,
@@ -69,7 +69,13 @@ public class Point extends Geo<Point> {
     protected void moveY(double y) {
         this.y += y;
     }
+    public void directionMove(int distance, double direction) {
+        super.directionMove(distance, direction);
+    }
 
+    public void directionMove(double distance, double direction) {
+        super.directionMove(distance, direction);
+    }
     public void setBorderColor(Color color) {
         this.color = color;
     }

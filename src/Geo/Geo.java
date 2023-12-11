@@ -3,8 +3,8 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 
 abstract class Geo<T extends Geo<T>> implements Cloneable {
-    public Color color = Color.black;
-    public int width = 1;
+    Color color = Color.black;
+    int width = 1;
 
     protected void move(int x, int y) {
         moveX(x);
@@ -16,19 +16,19 @@ abstract class Geo<T extends Geo<T>> implements Cloneable {
         moveY(y);
     }
 
-    protected void moveX(int x) {
+    private void moveX(int x) {
         moveX((double) x);
     }
 
-    protected void moveY(int y) {
+    private void moveY(int y) {
         moveY((double) y);
     }
 
-    public void directionMove(int distance, double direction) {
+    protected void directionMove(int distance, double direction) {
         directionMove((double) distance, direction);
     }
 
-    public void directionMove(double distance, double direction) {
+    protected void directionMove(double distance, double direction) {
         move(-distance * Math.cos(direction), distance * Math.sin(direction));
     }
 
@@ -52,24 +52,24 @@ abstract class Geo<T extends Geo<T>> implements Cloneable {
         return t;
     }
 
-    protected Color getColor() {
+    public Color getBorderColor() {
         return color;
     }
 
-    protected int getWidth() {
+    public int getWidth() {
         return width;
     }
 
     public abstract T clone();
 
-    public abstract void draw(Graphics2D g2d, int x, int y);
+    protected abstract void draw(Graphics2D g2d, int x, int y);
 
-    protected abstract void moveX(double x);
+    abstract void moveX(double x);
 
-    protected abstract void moveY(double x);
+    abstract void moveY(double x);
 
-    public abstract void setBorderColor(Color color);
+    abstract void setBorderColor(Color color);
 
-    public abstract void setWidth(int width);
+    abstract void setWidth(int width);
 
 }

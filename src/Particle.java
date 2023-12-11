@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.Graphics2D;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -16,23 +17,19 @@ abstract class Particle extends Point {
         process();
     }
 
+    protected void draw(Graphics2D g2d, int x, int y) {
+        super.draw(g2d, x, y);
+    }
+
     void attemptMove(double distance, double direction) {
-        Point point = directionTranslate(-distance, direction);
-        if (room.getPoint(0).getX() < point.getX() - width / 2
-                && point.getX() + width / 2 < room.getPoint(2).getX()
-                && room.getPoint(0).getY() < point.getY() - width / 2
-                && point.getY() + width / 2 < room.getPoint(2).getY()) {
+        if (room.inside(directionTranslate(-distance, direction))) {
             directionMove(-distance, direction);
         } else {
             int l = 0;
             int r = (int) distance;
             while (l < r) {
                 int m = (l + r + 1) / 2;
-                point = directionTranslate(-distance, direction);
-                if (room.getPoint(0).getX() < point.getX() - width / 2
-                        && point.getX() + width / 2 < room.getPoint(2).getX()
-                        && room.getPoint(0).getY() < point.getY() - width / 2
-                        && point.getY() + width / 2 < room.getPoint(2).getY()) {
+                if (room.inside(directionTranslate(-distance, direction))) {
                     l = m;
                 } else {
                     r = m - 1;
@@ -99,8 +96,8 @@ class Casing extends Particle {
 
             public void run() {
                 count++;
-                color = new Color(175, 156, 96, -255 * count
-                        * count / (time3 * time3) + 255);
+                Casing.this.setBorderColor(new Color(175, 156, 96, -255 * count
+                        * count / (time3 * time3) + 255));
                 if (count == time3) {
                     room.particles.remove(Casing.this);
                     timer3.cancel();
