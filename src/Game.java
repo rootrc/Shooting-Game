@@ -21,7 +21,7 @@ class Game {
     private Game() {
         frame = new JFrame();
         panel = new Panel();
-        room = new Room(new Point[] { new Point(10, 10), new Point(777, 10), new Point(777, 700), new Point(10, 700) }, 1);
+        room = new Room(new Point[] { new Point(10, 10), new Point(777, 10), new Point(777, 700), new Point(10, 700) }, 6);
         frame.add(panel);
         frame.pack();
         frame.setTitle("Game");

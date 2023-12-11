@@ -84,7 +84,7 @@ class Player extends Entity {
         timer.schedule(timertask, 0, Game.delay);
     }
 
-    void move() {
+    private void move() {
         Point mouseLocation = Game.getInstance().panel.mouseLocation();
         double radian = new Line(getCentroid(), mouseLocation).caculateRadian();
         Player player = clone();
@@ -105,7 +105,7 @@ class Player extends Entity {
         }
     }
 
-    void hit() {
+    protected void hit() {
         setColor(new Color(139, 0, 0));
         speed /= 2;
         moveSpeed /= 2;
@@ -136,14 +136,15 @@ class Player extends Entity {
         timer2.schedule(timertask, 0, Game.delay);
     }
 
-    void death() {
+    protected void death() {
         timer.cancel();
         timer.purge();
         room.entities.remove(this);
         new Corpse(this, corpseTime);
     }
 
-    void shoot() {
+    private void shoot() {
+        speed = (int) (moveSpeed * weapon.shootMoveSpeed);
         Timer timer = new Timer();
         TimerTask timertask = new TimerTask() {
             public void run() {
@@ -153,14 +154,9 @@ class Player extends Entity {
                     shooting = false;
                     return;
                 }
-                weapon.shoot(getCentroid(), direction);
-                attemptMove(weapon.recoil, direction);
-                Casing casing = new Casing(room, getCentroid(),
-                        direction + Math.PI / 2 + Math.PI / 10 * Math.random() - Math.PI / 20, 25, 50, 4, 40, 200);
-                casing.setBorderColor(new Color(175, 156, 96));
-                casing.setWidth(3);
-                new MuzzleFlash(Player.this);
-                TimerTask timertask2 = new TimerTask() {
+                weapon.shoot();
+                Timer timer = new Timer();
+                TimerTask timertask = new TimerTask() {
                     public void run() {
                         room.xAdjust = 0;
                         room.yAdjust = 0;
@@ -168,7 +164,7 @@ class Player extends Entity {
                 };
                 room.xAdjust = (int) (6 * Math.random()) - 3;
                 room.yAdjust = (int) (6 * Math.random()) - 3;
-                timer.schedule(timertask2, Game.delay);
+                timer.schedule(timertask, Game.delay);
             }
         };
         timer.schedule(timertask, 0, weapon.cooldown);
@@ -208,7 +204,6 @@ class Player extends Entity {
             case KeyEvent.VK_SPACE:
                 if (!shoot && !shooting) {
                     shoot = true;
-                    speed = (int) (moveSpeed * weapon.shootMoveSpeed);
                     shoot();
                 }
                 break;

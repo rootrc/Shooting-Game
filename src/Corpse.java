@@ -6,9 +6,9 @@ import java.util.TimerTask;
 import Geo.Polygon;
 
 class Corpse extends Polygon {
-    Room room;
-    Timer timer = new Timer();
-    int time;
+    private Room room;
+    private Timer timer = new Timer();
+    private int time;
 
     Corpse(Entity entity, int time) {
         super(entity.getPoints());

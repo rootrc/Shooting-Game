@@ -59,7 +59,7 @@ abstract class Entity extends Polygon {
 
     public abstract Entity clone();
 
-    abstract void hit();
+    protected abstract void hit();
 
-    abstract void death();
+    protected abstract void death();
 }

@@ -1,19 +1,24 @@
+import java.awt.Color;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import Geo.Point;
 
 class Weapon {
+    private Entity entity;
     int cooldown;
-    int shotCount;
-    int shotCooldown;
+    private int shotCount;
+    private int shotCooldown;
     double shootMoveSpeed;
-    int recoil;
+    private int recoil;
     private double accuracy;
     Projectile projectile;
 
-    Weapon(Entity entity, String name) {
+    public Weapon(Entity entity, String name) {
+        this.entity = entity;
         try {
             Scanner data = new Scanner(new FileReader("data/weapons/" + name + ".txt"));
             cooldown = Game.parseInt(data) * 100;
@@ -54,7 +59,36 @@ class Weapon {
         }
     }
 
-    void shoot(Point centroid, double direction) {
-        projectile.shoot(centroid, direction, accuracy);
+    public void shoot() {
+        shot(entity.getCentroid(), entity.direction);
+        if (shotCount == 1) {
+            return;
+        }
+        Timer timer2 = new Timer();
+        TimerTask timertask2 = new TimerTask() {
+            int count = 0;
+
+            public void run() {
+                count++;
+                shot(entity.getCentroid(), entity.direction);
+                if (count == shotCount - 1) {
+                    timer2.cancel();
+                    timer2.purge();
+                }
+            }
+        };
+        timer2.schedule(timertask2, shotCooldown * Game.delay,
+                shotCooldown * Game.delay);
+    }
+
+    private void shot(Point centroid, double direction) {
+        direction += accuracy * Math.random() - accuracy / 2;
+        entity.attemptMove(recoil, direction);
+        Casing casing = new Casing(entity.room, entity.getCentroid(),
+                direction + Math.PI / 2 + Math.PI / 10 * Math.random() - Math.PI / 20, 25, 50, 4, 40, 200);
+        casing.setBorderColor(new Color(175, 156, 96));
+        casing.setWidth(3);
+        new MuzzleFlash(entity);
+        projectile.shoot(centroid, direction);
     }
 }

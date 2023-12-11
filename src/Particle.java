@@ -6,8 +6,8 @@ import java.util.TimerTask;
 import Geo.Point;
 
 abstract class Particle extends Point {
-    Room room;
-    double direction;
+    protected Room room;
+    protected double direction;
 
     Particle(Room room, Point point, double direction) {
         super(point.getX(), point.getY());
@@ -43,11 +43,11 @@ abstract class Particle extends Point {
 }
 
 class Casing extends Particle {
-    double distance1;
-    double distance2;
-    int time1;
-    int time2;
-    int time3;
+    private double distance1;
+    private double distance2;
+    private int time1;
+    private int time2;
+    private int time3;
 
     Casing(Room room, Point point, double direction, double distance1, double distance2, int time1, int time2,
             int time3) {

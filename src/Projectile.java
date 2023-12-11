@@ -6,12 +6,13 @@ import Geo.Line;
 import Geo.Point;
 
 abstract class Projectile extends Line {
-    Room room;
-    boolean isPlayer;
-    int damage;
-    int piercing;
-    double length;
-    int knockback;
+    protected Room room;
+    protected Timer timer = new Timer();
+    protected boolean isPlayer;
+    protected int damage;
+    protected int piercing;
+    protected double length;
+    protected int knockback;
 
     Projectile(Room room, Point p1, Point p2) {
         super(p1, p2);
@@ -32,15 +33,15 @@ abstract class Projectile extends Line {
 
     abstract public Projectile clone();
 
-    abstract void shoot(Point centroid, double direction, double accuracy);
+    abstract void shoot(Point centroid, double direction);
 
-    abstract void shoot(double direction);
+    abstract void process();
 }
 
 class Bullet extends Projectile {
     int speed;
 
-    Bullet(Room room, Point p1, Point p2) {
+    private Bullet(Room room, Point p1, Point p2) {
         super(room, p1, p2);
     }
 
@@ -61,16 +62,15 @@ class Bullet extends Projectile {
         return bullet;
     }
 
-    void shoot(Point centroid, double direction, double accuracy) {
-        direction += accuracy * Math.random() - accuracy / 2;
+    void shoot(Point centroid, double direction) {
         Bullet bullet = clone();
         bullet.set(centroid.directionTranslate(20, direction),
                 centroid.directionTranslate(20 + bullet.length, direction));
-        bullet.shoot(direction);
+        bullet.process();
     }
 
-    void shoot(double direction) {
-        Timer timer = new Timer();
+    void process() {
+        double direction = caculateRadian();
         TimerTask timertask = new TimerTask() {
             public void run() {
                 Bullet.this.directionMove(speed, direction);
@@ -117,7 +117,7 @@ class LimitedBullet extends Projectile {
     int speed;
     int duration;
 
-    LimitedBullet(Room room, Point p1, Point p2) {
+    private LimitedBullet(Room room, Point p1, Point p2) {
         super(room, p1, p2);
     }
 
@@ -139,16 +139,15 @@ class LimitedBullet extends Projectile {
         return limitedBullet;
     }
 
-    void shoot(Point centroid, double direction, double random) {
-        direction += random * Math.random() - random / 2;
+    void shoot(Point centroid, double direction) {
         LimitedBullet limitedBullet = clone();
         limitedBullet.setP1(centroid.directionTranslate(20, direction));
         limitedBullet.setP2(centroid.directionTranslate(20 + limitedBullet.length, direction));
-        limitedBullet.shoot(direction);
+        limitedBullet.process();
     }
 
-    void shoot(double direction) {
-        Timer timer = new Timer();
+    void process() {
+        double direction = caculateRadian();
         TimerTask timertask = new TimerTask() {
             int count = 0;
 

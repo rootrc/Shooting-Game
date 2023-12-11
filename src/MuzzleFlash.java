@@ -7,12 +7,12 @@ import Geo.Line;
 import Geo.Point;
 
 class MuzzleFlash extends Line {
-    Room room;
-    Point centroid;
-    double direction;
-    double length;
+    private Room room;
+    private Timer timer = new Timer();
+    private Point centroid;
+    private double direction;
+    private double length;
 
-    Timer timer = new Timer();
 
     MuzzleFlash(Entity entity) {
         this.room = entity.room;
