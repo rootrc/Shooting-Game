@@ -1,6 +1,6 @@
-18
-2
-chaser2
-4
-sniper1
-4
+scoreForNextRoom: 18
+enemyCount: 2
+enemyName: chaser2
+spawnRate: 4
+enemyName: sniper1
+spawnRate: 4

@@ -1,18 +1,18 @@
-50
-8
-chaser1
-12
-rifle1
-12
-sniper1
-12
-machine1
-12
-chaser2
-8
-rifle2
-8
-sniper2
-8
-machine2
-8
+scoreForNextRoom: 50
+enemyCount: 8
+enemyName: chaser1
+spawnRate: 12
+enemyName: rifle1
+spawnRate: 12
+enemyName: sniper1
+spawnRate: 12
+enemyName: machine1
+spawnRate: 12
+enemyName: chaser2
+spawnRate: 8
+enemyName: rifle2
+spawnRate: 8
+enemyName: sniper2
+spawnRate: 8
+enemyName: machine2
+spawnRate: 8

@@ -1,12 +1,12 @@
-10
-1
-0.2
-30
-40
-bullet
-3
-2
-4
-40
-50
-35
+cooldown: 10
+shootCount: 1
+shootMoveSpeed: 0.2
+recoil: 30
+accuracy: 40
+projectileType: bullet
+damage: 3
+piercing: 2
+width: 4
+length: 40
+knockback: 35
+speed: 50

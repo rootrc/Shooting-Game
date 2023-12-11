@@ -48,11 +48,11 @@ public class Room extends Polygon {
         enemySpawns.clear();
         try {
             Scanner data = new Scanner(new FileReader("data/rooms/room" + id + ".txt"));
-            scoreForNextRoom += Integer.parseInt(data.next()) * 10;
-            int N = Integer.parseInt(data.next());
-            for (int i = 0; i < N; i++) {
-                String enemyName = data.next();
-                double spawnRate = Double.parseDouble(data.next()) * 50;
+            scoreForNextRoom += Game.parseInt(data) * 10;
+            int enemyCount = Game.parseInt(data);
+            for (int i = 0; i < enemyCount; i++) {
+                String enemyName = Game.parseStr(data);
+                double spawnRate = Game.parseDouble(data) * 50;
                 enemySpawns.put(enemyName, spawnRate);
             }
 

@@ -1,7 +1,7 @@
-3
-34.6410161514 40
-34.6410161514 0
-0 20
-1
-1
-3
+polygonSides: 3
+point: 34.6410161514 40
+point: 34.6410161514 0
+point: 0 20
+value: 1
+health: 1
+moveSpeed: 3

@@ -1,4 +1,4 @@
-5
-1
-chaser1
-1.8
+scoreForNextRoom: 5
+enemyCount: 1
+enemyName: chaser1
+spawnRate: 1.8

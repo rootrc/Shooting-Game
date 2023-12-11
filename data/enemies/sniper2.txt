@@ -1,10 +1,10 @@
-3
-45 20
-45 0
-0 10
-4
-1
-4
-1000
-1000
-400
+polygonSides: 3
+point: 45 20
+point: 45 0
+point: 0 10
+value: 4
+health: 1
+moveSpeed: 4
+shootDistance: 750
+moveDistance: 700
+runDistance: 400

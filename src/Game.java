@@ -4,6 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.Scanner;
+
 import javax.swing.JFrame;
 import javax.swing.Timer;
 
@@ -19,7 +21,7 @@ class Game {
     private Game() {
         frame = new JFrame();
         panel = new Panel();
-        room = new Room(new Point[] { new Point(10, 10), new Point(777, 10), new Point(777, 700), new Point(10, 700) }, 5);
+        room = new Room(new Point[] { new Point(10, 10), new Point(777, 10), new Point(777, 700), new Point(10, 700) }, 1);
         frame.add(panel);
         frame.pack();
         frame.setTitle("Game");
@@ -45,6 +47,26 @@ class Game {
 
     public static void main(String[] args) {
         Game.getInstance().room.process();
+    }
+
+    static String parseStr(Scanner data) {
+        data.next();
+        return data.next();
+    }
+
+    static int parseInt(Scanner data) {
+        data.next();
+        return Integer.parseInt(data.next());
+    }
+
+    static double parseDouble(Scanner data) {
+        data.next();
+        return Double.parseDouble(data.next());
+    }
+
+    static Point parsePoint(Scanner data) {
+        data.next();
+        return new Point(Double.parseDouble(data.next()), Double.parseDouble(data.next()));
     }
 
     // https://stackoverflow.com/questions/37758061/rotate-a-buffered-image-in-java

@@ -1,13 +1,13 @@
-2
-1
-0.5
-3
-5
-limitedBullet
-1
-1
-1
-10
-5
-10
-35
+cooldown: 2
+shootCount: 1
+shootMoveSpeed: 0.5
+recoil: 3
+accuracy: 5
+projectileType: limitedBullet
+damage: 1
+piercing: 1
+width: 1
+length: 10
+knockback: 10
+speed: 5
+duration: 35

@@ -1,6 +1,6 @@
-30
-2
-machine2
-4
-sniper2
-6
+scoreForNextRoom: 30
+enemyCount: 2
+enemyName: machine2
+spawnRate: 4
+enemyName: sniper2
+spawnRate: 6

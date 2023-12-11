@@ -208,7 +208,7 @@ class Player extends Entity {
             case KeyEvent.VK_SPACE:
                 if (!shoot && !shooting) {
                     shoot = true;
-                    speed = (int) (moveSpeed * weapon.shootMovementSpeed);
+                    speed = (int) (moveSpeed * weapon.shootMoveSpeed);
                     shoot();
                 }
                 break;

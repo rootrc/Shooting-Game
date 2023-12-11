@@ -1,8 +1,8 @@
-20
-3
-rifle1
-5
-rifle2
-4
-machine1
-10
+scoreForNextRoom: 20
+enemyCount: 3
+enemyName: rifle1
+spawnRate: 5
+enemyName: rifle2
+spawnRate: 4
+enemyName: machine1
+spawnRate: 10

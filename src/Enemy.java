@@ -26,15 +26,15 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
     }
 
     void scan(Scanner data) throws IOException {
-        int length = Integer.parseInt(data.next());
+        int length = Game.parseInt(data);
         Point[] points = new Point[length];
         for (int j = 0; j < length; j++) {
-            points[j] = new Point(Double.parseDouble(data.next()), Double.parseDouble(data.next()));
+            points[j] = Game.parsePoint(data);
         }
         set(points);
-        value = Integer.parseInt(data.next()) * 10;
-        health = Integer.parseInt(data.next());
-        moveSpeed = Double.parseDouble(data.next());
+        value = Game.parseInt(data) * 10;
+        health = Game.parseInt(data);
+        moveSpeed = Game.parseDouble(data);
     }
 
     protected void draw(Graphics2D g2d, int x, int y) {
@@ -154,8 +154,8 @@ class Chaser extends Enemy<Chaser> {
 }
 
 class Rifle extends Enemy<Rifle> {
-    int shootDistance;
-    int moveDistance;
+    double shootDistance;
+    double moveDistance;
 
     Rifle(Room room, int id) {
         super(room, id);
@@ -166,8 +166,8 @@ class Rifle extends Enemy<Rifle> {
             Scanner data = new Scanner(new FileReader("data/enemies/rifle" + id + ".txt"));
             scan(data);
             weapon = new Weapon(this, "rifle" + id);
-            shootDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 1));
-            moveDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 0.8));
+            shootDistance = Game.parseInt(data) * (0.2 * Math.random() + 1);
+            moveDistance = Game.parseInt(data) * (0.2 * Math.random() + 0.8);
         } catch (IOException e) {
             System.out.println("Enemy Loading Error");
             System.exit(-1);
@@ -204,7 +204,7 @@ class Rifle extends Enemy<Rifle> {
             public void run() {
                 Point playerCentroid = room.player.getCentroid();
                 if (new Line(getCentroid(), playerCentroid).getLength() <= shootDistance) {
-                    speed = moveSpeed * weapon.shootMovementSpeed;
+                    speed = moveSpeed * weapon.shootMoveSpeed;
                     shoot();
                 } else {
                     speed = moveSpeed;
@@ -216,9 +216,9 @@ class Rifle extends Enemy<Rifle> {
 }
 
 class Sniper extends Enemy<Sniper> {
-    int shootDistance;
-    int moveDistance;
-    int runDistance;
+    double shootDistance;
+    double moveDistance;
+    double runDistance;
 
     Sniper(Room room, int id) {
         super(room, id);
@@ -229,9 +229,9 @@ class Sniper extends Enemy<Sniper> {
             Scanner data = new Scanner(new FileReader("data/enemies/sniper" + id + ".txt"));
             scan(data);
             weapon = new Weapon(this, "sniper" + id);
-            shootDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 1));
-            moveDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 0.8));
-            runDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 0.9));
+            shootDistance = Game.parseInt(data) * (0.2 * Math.random() + 1);
+            moveDistance = Game.parseInt(data) * (0.2 * Math.random() + 0.8);
+            runDistance = Game.parseInt(data) * (0.2 * Math.random() + 0.9);
         } catch (IOException e) {
             System.out.println("Enemy Loading Error");
             System.exit(-1);
@@ -285,7 +285,7 @@ class Sniper extends Enemy<Sniper> {
                 if (runDistance <= length && length <= shootDistance
                         || Sniper.this.directionTranslate(-speed, direction)
                                 .intersects(room.boundingBox(30))) {
-                    speed = moveSpeed * weapon.shootMovementSpeed;
+                    speed = moveSpeed * weapon.shootMoveSpeed;
                     shoot();
                 } else {
                     speed = moveSpeed;
@@ -297,8 +297,8 @@ class Sniper extends Enemy<Sniper> {
 }
 
 class Machine extends Enemy<Machine> {
-    int shootDistance;
-    int moveDistance;
+    double shootDistance;
+    double moveDistance;
 
     Machine(Room room, int id) {
         super(room, id);
@@ -309,8 +309,8 @@ class Machine extends Enemy<Machine> {
             Scanner data = new Scanner(new FileReader("data/enemies/machine" + id + ".txt"));
             scan(data);
             weapon = new Weapon(this, "machine" + id);
-            shootDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 1));
-            moveDistance = (int) (Integer.parseInt(data.next()) * (0.2 * Math.random() + 0.8));
+            shootDistance = Game.parseInt(data) * (0.2 * Math.random() + 1);
+            moveDistance = Game.parseInt(data) * (0.2 * Math.random() + 0.8);
         } catch (IOException e) {
             System.out.println("Enemy Loading Error");
             System.exit(-1);
@@ -347,7 +347,7 @@ class Machine extends Enemy<Machine> {
             public void run() {
                 Point playerCentroid = room.player.getCentroid();
                 if (new Line(getCentroid(), playerCentroid).getLength() <= shootDistance) {
-                    speed = moveSpeed * weapon.shootMovementSpeed;
+                    speed = moveSpeed * weapon.shootMoveSpeed;
                     shoot();
                 } else {
                     speed = moveSpeed;
@@ -359,8 +359,8 @@ class Machine extends Enemy<Machine> {
 }
 
 class Sharp extends Enemy<Sharp> {
-    int shootDistance;
-    int moveDistance;
+    double shootDistance;
+    double moveDistance;
     int strafing;
 
     Sharp(Room room, int id) {
@@ -377,8 +377,8 @@ class Sharp extends Enemy<Sharp> {
             Scanner data = new Scanner(new FileReader("data/enemies/sharp" + id + ".txt"));
             scan(data);
             weapon = new Weapon(this, "sharp" + id);
-            shootDistance = (int) (Integer.parseInt(data.next()) * (0.1 * Math.random() + 1));
-            moveDistance = (int) (Integer.parseInt(data.next()) * (0.1 * Math.random() + 0.9));
+            shootDistance = Game.parseInt(data) * (0.1 * Math.random() + 1);
+            moveDistance = Game.parseInt(data) * (0.1 * Math.random() + 0.9);
         } catch (IOException e) {
             System.out.println("Enemy Loading Error");
             System.exit(-1);
@@ -429,7 +429,7 @@ class Sharp extends Enemy<Sharp> {
             public void run() {
                 Point playerCentroid = room.player.getCentroid();
                 if (new Line(getCentroid(), playerCentroid).getLength() <= shootDistance) {
-                    speed = moveSpeed * weapon.shootMovementSpeed;
+                    speed = moveSpeed * weapon.shootMoveSpeed;
                     shoot();
                 } else {
                     speed = moveSpeed;

@@ -8,9 +8,9 @@ import Geo.Point;
 abstract class Projectile extends Line {
     Room room;
     boolean isPlayer;
-    double length;
     int damage;
     int piercing;
+    double length;
     int knockback;
 
     Projectile(Room room, Point p1, Point p2) {
@@ -32,7 +32,7 @@ abstract class Projectile extends Line {
 
     abstract public Projectile clone();
 
-    abstract void shoot(Point centroid, double direction, double random);
+    abstract void shoot(Point centroid, double direction, double accuracy);
 
     abstract void shoot(double direction);
 }
@@ -61,8 +61,8 @@ class Bullet extends Projectile {
         return bullet;
     }
 
-    void shoot(Point centroid, double direction, double random) {
-        direction += random * Math.random() - random / 2;
+    void shoot(Point centroid, double direction, double accuracy) {
+        direction += accuracy * Math.random() - accuracy / 2;
         Bullet bullet = clone();
         bullet.set(centroid.directionTranslate(20, direction),
                 centroid.directionTranslate(20 + bullet.length, direction));

@@ -1,6 +1,6 @@
-12
-2
-rifle1
-3
-sniper1
-6
+scoreForNextRoom: 12
+enemyCount: 2
+enemyName: rifle1
+spawnRate: 3
+enemyName: sniper1
+spawnRate: 6

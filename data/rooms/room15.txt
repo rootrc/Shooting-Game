@@ -1,4 +1,4 @@
-50
-1
-sharp2
-6
+scoreForNextRoom: 50
+enemyCount: 1
+enemyName: sharp2
+spawnRate: 6

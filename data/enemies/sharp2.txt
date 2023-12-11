@@ -1,9 +1,9 @@
-3
-25.9807621135 30
-25.9807621135 0
-0 15
-5
-2
-6
-350
-330
+polygonSides: 3
+point: 25.9807621135 30
+point: 25.9807621135 0
+point: 0 15
+value: 5
+health: 2
+moveSpeed: 6
+shootDistance: 350
+moveDistance: 330
