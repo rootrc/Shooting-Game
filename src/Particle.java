@@ -2,6 +2,8 @@ import java.awt.Color;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import Geo.Point;
+
 abstract class Particle extends Point {
     Room room;
     double direction;
@@ -16,10 +18,10 @@ abstract class Particle extends Point {
 
     void attemptMove(double distance, double direction) {
         Point point = directionTranslate(-distance, direction);
-        if (room.points[0].getX() < point.getX() - width / 2
-                && point.getX() + width / 2 < room.points[2].getX()
-                && room.points[0].getY() < point.getY() - width / 2
-                && point.getY() + width / 2 < room.points[2].getY()) {
+        if (room.getPoint(0).getX() < point.getX() - width / 2
+                && point.getX() + width / 2 < room.getPoint(2).getX()
+                && room.getPoint(0).getY() < point.getY() - width / 2
+                && point.getY() + width / 2 < room.getPoint(2).getY()) {
             directionMove(-distance, direction);
         } else {
             int l = 0;
@@ -27,10 +29,10 @@ abstract class Particle extends Point {
             while (l < r) {
                 int m = (l + r + 1) / 2;
                 point = directionTranslate(-distance, direction);
-                if (room.points[0].getX() < point.getX() - width / 2
-                        && point.getX() + width / 2 < room.points[2].getX()
-                        && room.points[0].getY() < point.getY() - width / 2
-                        && point.getY() + width / 2 < room.points[2].getY()) {
+                if (room.getPoint(0).getX() < point.getX() - width / 2
+                        && point.getX() + width / 2 < room.getPoint(2).getX()
+                        && room.getPoint(0).getY() < point.getY() - width / 2
+                        && point.getY() + width / 2 < room.getPoint(2).getY()) {
                     l = m;
                 } else {
                     r = m - 1;

@@ -7,10 +7,11 @@ import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
 import javax.swing.Timer;
 
+import Geo.Point;
+
 class Game {
     final static int delay = 20;
     private static Game instance = new Game();
-    int gameState;
     JFrame frame;
     Panel panel;
     Room room;

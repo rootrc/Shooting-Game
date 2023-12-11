@@ -9,23 +9,26 @@ import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.SwingUtilities;
 
+import Geo.Point;
+import Geo.Polygon;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 
 public class Room extends Polygon {
-    int id;
-    Timer timer = new Timer();
+    private int id;
+    private Timer timer = new Timer();
     ConcurrentHashMap.KeySetView<Projectile, Boolean> projectiles = ConcurrentHashMap.newKeySet();
     ConcurrentHashMap.KeySetView<Entity, Boolean> entities = ConcurrentHashMap.newKeySet();
-    HashMap<String, Double> enemySpawns = new HashMap<>();
+    private HashMap<String, Double> enemySpawns = new HashMap<>();
     ConcurrentHashMap.KeySetView<Polygon, Boolean> polygons = ConcurrentHashMap.newKeySet();
     ConcurrentHashMap.KeySetView<Particle, Boolean> particles = ConcurrentHashMap.newKeySet();
     Player player;
     int xAdjust;
     int yAdjust;
     int score;
-    int scoreForNextRoom;
+    private int scoreForNextRoom;
 
     Room(Point[] points, int id) {
         super(points);
@@ -76,21 +79,21 @@ public class Room extends Polygon {
     }
 
     void draw(Graphics2D g2d) {
-        super.draw(g2d);
-        super.fill(g2d);
+        super.draw(g2d, xAdjust, yAdjust);
+        super.fill(g2d, xAdjust, yAdjust);
         for (Polygon polygon : polygons) {
-            polygon.draw(g2d);
-            polygon.fill(g2d);
+            polygon.draw(g2d, xAdjust, yAdjust);
+            polygon.fill(g2d, xAdjust, yAdjust);
         }
         for (Particle particle : particles) {
-            particle.draw(g2d);
+            particle.draw(g2d, xAdjust, yAdjust);
         }
         for (Projectile projectile : projectiles) {
-            projectile.draw(g2d);
+            projectile.draw(g2d, xAdjust, yAdjust);
         }
         for (Entity entity : entities) {
-            entity.draw(g2d);
-            entity.fill(g2d);
+            entity.draw(g2d, xAdjust, yAdjust);
+            entity.fill(g2d, xAdjust, yAdjust);
         }
         g2d.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
         g2d.setColor(Color.black);
@@ -123,26 +126,26 @@ public class Room extends Polygon {
                 break;
         }
         if (Math.random() < 0.5) {
-            x = (777 - 20 - enemy.points[0].getX()) * Math.random() + 10;
-            if (30 < x && x < 777 - 50 - enemy.points[0].getX()) {
+            x = (777 - 20 - enemy.getPoint(0).getX()) * Math.random() + 10;
+            if (30 < x && x < 777 - 50 - enemy.getPoint(0).getX()) {
                 if (Math.random() < 0.5) {
                     y = (50 - 10) * Math.random() + 10;
                 } else {
-                    y = (50 - 10) * Math.random() + 700 - (50 - 10) - 10 - enemy.points[0].getY();
+                    y = (50 - 10) * Math.random() + 700 - (50 - 10) - 10 - enemy.getPoint(0).getY();
                 }
             } else {
-                y = (700 - 20 - enemy.points[0].getY()) * Math.random() + 10;
+                y = (700 - 20 - enemy.getPoint(0).getY()) * Math.random() + 10;
             }
         } else {
-            y = (700 - 20 - enemy.points[0].getY()) * Math.random() + 10;
-            if (50 < y && y < 700 - 50 - enemy.points[0].getY()) {
+            y = (700 - 20 - enemy.getPoint(0).getY()) * Math.random() + 10;
+            if (50 < y && y < 700 - 50 - enemy.getPoint(0).getY()) {
                 if (Math.random() < 0.5) {
                     x = (50 - 10) * Math.random() + 10;
                 } else {
-                    x = (50 - 10) * Math.random() + 777 - (50 - 10) - 10 - enemy.points[0].getX();
+                    x = (50 - 10) * Math.random() + 777 - (50 - 10) - 10 - enemy.getPoint(0).getX();
                 }
             } else {
-                x = (777 - 20 - enemy.points[0].getX()) * Math.random() + 10;
+                x = (777 - 20 - enemy.getPoint(0).getX()) * Math.random() + 10;
             }
         }
         enemy = enemy.translate(x, y);
@@ -151,8 +154,8 @@ public class Room extends Polygon {
     }
 
     Polygon boundingBox(int width) {
-        return new Polygon(new Point[] { points[0].translate(width, width), points[1].translate(-width, width),
-                points[2].translate(-width, -width), points[3].translate(width, -width) });
+        return new Polygon(new Point[] { getPoint(0).translate(width, width), getPoint(1).translate(-width, width),
+                getPoint(2).translate(-width, -width), getPoint(3).translate(width, -width) });
     }
 
     void keyPressed(KeyEvent e) {

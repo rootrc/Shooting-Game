@@ -5,17 +5,21 @@ import java.awt.event.MouseEvent;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import Geo.Line;
+import Geo.Point;
+import Geo.Polygon;
+
 class Player extends Entity {
-    boolean a, d, s, w;
-    boolean shoot, shooting;
-    double speed;
-    double moveSpeed;
-    int xMovement, yMovement;
-    Line muzzleFlash;
-    boolean muzzleFlashing;
-    Weapon weapon;
-    Weapon weapon1;
-    Weapon weapon2;
+    private boolean a, d, s, w;
+    private boolean shoot, shooting;
+    private double speed;
+    private double moveSpeed;
+    private int xMovement, yMovement;
+    private Line muzzleFlash;
+    private boolean muzzleFlashing;
+    private Weapon weapon;
+    private Weapon weapon1;
+    private Weapon weapon2;
 
     Player(Room room, Point[] points) {
         super(room, points);
@@ -36,11 +40,7 @@ class Player extends Entity {
     }
 
     public Player clone() {
-        Point[] points = new Point[length];
-        for (int i = 0; i < length; i++) {
-            points[i] = this.points[i].clone();
-        }
-        Player player = new Player(room, points);
+        Player player = new Player(room, getPoints());
         player.a = a;
         player.d = d;
         player.s = s;
@@ -60,11 +60,11 @@ class Player extends Entity {
         return player;
     }
 
-    void draw(Graphics2D g2d) {
+    public void draw(Graphics2D g2d, int x, int y) {
         if (muzzleFlashing) {
-            muzzleFlash.draw(g2d);
+            muzzleFlash.draw(g2d, x, y);
         }
-        super.draw(g2d);
+        super.draw(g2d, x, y);
     }
 
     void process() {
@@ -97,15 +97,15 @@ class Player extends Entity {
 
     void move() {
         Point mouseLocation = Game.getInstance().panel.mouseLocation();
-        double radian = new Line(centroid, mouseLocation).caculateRadian();
-        Polygon polygon = clone();
+        double radian = new Line(getCentroid(), mouseLocation).caculateRadian();
+        Player player = clone();
         if (xMovement == 0 || yMovement == 0) {
-            polygon.move(xMovement * speed, yMovement * speed);
+            player.move(xMovement * speed, yMovement * speed);
         } else {
-            polygon.move(xMovement * speed / Math.sqrt(2), yMovement * speed / Math.sqrt(2));
+            player.move(xMovement * speed / Math.sqrt(2), yMovement * speed / Math.sqrt(2));
         }
-        polygon.rotate(direction - radian);
-        if (!room.intersects(polygon)) {
+        player.rotate(direction - radian);
+        if (!room.intersects(player)) {
             if (xMovement == 0 || yMovement == 0) {
                 super.move(xMovement * speed, yMovement * speed);
             } else {
@@ -205,9 +205,9 @@ class Player extends Entity {
                     shooting = false;
                     return;
                 }
-                weapon.shoot(centroid, direction);
+                weapon.shoot(getCentroid(), direction);
                 attemptMove(weapon.recoil, direction);
-                Casing casing = new Casing(room, centroid,
+                Casing casing = new Casing(room, getCentroid(),
                         direction + Math.PI / 2 + Math.PI / 10 * Math.random() - Math.PI / 20, 25, 50, 4, 40, 200);
                 casing.color = new Color(175, 156, 96);
                 casing.width = 3;
@@ -219,9 +219,9 @@ class Player extends Entity {
 
                     public void run() {
                         count++;
-                        muzzleFlash.setP1(centroid.clone());
+                        muzzleFlash.setP1(getCentroid().clone());
                         muzzleFlash
-                                .setP2(centroid.directionTranslate(20 + weapon.projectile.length / 2, muzzleDirection));
+                                .setP2(getCentroid().directionTranslate(20 + weapon.projectile.getLength() / 2, muzzleDirection));
                         if (count == 3) {
                             muzzleFlashing = false;
                             timer.cancel();

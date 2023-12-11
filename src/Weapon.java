@@ -2,18 +2,18 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
 
+import Geo.Point;
+
 class Weapon {
-    Entity entity;
     int cooldown;
     int shotCount;
     int shotCooldown;
     double shootMovementSpeed;
     int recoil;
-    double random;
+    private double random;
     Projectile projectile;
 
     Weapon(Entity entity, String name) {
-        this.entity = entity;
         try {
             Scanner data = new Scanner(new FileReader("data/weapons/" + name + ".txt"));
             cooldown = Integer.parseInt(data.next()) * 100;
@@ -55,9 +55,6 @@ class Weapon {
     }
 
     void shoot(Point centroid, double direction) {
-        direction += random * Math.random() - random / 2;
-        projectile.setP1(centroid.directionTranslate(20, direction));
-        projectile.setP2(centroid.directionTranslate(20 + projectile.length, direction));
-        projectile.shoot(direction);
+        projectile.shoot(centroid, direction, random);
     }
 }

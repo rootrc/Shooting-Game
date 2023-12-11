@@ -1,30 +1,31 @@
+package Geo;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-class Point extends Geo<Point> {
+public class Point extends Geo<Point> {
     private double x;
     private double y;
 
-    Point(int x, int y) {
+    public Point(int x, int y) {
         this((double) x, (double) y);
     }
 
-    Point(double x, double y) {
+    public Point(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
-    Point() {
+    public Point() {
 
     }
 
-    void set(int x, int y) {
+    protected void set(int x, int y) {
         set((double) x, (double) y);
     }
 
-    void set(double x, double y) {
+    protected void set(double x, double y) {
         this.x = x;
         this.y = y;
     }
@@ -36,48 +37,48 @@ class Point extends Geo<Point> {
         return point;
     }
 
-    void draw(Graphics2D g2d) {
+    public void draw(Graphics2D g2d, int x, int y) {
         g2d.setColor(color);
         g2d.setStroke(new BasicStroke(width));
-        g2d.drawLine((int) Math.round(this.x) + Game.getInstance().room.xAdjust,
-                (int) Math.round(this.y) + Game.getInstance().room.yAdjust,
-                (int) Math.round(this.x) + Game.getInstance().room.xAdjust,
-                (int) Math.round(this.y) + Game.getInstance().room.yAdjust);
+        g2d.drawLine((int) Math.round(this.x) + x,
+                (int) Math.round(this.y) + y,
+                (int) Math.round(this.x) + x,
+                (int) Math.round(this.y) + y);
     }
 
-    double getX() {
+    public double getX() {
         return x;
     }
 
-    double getY() {
+    public double getY() {
         return y;
     }
 
-    void setX(double x) {
+    protected void setX(double x) {
         this.x = x;
     }
 
-    void setY(double y) {
+    protected void setY(double y) {
         this.y = y;
     }
 
-    void moveX(double x) {
+    protected void moveX(double x) {
         this.x += x;
     }
 
-    void moveY(double y) {
+    protected void moveY(double y) {
         this.y += y;
     }
 
-    void setBorderColor(Color color) {
+    public void setBorderColor(Color color) {
         this.color = color;
     }
 
-    void setWidth(int width) {
+    public void setWidth(int width) {
         this.width = width;
     }
 
-    void rotate(double radian, Point pivot) {
+    protected void rotate(double radian, Point pivot) {
         double s = Math.sin(radian);
         double c = Math.cos(radian);
         x -= pivot.x;
@@ -88,7 +89,7 @@ class Point extends Geo<Point> {
         y = ynew + pivot.y;
     }
 
-    Point getRotation(double radian, Point pivot) {
+    protected Point getRotation(double radian, Point pivot) {
         Point point = clone();
         point.rotate(radian, pivot);
         return point;

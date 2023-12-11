@@ -1,13 +1,15 @@
+package Geo;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-class Polygon extends Geo<Polygon> {
-    int length;
-    Point[] points;
-    Line[] lines;
-    Point centroid = new Point();
+public class Polygon extends Geo<Polygon> {
+    private int length;
+    private Point[] points;
+    private Line[] lines;
+    private Point centroid = new Point();
 
-    Polygon(Point[] points) {
+    public Polygon(Point[] points) {
         this.length = points.length;
         this.points = points.clone();
         lines = new Line[length];
@@ -17,11 +19,11 @@ class Polygon extends Geo<Polygon> {
         computeCentroid();
     }
 
-    Polygon() {
+    public Polygon() {
 
     }
 
-    void set(Point[] points) {
+    protected void set(Point[] points) {
         this.length = points.length;
         this.points = points.clone();
         lines = new Line[length];
@@ -32,64 +34,72 @@ class Polygon extends Geo<Polygon> {
     }
 
     public Polygon clone() {
-        Point[] points = new Point[length];
-        for (int i = 0; i < length; i++) {
-            points[i] = this.points[i].clone();
-        }
-        Polygon polygon = new Polygon(points);
+        Polygon polygon = new Polygon(getPoints());
         polygon.setColor(color);
         polygon.setWidth(width);
         return polygon;
     }
 
-    void draw(Graphics2D g2d) {
+    public void draw(Graphics2D g2d, int x, int y) {
         for (int i = 0; i < length; i++) {
-            lines[i].draw(g2d);
+            lines[i].draw(g2d, x, y);
         }
     }
 
-    void fill(Graphics2D g2d) {
+    public void fill(Graphics2D g2d, int x, int y) {
         int[] xPoints = new int[length];
         int[] yPoints = new int[length];
         for (int i = 0; i < length; i++) {
-            xPoints[i] = (int) Math.round(points[i].getX() + Game.getInstance().room.xAdjust);
-            yPoints[i] = (int) Math.round(points[i].getY() + Game.getInstance().room.yAdjust);
+            xPoints[i] = (int) Math.round(points[i].getX() + x);
+            yPoints[i] = (int) Math.round(points[i].getY() + y);
         }
         g2d.setColor(color);
         g2d.fillPolygon(xPoints, yPoints, length);
     }
 
-    void moveX(double x) {
+    protected void moveX(double x) {
         for (Point point : points) {
             point.moveX(x);
         }
         centroid.moveX(x);
     }
 
-    void moveY(double y) {
+    protected void moveY(double y) {
         for (Point point : points) {
             point.moveY(y);
         }
         centroid.moveY(y);
     }
 
-    void setBorderColor(Color color) {
+    public void setBorderColor(Color color) {
         for (Line line : lines) {
             line.setBorderColor(color);
         }
     }
 
-    void setColor(Color color) {
+    public void setColor(Color color) {
         this.color = color;
     }
 
-    void setWidth(int width) {
+    public void setWidth(int width) {
         for (Line line : lines) {
             line.setWidth(width);
         }
     }
 
-    boolean intersects(Line line) {
+    public Point[] getPoints() {
+        Point[] points = new Point[length];
+        for (int i = 0; i < length; i++) {
+            points[i] = this.points[i].clone();
+        }
+        return points;
+    }
+
+    public Point getPoint(int i) {
+        return points[i].clone();
+    }
+
+    public boolean intersects(Line line) {
         for (Line line2 : lines) {
             if (line2.intersects(line)) {
                 return true;
@@ -98,7 +108,7 @@ class Polygon extends Geo<Polygon> {
         return false;
     }
 
-    boolean intersects(Polygon polygon) {
+    public boolean intersects(Polygon polygon) {
         for (Line line1 : lines) {
             for (Line line2 : polygon.lines) {
                 if (line1.intersects(line2)) {
@@ -109,23 +119,23 @@ class Polygon extends Geo<Polygon> {
         return false;
     }
 
-    void rotate(double radian, Point pivot) {
+    protected void rotate(double radian, Point pivot) {
         for (Point point : points) {
             point.rotate(radian, pivot);
         }
     }
 
-    void rotate(double radian) {
+    protected void rotate(double radian) {
         rotate(radian, centroid);
     }
 
-    Polygon getRotation(double radian) {
+    protected Polygon getRotation(double radian) {
         Polygon polygon = clone();
         polygon.rotate(radian);
         return polygon;
     }
 
-    Point computeCentroid() {
+    private Point computeCentroid() {
         double signedArea = 0.0;
         double a = 0.0;
         for (Line line : lines) {
@@ -137,6 +147,10 @@ class Polygon extends Geo<Polygon> {
         signedArea /= 2;
         centroid.setX(centroid.getX() / (6.0 * signedArea));
         centroid.setY(centroid.getY() / (6.0 * signedArea));
+        return centroid;
+    }
+
+    public Point getCentroid() {
         return centroid;
     }
 }

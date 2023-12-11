@@ -6,6 +6,10 @@ import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import Geo.Line;
+import Geo.Point;
+import Geo.Polygon;
+
 abstract class Enemy<T extends Enemy<T>> extends Entity {
     int id;
     Line muzzleFlash;
@@ -29,7 +33,7 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
     }
 
     void scan(Scanner data) throws IOException {
-        length = Integer.parseInt(data.next());
+        int length = Integer.parseInt(data.next());
         Point[] points = new Point[length];
         for (int j = 0; j < length; j++) {
             points[j] = new Point(Double.parseDouble(data.next()), Double.parseDouble(data.next()));
@@ -40,17 +44,17 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
         moveSpeed = Double.parseDouble(data.next());
     }
 
-    void draw(Graphics2D g2d) {
+    public void draw(Graphics2D g2d, int x, int y) {
         if (muzzleFlashing) {
-            muzzleFlash.draw(g2d);
+            muzzleFlash.draw(g2d, x, y);
         }
-        super.draw(g2d);
+        super.draw(g2d, x, y);
     }
 
     void shoot() {
-        weapon.shoot(centroid, direction);
+        weapon.shoot(getCentroid(), direction);
         attemptMove(weapon.recoil, direction);
-        Casing casing = new Casing(room, centroid,
+        Casing casing = new Casing(room, getCentroid(),
                 direction + Math.PI / 2 + Math.PI / 10 * Math.random() - Math.PI / 20, 20,
                 40, 4, 30, 100);
         casing.color = new Color(175, 156, 96);
@@ -63,8 +67,8 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
 
             public void run() {
                 count++;
-                muzzleFlash.setP1(centroid.clone());
-                muzzleFlash.setP2(centroid.directionTranslate(20 + weapon.projectile.length / 2, muzzleDirection));
+                muzzleFlash.setP1(getCentroid().clone());
+                muzzleFlash.setP2(getCentroid().directionTranslate(20 + weapon.projectile.getLength() / 2, muzzleDirection));
                 if (count == 3) {
                     muzzleFlashing = false;
                     timer.cancel();
@@ -91,9 +95,9 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
 
                     public void run() {
                         count++;
-                        muzzleFlash.setP1(centroid.clone());
+                        muzzleFlash.setP1(getCentroid().clone());
                         muzzleFlash
-                                .setP2(centroid.directionTranslate(20 + weapon.projectile.length / 2, muzzleDirection));
+                                .setP2(getCentroid().directionTranslate(20 + weapon.projectile.getLength() / 2, muzzleDirection));
                         if (count == 3) {
                             muzzleFlashing = false;
                             timer.cancel();
@@ -102,7 +106,7 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
                     }
                 };
                 timer.schedule(timertask, 0, Game.delay);
-                weapon.shoot(centroid, direction);
+                weapon.shoot(getCentroid(), direction);
                 if (count == weapon.shotCount - 1) {
                     timer2.cancel();
                     timer2.purge();
@@ -158,11 +162,11 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
         timer.schedule(timertask, 30 * Game.delay, Game.delay);
     }
 
-    T translate(int x, double y) {
+    public T translate(int x, int y) {
         return translate((double) x, (double) y);
     }
 
-    T translate(double x, double y) {
+    public T translate(double x, double y) {
         T t = clone();
         t.move(x, y);
         return t;
@@ -196,19 +200,15 @@ class Chaser extends Enemy<Chaser> {
     }
 
     public Chaser clone() {
-        Point[] points = new Point[length];
-        for (int i = 0; i < length; i++) {
-            points[i] = this.points[i].clone();
-        }
-        Chaser chaser = new Chaser(room, points, id);
+        Chaser chaser = new Chaser(room, getPoints(), id);
         return chaser;
     }
 
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = room.player.centroid;
-                double radian = new Line(centroid, playerCentroid).caculateRadian();
+                Point playerCentroid = room.player.getCentroid();
+                double radian = new Line(getCentroid(), playerCentroid).caculateRadian();
                 rotate(direction - radian);
                 direction = radian;
                 directionMove(moveSpeed, direction);
@@ -245,11 +245,7 @@ class Rifle extends Enemy<Rifle> {
     }
 
     public Rifle clone() {
-        Point[] points = new Point[length];
-        for (int i = 0; i < length; i++) {
-            points[i] = this.points[i].clone();
-        }
-        Rifle rifle = new Rifle(room, points, id);
+        Rifle rifle = new Rifle(room, getPoints(), id);
         rifle.shootDistance = shootDistance;
         rifle.moveDistance = moveDistance;
         return rifle;
@@ -258,12 +254,12 @@ class Rifle extends Enemy<Rifle> {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = room.player.centroid;
-                Line line = new Line(centroid, playerCentroid);
+                Point playerCentroid = room.player.getCentroid();
+                Line line = new Line(getCentroid(), playerCentroid);
                 double radian = line.caculateRadian();
                 rotate(direction - radian);
                 direction = radian;
-                if (line.length >= moveDistance) {
+                if (line.getLength() >= moveDistance) {
                     directionMove(speed, direction);
                 }
             }
@@ -271,8 +267,8 @@ class Rifle extends Enemy<Rifle> {
         timer.schedule(timertask, 0, Game.delay);
         timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = room.player.centroid;
-                if (new Line(centroid, playerCentroid).length <= shootDistance) {
+                Point playerCentroid = room.player.getCentroid();
+                if (new Line(getCentroid(), playerCentroid).getLength() <= shootDistance) {
                     speed = moveSpeed * weapon.shootMovementSpeed;
                     shoot();
                 } else {
@@ -313,11 +309,7 @@ class Sniper extends Enemy<Sniper> {
     }
 
     public Sniper clone() {
-        Point[] points = new Point[length];
-        for (int i = 0; i < length; i++) {
-            points[i] = this.points[i].clone();
-        }
-        Sniper sniper = new Sniper(room, points, id);
+        Sniper sniper = new Sniper(room, getPoints(), id);
         sniper.shootDistance = shootDistance;
         sniper.moveDistance = moveDistance;
         sniper.runDistance = runDistance;
@@ -327,17 +319,17 @@ class Sniper extends Enemy<Sniper> {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = room.player.centroid;
-                Line line = new Line(centroid, playerCentroid);
+                Point playerCentroid = room.player.getCentroid();
+                Line line = new Line(getCentroid(), playerCentroid);
                 double radian = line.caculateRadian();
                 rotate(direction - radian);
                 direction = radian;
-                if (line.length >= moveDistance) {
+                if (line.getLength() >= moveDistance) {
                     directionMove(speed, direction);
                 } else if (Sniper.this.directionTranslate(-speed, direction)
                         .intersects(room.boundingBox(20))) {
                     directionMove(moveSpeed, direction);
-                } else if (runDistance >= line.length) {
+                } else if (runDistance >= line.getLength()) {
                     if (!Sniper.this.directionTranslate(-speed, direction)
                             .intersects(room.boundingBox(30))) {
                         directionMove(-speed, direction);
@@ -349,8 +341,8 @@ class Sniper extends Enemy<Sniper> {
         timer.schedule(timertask, 0, Game.delay);
         timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = room.player.centroid;
-                double length = new Line(centroid, playerCentroid).length;
+                Point playerCentroid = room.player.getCentroid();
+                double length = new Line(getCentroid(), playerCentroid).getLength();
                 if (length > shootDistance) {
                     speed = moveSpeed;
                     return;
@@ -396,11 +388,7 @@ class Machine extends Enemy<Machine> {
     }
 
     public Machine clone() {
-        Point[] points = new Point[length];
-        for (int i = 0; i < length; i++) {
-            points[i] = this.points[i].clone();
-        }
-        Machine machine = new Machine(room, points, id);
+        Machine machine = new Machine(room, getPoints(), id);
         machine.shootDistance = shootDistance;
         machine.moveDistance = moveDistance;
         return machine;
@@ -409,12 +397,12 @@ class Machine extends Enemy<Machine> {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = room.player.centroid;
-                Line line = new Line(centroid, playerCentroid);
+                Point playerCentroid = room.player.getCentroid();
+                Line line = new Line(getCentroid(), playerCentroid);
                 double radian = line.caculateRadian();
                 rotate(direction - radian);
                 direction = radian;
-                if (line.length >= moveDistance) {
+                if (line.getLength() >= moveDistance) {
                     directionMove(speed, direction);
                 }
             }
@@ -422,8 +410,8 @@ class Machine extends Enemy<Machine> {
         timer.schedule(timertask, 0, Game.delay);
         timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = room.player.centroid;
-                if (new Line(centroid, playerCentroid).length <= shootDistance) {
+                Point playerCentroid = room.player.getCentroid();
+                if (new Line(getCentroid(), playerCentroid).getLength() <= shootDistance) {
                     speed = moveSpeed * weapon.shootMovementSpeed;
                     shoot();
                 } else {
@@ -468,11 +456,7 @@ class Sharp extends Enemy<Sharp> {
     }
 
     public Sharp clone() {
-        Point[] points = new Point[length];
-        for (int i = 0; i < length; i++) {
-            points[i] = this.points[i].clone();
-        }
-        Sharp sharp = new Sharp(room, points, id);
+        Sharp sharp = new Sharp(room, getPoints(), id);
         sharp.shootDistance = shootDistance;
         sharp.moveDistance = moveDistance;
         sharp.strafing = strafing;
@@ -482,12 +466,12 @@ class Sharp extends Enemy<Sharp> {
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = room.player.centroid;
-                Line line = new Line(centroid, playerCentroid);
+                Point playerCentroid = room.player.getCentroid();
+                Line line = new Line(getCentroid(), playerCentroid);
                 double radian = line.caculateRadian();
                 rotate(direction - radian);
                 direction = radian;
-                if (line.length >= moveDistance) {
+                if (line.getLength() >= moveDistance) {
                     directionMove(2 * speed / 3, direction);
                     if (room
                             .intersects(directionTranslate(speed, direction + strafing * Math.PI / 2))) {
@@ -508,8 +492,8 @@ class Sharp extends Enemy<Sharp> {
         timer.schedule(timertask, 0, Game.delay);
         timertask = new TimerTask() {
             public void run() {
-                Point playerCentroid = room.player.centroid;
-                if (new Line(centroid, playerCentroid).length <= shootDistance) {
+                Point playerCentroid = room.player.getCentroid();
+                if (new Line(getCentroid(), playerCentroid).getLength() <= shootDistance) {
                     speed = moveSpeed * weapon.shootMovementSpeed;
                     shoot();
                 } else {

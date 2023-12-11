@@ -1,6 +1,9 @@
 import java.awt.Color;
 import java.util.Timer;
 
+import Geo.Point;
+import Geo.Polygon;
+
 abstract class Entity extends Polygon {
     Room room;
     Timer timer = new Timer();
@@ -15,7 +18,6 @@ abstract class Entity extends Polygon {
         this.room = room;
     }
 
-    
     Entity(Room room) {
         this.room = room;
     }

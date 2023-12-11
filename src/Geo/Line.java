@@ -1,30 +1,30 @@
+package Geo;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
-class Line extends Geo<Line> {
+public class Line extends Geo<Line> {
     final private double doublePrecision = 1000000;
     private Point p1;
     private Point p2;
-    protected double length;
+    private double length;
 
-    Line(Point p1, Point p2) {
+    public Line(Point p1, Point p2) {
         this.p1 = p1;
         this.p2 = p2;
-        length = Math.sqrt(
-                (p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
+        length = caculateLength();
     }
 
-    Line() {
+    public Line() {
         p1 = new Point();
         p2 = new Point();
     }
 
-    void set(Point p1, Point p2) {
+    public void set(Point p1, Point p2) {
         this.p1 = p1;
         this.p2 = p2;
-        length = Math.sqrt((p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
+        length = caculateLength();
     }
 
     public Line clone() {
@@ -34,54 +34,62 @@ class Line extends Geo<Line> {
         return line;
     }
 
-    void draw(Graphics2D g2d) {
+    public void draw(Graphics2D g2d, int x, int y) {
         g2d.setColor(color);
         g2d.setStroke(new BasicStroke(width));
-        g2d.drawLine((int) Math.round(p1.getX()) + Game.getInstance().room.xAdjust,
-                (int) Math.round(p1.getY()) + Game.getInstance().room.yAdjust,
-                (int) Math.round(p2.getX()) + Game.getInstance().room.xAdjust,
-                (int) Math.round(p2.getY()) + Game.getInstance().room.yAdjust);
+        g2d.drawLine((int) Math.round(p1.getX()) + x,
+                (int) Math.round(p1.getY()) + y,
+                (int) Math.round(p2.getX()) + x,
+                (int) Math.round(p2.getY()) + y);
     }
 
-    Point getP1() {
+    public Point getP1() {
         return p1;
     }
 
-    Point getP2() {
+    public Point getP2() {
         return p2;
     }
 
-    void setP1(Point point) {
+    public double getLength() {
+        return length;
+    }
+
+    public void setP1(Point point) {
         p1 = point;
+        // length = Math.sqrt(
+        //         (p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
     }
 
-    void setP2(Point point) {
+    public void setP2(Point point) {
         p2 = point;
+        // length = Math.sqrt(
+        //         (p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
     }
 
-    void moveX(double x) {
+    protected void moveX(double x) {
         p1.moveX(x);
         p2.moveX(x);
     }
 
-    void moveY(double y) {
+    protected void moveY(double y) {
         p1.moveY(y);
         p2.moveY(y);
     }
 
-    void setBorderColor(Color color) {
+    public void setBorderColor(Color color) {
         this.color = color;
         p1.setBorderColor(color);
         p2.setBorderColor(color);
     }
 
-    void setWidth(int width) {
+    public void setWidth(int width) {
         this.width = width;
         p1.setWidth(width);
         p1.setWidth(width);
     }
 
-    boolean intersects(Line line) {
+    protected boolean intersects(Line line) {
         double d = (p1.getX() - p2.getX()) * (line.p1.getY() - line.p2.getY())
                 - (p1.getY() - p2.getY()) * (line.p1.getX() - line.p2.getX());
         if (d == 0) {
@@ -111,7 +119,7 @@ class Line extends Geo<Line> {
         return true;
     }
 
-    Point intersectionPoint(Line line) {
+    protected Point intersectionPoint(Line line) {
         double d = (p1.getX() - p2.getX()) * (line.p1.getY() - line.p2.getY())
                 - (p1.getY() - p2.getY()) * (line.p1.getX() - line.p2.getX());
         if (d == 0) {
@@ -140,12 +148,12 @@ class Line extends Geo<Line> {
         return new Point(x, y);
     }
 
-    double caculateLength() {
+    private double caculateLength() {
         return Math.sqrt(
                 (p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) + (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
     }
 
-    double caculateRadian() {
+    public double caculateRadian() {
         return -Math.atan2(p1.getY() - p2.getY(), p1.getX() - p2.getX());
     }
 
