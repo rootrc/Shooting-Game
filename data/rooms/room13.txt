@@ -1,6 +1,6 @@
 scoreForNextRoom: 30
 enemyCount: 2
 enemyName: machine2
-spawnRate: 4
+spawnRate: 5
 enemyName: sniper2
-spawnRate: 6
+spawnRate: 8

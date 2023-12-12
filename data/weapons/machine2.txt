@@ -5,9 +5,9 @@ shootMoveSpeed: 0.1
 recoil: 6
 accuracy: 3
 damage: 1
-piercing: 1
 width: 1
 length: 15
 knockback: 10
+piercing: 1
 speed: 4
 duration: 50

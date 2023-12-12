@@ -3,8 +3,8 @@ point: 30 30
 point: 30 0
 point: 0 0
 point: 0 30
-value: 2
+value: 3
 health: 1
-moveSpeed: 4
+moveSpeed: 5
 shootDistance: 280
-moveDistance: 200
+moveDistance: 220

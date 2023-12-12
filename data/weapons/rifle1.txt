@@ -5,8 +5,8 @@ shootMoveSpeed: 0.3
 recoil: 20
 accuracy: 20
 damage: 1
-piercing: 1
 width: 1
 length: 20
 knockback: 12
+piercing: 1
 speed: 8

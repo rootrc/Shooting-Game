@@ -17,18 +17,26 @@ class Corpse extends Polygon {
         process();
     }
 
+    protected void draw(Graphics2D g2d, int x, int y) {
+        super.draw(g2d, x, y);
+    }
+
+    protected void fill(Graphics2D g2d, int x, int y) {
+        super.fill(g2d, x, y);
+    }
+
     private void process() {
         setColor(new Color(139, 0, 0));
         TimerTask timertask = new TimerTask() {
-            int count = time;
+            int count = 0;
 
             public void run() {
-                count--;
-                setColor(new Color(0, 0, 0, -255 * (time - count)
-                        * (time - count) / time / time + 255));
-                setBorderColor(new Color(0, 0, 0, -255 * (time - count)
-                        * (time - count) / time / time + 255));
-                if (count == 0) {
+                count++;
+                setColor(new Color(0, 0, 0, -255 * count
+                        * count / time / time + 255));
+                setBorderColor(new Color(0, 0, 0, -255 * count
+                        * count / time / time + 255));
+                if (count == time) {
                     room.corpses.remove(Corpse.this);
                     timer.cancel();
                     timer.purge();
@@ -37,13 +45,5 @@ class Corpse extends Polygon {
         };
         room.corpses.add(this);
         timer.schedule(timertask, 30 * Game.delay, Game.delay);
-    }
-
-    protected void draw(Graphics2D g2d, int x, int y) {
-        super.draw(g2d, x, y);
-    }
-
-    protected void fill(Graphics2D g2d, int x, int y) {
-        super.fill(g2d, x, y);
     }
 }

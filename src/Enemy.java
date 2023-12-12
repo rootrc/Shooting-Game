@@ -82,6 +82,9 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
     }
 
     protected void death() {
+        if (!getRoom().entities.contains(this)) {
+            return;
+        }
         getRoom().entities.remove(this);
         timer.cancel();
         timer.purge();
@@ -440,7 +443,7 @@ class Sharp extends Enemy<Sharp> {
             public void run() {
                 double distance = distanceToPlayer();
                 if (distance <= shootDistance) {
-                    shoot();
+                    weapon.shoot();
                 } else {
                     speed = moveSpeed;
                 }

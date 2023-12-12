@@ -13,7 +13,6 @@ class MuzzleFlash extends Line {
     private double direction;
     private double length;
 
-
     MuzzleFlash(Entity entity, double length) {
         room = entity.getRoom();
         centroid = entity.getCentroid().clone();
@@ -22,6 +21,10 @@ class MuzzleFlash extends Line {
         setBorderColor(new Color(247, 241, 181));
         setWidth(8);
         process();
+    }
+
+    protected void draw(Graphics2D g2d, int x, int y) {
+        super.draw(g2d, x, y);
     }
 
     private void process() {
@@ -43,7 +46,4 @@ class MuzzleFlash extends Line {
         timer.schedule(timertask, 0, Game.delay);
     }
 
-    protected void draw(Graphics2D g2d, int x, int y) {
-        super.draw(g2d, x, y);
-    }
 }

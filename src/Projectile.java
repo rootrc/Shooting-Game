@@ -10,7 +10,6 @@ abstract class Projectile extends Line {
     protected Timer timer = new Timer();
     protected boolean isPlayer;
     protected int damage;
-    protected int piercing;
     protected double length;
     protected int knockback;
 
@@ -21,6 +20,22 @@ abstract class Projectile extends Line {
 
     Projectile(Room room) {
         this.room = room;
+    }
+
+    protected void remove() {
+        getRoom().projectiles.remove(this);
+        timer.cancel();
+        timer.purge();
+    }
+
+    protected void hit(Entity entity, double direction) {
+        entity.health -= damage;
+        entity.attemptMove(-knockback, direction);
+        if (entity.health > 0) {
+            entity.hit();
+        } else {
+            entity.death();
+        }
     }
 
     protected void draw(Graphics2D g2d, int x, int y) {
@@ -44,6 +59,7 @@ abstract class Projectile extends Line {
 }
 
 class Bullet extends Projectile {
+    int piercing;
     int speed;
 
     private Bullet(Room room, Point p1, Point p2) {
@@ -62,8 +78,8 @@ class Bullet extends Projectile {
         bullet.isPlayer = isPlayer;
         bullet.damage = damage;
         bullet.piercing = piercing;
-        bullet.speed = speed;
         bullet.knockback = knockback;
+        bullet.speed = speed;
         return bullet;
     }
 
@@ -81,13 +97,9 @@ class Bullet extends Projectile {
                 Bullet.this.directionMove(speed, direction);
                 if (getRoom().intersects(new Line(Bullet.this.p2, Bullet.this.p2
                         .directionTranslate(-Bullet.this.speed, direction)))) {
-                    getRoom().projectiles.remove(Bullet.this);
-                    timer.cancel();
-                    timer.purge();
+                    remove();
                 } else if (!getRoom().inside(getP2())) {
-                    getRoom().projectiles.remove(Bullet.this);
-                    timer.cancel();
-                    timer.purge();
+                    remove();
                 }
                 for (Entity entity : getRoom().entities) {
                     if (entity.getClass() != Player.class && !Bullet.this.isPlayer) {
@@ -96,18 +108,10 @@ class Bullet extends Projectile {
                     if (entity.intersects(
                             new Line(Bullet.this.p2,
                                     Bullet.this.p2.directionTranslate(-Bullet.this.speed, direction)))) {
-                        entity.health -= Bullet.this.damage;
-                        entity.attemptMove(-Bullet.this.knockback, Bullet.this.caculateRadian());
-                        if (entity.health > 0) {
-                            entity.hit();
-                        } else {
-                            entity.death();
-                        }
+                        hit(entity, direction);
                         Bullet.this.piercing--;
                         if (Bullet.this.piercing <= 0) {
-                            getRoom().projectiles.remove(Bullet.this);
-                            timer.cancel();
-                            timer.purge();
+                            remove();
                         }
                     }
                 }
@@ -119,6 +123,7 @@ class Bullet extends Projectile {
 }
 
 class LimitedBullet extends Projectile {
+    int piercing;
     int speed;
     int duration;
 
@@ -138,8 +143,8 @@ class LimitedBullet extends Projectile {
         limitedBullet.isPlayer = isPlayer;
         limitedBullet.damage = damage;
         limitedBullet.piercing = piercing;
-        limitedBullet.speed = speed;
         limitedBullet.knockback = knockback;
+        limitedBullet.speed = speed;
         limitedBullet.duration = duration;
         return limitedBullet;
     }
@@ -153,6 +158,7 @@ class LimitedBullet extends Projectile {
 
     void process() {
         double direction = caculateRadian();
+        duration = (int) ((0.8 + 0.4 * Math.random()) * duration);
         TimerTask timertask = new TimerTask() {
             int count = 0;
 
@@ -163,17 +169,11 @@ class LimitedBullet extends Projectile {
                 count++;
                 if (getRoom().intersects(new Line(LimitedBullet.this.p2, LimitedBullet.this.p2
                         .directionTranslate(-LimitedBullet.this.speed, direction)))) {
-                    getRoom().projectiles.remove(LimitedBullet.this);
-                    timer.cancel();
-                    timer.purge();
+                    remove();
                 } else if (!getRoom().inside(getP2())) {
-                    getRoom().projectiles.remove(LimitedBullet.this);
-                    timer.cancel();
-                    timer.purge();
+                    remove();
                 } else if (count == LimitedBullet.this.duration) {
-                    getRoom().projectiles.remove(LimitedBullet.this);
-                    timer.cancel();
-                    timer.purge();
+                    remove();
                 }
                 for (Entity entity : getRoom().entities) {
                     if (entity.getClass() != Player.class && !LimitedBullet.this.isPlayer) {
@@ -183,18 +183,10 @@ class LimitedBullet extends Projectile {
                             new Line(LimitedBullet.this.p2,
                                     LimitedBullet.this.p2.directionTranslate(-LimitedBullet.this.speed,
                                             direction)))) {
-                        entity.health -= LimitedBullet.this.damage;
-                        entity.attemptMove(-LimitedBullet.this.knockback, LimitedBullet.this.caculateRadian());
-                        if (entity.health > 0) {
-                            entity.hit();
-                        } else {
-                            entity.death();
-                        }
+                        hit(entity, direction);
                         LimitedBullet.this.piercing--;
                         if (LimitedBullet.this.piercing <= 0) {
-                            getRoom().projectiles.remove(LimitedBullet.this);
-                            timer.cancel();
-                            timer.purge();
+                            remove();
                         }
                     }
                 }
@@ -203,4 +195,67 @@ class LimitedBullet extends Projectile {
         getRoom().projectiles.add(this);
         timer.schedule(timertask, 0, Game.delay);
     }
+}
+
+class Grenade extends Projectile {
+    int speed;
+    int size;
+    int maxDistance;
+
+    private Grenade(Room room, Point p1, Point p2) {
+        super(room, p1, p2);
+    }
+
+    Grenade(Room room) {
+        super(room);
+    }
+
+    public Grenade clone() {
+        Grenade grenade = new Grenade(getRoom(), getP1(), getP2());
+        grenade.setBorderColor(getBorderColor());
+        grenade.setWidth(getWidth());
+        grenade.length = length;
+        grenade.isPlayer = isPlayer;
+        grenade.damage = damage;
+        grenade.knockback = knockback;
+        grenade.speed = speed;
+        grenade.size = size;
+        grenade.maxDistance = maxDistance;
+        return grenade;
+    }
+
+    void shoot(Point centroid, double direction) {
+        Grenade grenade = clone();
+        grenade.setP1(centroid.directionTranslate(20, direction));
+        grenade.setP2(centroid.directionTranslate(20 + grenade.length, direction));
+        grenade.process();
+    }
+
+    void process() {
+        double direction = caculateRadian();
+        double distance = Math.min(maxDistance, new Line(this.p1, Game.getInstance().panel.mouseLocation()).getLength());
+        double randomDistance = (0.8 - 0.3 * Math.random()) * distance;
+        TimerTask timertask = new TimerTask() {
+            int count = 0;
+            public void run() {
+                count += speed;
+                Grenade.this.directionMove(speed * (2 * distance - 2 * count - speed) / distance, direction);
+                if (getRoom().intersects(new Line(Grenade.this.p2, Grenade.this.p2
+                        .directionTranslate(-Grenade.this.speed, direction)))) {
+                    new Explosion(Grenade.this);
+                    remove();
+                } else if (!getRoom().inside(getP2())) {
+                    new Explosion(Grenade.this);
+                    remove();
+                } else if (count >= randomDistance) {
+                    new Explosion(Grenade.this);
+                    remove();
+                }
+
+            }
+        };
+        getRoom().projectiles.add(this);
+        timer.schedule(timertask, 0, Game.delay);
+    }
+
 }

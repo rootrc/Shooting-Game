@@ -24,8 +24,8 @@ class Player extends Entity {
         orginalColor = Color.blue;
         setColor(orginalColor);
         corpseTime = 200;
-        weapon1 = Weapon.createWeapon(this, "player_gun");
-        weapon2 = Weapon.createWeapon(this, "player_sniper");
+        weapon1 = Weapon.createWeapon(this, "player_shotgun");
+        weapon2 = Weapon.createWeapon(this, "player_grenade");
         weapon = weapon1;
     }
     
