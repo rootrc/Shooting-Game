@@ -69,6 +69,7 @@ public class Point extends Geo<Point> {
     protected void moveY(double y) {
         this.y += y;
     }
+
     public void directionMove(int distance, double direction) {
         super.directionMove(distance, direction);
     }
@@ -76,6 +77,7 @@ public class Point extends Geo<Point> {
     public void directionMove(double distance, double direction) {
         super.directionMove(distance, direction);
     }
+
     public void setBorderColor(Color color) {
         this.color = color;
     }

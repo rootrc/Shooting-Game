@@ -111,24 +111,7 @@ public class Room extends Polygon {
 
     void addEnemy(String name) {
         double x, y;
-        Enemy<?> enemy = null;
-        switch (name.substring(0, name.length() - 1)) {
-            case "chaser":
-                enemy = new Chaser(this, name.charAt(name.length() - 1) - '0');
-                break;
-            case "rifle":
-                enemy = new Rifle(this, name.charAt(name.length() - 1) - '0');
-                break;
-            case "sniper":
-                enemy = new Sniper(this, name.charAt(name.length() - 1) - '0');
-                break;
-            case "machine":
-                enemy = new Machine(this, name.charAt(name.length() - 1) - '0');
-                break;
-            case "sharp":
-                enemy = new Sharp(this, name.charAt(name.length() - 1) - '0');
-                break;
-        }
+        Enemy<?> enemy = Enemy.createEnemy(this, name);
         if (Math.random() < 0.5) {
             x = (777 - 20 - enemy.getPoint(0).getX()) * Math.random() + 10;
             if (30 < x && x < 777 - 50 - enemy.getPoint(0).getX()) {

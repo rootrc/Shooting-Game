@@ -123,6 +123,24 @@ public class Polygon extends Geo<Polygon> {
         return false;
     }
 
+    public boolean intersects(Circle circle) {
+        for (Line line : lines) {
+            if (circle.intersects(line)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isInside(Circle circle) {
+        for (Line line : lines) {
+            if (circle.isInside(line)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected void rotate(double radian, Point pivot) {
         for (Point point : points) {
             point.rotate(radian, pivot);

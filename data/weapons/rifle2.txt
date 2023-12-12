@@ -1,9 +1,9 @@
+type: gun
 cooldown: 12
 shootCount: 1
 shootMoveSpeed: 0.4
 recoil: 5
 accuracy: 30
-projectileType: bullet
 damage: 1
 piercing: 1
 width: 2

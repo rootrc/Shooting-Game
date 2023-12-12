@@ -1,9 +1,9 @@
+type: limitedGun
 cooldown: 1
 shootCount: 1
 shootMoveSpeed: 0.1
 recoil: 6
 accuracy: 3
-projectileType: limitedBullet
 damage: 1
 piercing: 1
 width: 1

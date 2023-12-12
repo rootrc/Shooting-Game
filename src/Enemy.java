@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -10,6 +11,7 @@ import Geo.Line;
 import Geo.Point;
 
 abstract class Enemy<T extends Enemy<T>> extends Entity {
+    private static HashMap<String, Enemy<?>> map = new HashMap<>();
     protected int id;
     protected double speed;
     protected double moveSpeed;
@@ -35,6 +37,7 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
         value = Game.parseInt(data) * 10;
         health = Game.parseInt(data);
         moveSpeed = Game.parseDouble(data);
+        speed = moveSpeed;
     }
 
     protected void draw(Graphics2D g2d, int x, int y) {
@@ -53,7 +56,7 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
         rotate(direction - radian);
         direction = radian;
         return line.getLength();
-    }
+    }    
 
     protected double distanceToPlayer() {
         Point playerCentroid = getRoom().player.getCentroid();
@@ -100,6 +103,29 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
         directionMove(speed, direction);
     }
 
+    static Enemy<?> createEnemy(Room room, String name) {
+        if (map.containsKey(name)) {
+            return map.get(name);
+        }
+        switch (name.substring(0, name.length() - 1)) {
+            case "chaser":
+                map.put(name, new Chaser(room, name.charAt(name.length() - 1) - '0'));
+                break;
+            case "rifle":
+                map.put(name, new Rifle(room, name.charAt(name.length() - 1) - '0'));
+                break;
+            case "sniper":
+                map.put(name, new Sniper(room, name.charAt(name.length() - 1) - '0'));
+                break;
+            case "machine":
+                map.put(name, new Machine(room, name.charAt(name.length() - 1) - '0'));
+                break;
+            case "sharp":
+                map.put(name, new Sharp(room, name.charAt(name.length() - 1) - '0'));
+                break;
+        }
+        return map.get(name);
+    }
     public abstract T clone();
 
     abstract void process();
@@ -111,7 +137,6 @@ class Chaser extends Enemy<Chaser> {
         super(room, id);
         orginalColor = Color.yellow;
         setColor(orginalColor);
-        speed = moveSpeed;
         corpseTime = 600;
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/chaser" + id + ".txt"));
@@ -131,7 +156,7 @@ class Chaser extends Enemy<Chaser> {
         Chaser chaser = new Chaser(getRoom(), getPoints(), id);
         return chaser;
     }
-
+    
     void process() {
         TimerTask timertask = new TimerTask() {
             public void run() {
@@ -155,7 +180,7 @@ class Rifle extends Enemy<Rifle> {
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/rifle" + id + ".txt"));
             scan(data);
-            weapon = new Weapon(this, "rifle" + id);
+            weapon = Weapon.createWeapon(this, "rifle" + id);
             shootDistance = Game.parseInt(data) * (0.2 * Math.random() + 1);
             moveDistance = Game.parseInt(data) * (0.2 * Math.random() + 0.8);
         } catch (IOException e) {
@@ -187,7 +212,6 @@ class Rifle extends Enemy<Rifle> {
         };
         timer.schedule(timertask, 0, Game.delay);
         shoot();
-
     }
 
     protected void shoot() {
@@ -218,7 +242,7 @@ class Sniper extends Enemy<Sniper> {
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/sniper" + id + ".txt"));
             scan(data);
-            weapon = new Weapon(this, "sniper" + id);
+            weapon = Weapon.createWeapon(this, "sniper" + id);
             shootDistance = Game.parseInt(data) * (0.2 * Math.random() + 1);
             moveDistance = Game.parseInt(data) * (0.2 * Math.random() + 0.8);
             runDistance = Game.parseInt(data) * (0.2 * Math.random() + 0.9);
@@ -296,7 +320,7 @@ class Machine extends Enemy<Machine> {
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/machine" + id + ".txt"));
             scan(data);
-            weapon = new Weapon(this, "machine" + id);
+            weapon = Weapon.createWeapon(this, "machine" + id);
             shootDistance = Game.parseInt(data) * (0.2 * Math.random() + 1);
             moveDistance = Game.parseInt(data) * (0.2 * Math.random() + 0.8);
         } catch (IOException e) {
@@ -363,7 +387,7 @@ class Sharp extends Enemy<Sharp> {
         try {
             Scanner data = new Scanner(new FileReader("data/enemies/sharp" + id + ".txt"));
             scan(data);
-            weapon = new Weapon(this, "sharp" + id);
+            weapon = Weapon.createWeapon(this, "sharp" + id);
             shootDistance = Game.parseInt(data) * (0.1 * Math.random() + 1);
             moveDistance = Game.parseInt(data) * (0.1 * Math.random() + 0.9);
         } catch (IOException e) {

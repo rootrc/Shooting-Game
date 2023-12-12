@@ -1,7 +1,6 @@
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.awt.Graphics2D;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -25,11 +24,11 @@ class Player extends Entity {
         orginalColor = Color.blue;
         setColor(orginalColor);
         corpseTime = 200;
-        weapon1 = new Weapon(this, "player_gun");
-        weapon2 = new Weapon(this, "player_sniper");
+        weapon1 = Weapon.createWeapon(this, "player_gun");
+        weapon2 = Weapon.createWeapon(this, "player_sniper");
         weapon = weapon1;
     }
-
+    
     public Player clone() {
         Player player = new Player(getRoom(), getPoints());
         player.a = a;
@@ -47,10 +46,6 @@ class Player extends Entity {
         player.weapon1 = weapon1;
         player.weapon2 = weapon2;
         return player;
-    }
-
-    public void draw(Graphics2D g2d, int x, int y) {
-        super.draw(g2d, x, y);
     }
 
     void process() {
