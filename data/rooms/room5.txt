@@ -4,3 +4,4 @@ enemyName: chaser1
 spawnRate: 3
 enemyName: sniper1
 spawnRate: 4
+upgradeCount: 0

@@ -2,3 +2,4 @@ scoreForNextRoom: 10
 enemyCount: 1
 enemyName: rifle1
 spawnRate: 2
+upgradeCount: 0

@@ -1,5 +1,5 @@
 type: gun
-cooldown: 15
+cooldown: 75
 shootCount: 1
 shootMoveSpeed: 0.3
 recoil: 20

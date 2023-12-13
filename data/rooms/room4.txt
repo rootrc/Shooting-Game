@@ -4,3 +4,4 @@ enemyName: rifle1
 spawnRate: 3
 enemyName: sniper1
 spawnRate: 6
+upgradeCount: 0

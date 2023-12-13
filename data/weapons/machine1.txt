@@ -1,5 +1,5 @@
 type: limitedGun
-cooldown: 2
+cooldown: 10
 shootCount: 1
 shootMoveSpeed: 0.5
 recoil: 3

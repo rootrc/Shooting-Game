@@ -2,3 +2,4 @@ scoreForNextRoom: 50
 enemyCount: 1
 enemyName: sharp2
 spawnRate: 6
+upgradeCount: 0

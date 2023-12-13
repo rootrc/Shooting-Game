@@ -37,7 +37,7 @@ abstract class Weapon {
                     weapon = new GrenadeLauncher(entity);
                     break;
             }
-            weapon.cooldown = Game.parseInt(data) * 100;
+            weapon.cooldown = Game.parseInt(data) * Game.delay;
             weapon.shotCount = Game.parseInt(data);
             if (weapon.shotCount != 1) {
                 weapon.shotCooldown = Game.parseInt(data);

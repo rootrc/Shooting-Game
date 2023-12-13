@@ -1,5 +1,5 @@
 type: limitedGun
-cooldown: 10
+cooldown: 50
 shotCount: 8
 shotCooldown: 0
 shootMoveSpeed: 0.7

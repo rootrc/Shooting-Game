@@ -14,7 +14,8 @@ class Player extends Entity {
     private double moveSpeed;
     private int xMovement, yMovement;
     private Weapon weapon1;
-    private Weapon weapon2;
+    //temp
+    public Weapon weapon2;
 
     Player(Room room, Point[] points) {
         super(room, points);
@@ -24,8 +25,7 @@ class Player extends Entity {
         orginalColor = Color.blue;
         setColor(orginalColor);
         corpseTime = 200;
-        weapon1 = Weapon.createWeapon(this, "player_shotgun");
-        weapon2 = Weapon.createWeapon(this, "player_grenade");
+        weapon1 = Weapon.createWeapon(this, "player_gun");
         weapon = weapon1;
     }
     

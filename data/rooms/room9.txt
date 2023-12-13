@@ -6,3 +6,4 @@ enemyName: rifle2
 spawnRate: 4
 enemyName: machine1
 spawnRate: 10
+upgradeCount: 0

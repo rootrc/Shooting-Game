@@ -4,3 +4,4 @@ enemyName: machine2
 spawnRate: 5
 enemyName: sniper2
 spawnRate: 8
+upgradeCount: 0

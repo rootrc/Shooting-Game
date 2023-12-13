@@ -1,2 +1,3 @@
 scoreForNextRoom: 10000
 enemyCount: 0
+upgradeCount: 0

@@ -1,10 +1,11 @@
-scoreForNextRoom: 15
+scoreForNextRoom: 25
 enemyCount: 4
 enemyName: chaser1
-spawnRate: 16
+spawnRate: 6
 enemyName: rifle1
-spawnRate: 16
+spawnRate: 6
 enemyName: sniper1
 spawnRate: 4
 enemyName: machine1
 spawnRate: 4
+upgradeCount: 0

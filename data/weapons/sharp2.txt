@@ -1,13 +1,13 @@
 type: gun
-cooldown: 50
+cooldown: 225
 shotCount: 3
-shotCooldown: 8
+shotCooldown: 10
 shootMoveSpeed: 0.6
 recoil: 15
 accuracy: 30
 damage: 1
 width: 1
 length: 8
-knockback: 8
+knockback: 10
 piercing: 1
-speed: 8
+speed: 10

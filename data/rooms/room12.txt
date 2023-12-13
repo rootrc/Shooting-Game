@@ -1,6 +1,7 @@
 scoreForNextRoom: 25
 enemyCount: 2
 enemyName: chaser2
-spawnRate: 5
+spawnRate: 6
 enemyName: sniper2
 spawnRate: 3
+upgradeCount: 0

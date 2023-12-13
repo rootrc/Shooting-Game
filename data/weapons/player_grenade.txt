@@ -1,5 +1,5 @@
 type: grenade
-cooldown: 20
+cooldown: 90
 shootCount: 1
 shootMoveSpeed: 0.9
 recoil: 30
@@ -7,7 +7,7 @@ accuracy: 8
 damage: 1
 width: 10
 length: 2
-knockback: 35
+knockback: 30
 speed: 3
 size: 75
-maxDistance: 350
+maxDistance: 400

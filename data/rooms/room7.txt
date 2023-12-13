@@ -8,3 +8,7 @@ enemyName: sniper1
 spawnRate: 5
 enemyName: machine1
 spawnRate: 5
+upgradeCount: 3
+upgrade1: player_shotgun
+upgrade2: player_marksman
+upgrade3: player_grenade
