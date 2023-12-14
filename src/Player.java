@@ -9,12 +9,12 @@ import Geo.Point;
 
 class Player extends Entity {
     private boolean a, d, s, w;
-    private boolean shoot, shooting;
+    private boolean shooting;
     private double speed;
     private double moveSpeed;
     private int xMovement, yMovement;
     private Weapon weapon1;
-    //temp
+    // temp
     public Weapon weapon2;
 
     Player(Room room, Point[] points) {
@@ -28,16 +28,13 @@ class Player extends Entity {
         weapon1 = Weapon.createWeapon(this, "player_gun");
         weapon = weapon1;
     }
-    
+
     public Player clone() {
         Player player = new Player(getRoom(), getPoints());
         player.a = a;
         player.d = d;
         player.s = s;
         player.w = w;
-        player.shoot = shoot;
-        player.shooting = shooting;
-        player.shooting = shooting;
         player.speed = speed;
         player.moveSpeed = moveSpeed;
         player.xMovement = xMovement;
@@ -48,32 +45,28 @@ class Player extends Entity {
         return player;
     }
 
-    void process() {
-        TimerTask timertask = new TimerTask() {
-            public void run() {
-                for (Entity entity : getRoom().entities) {
-                    if (Player.this == entity) {
-                        continue;
-                    }
-                    if (Player.this.intersects(entity)) {
-                        health--;
-                        entity.health--;
-                        if (health > 0) {
-                            hit();
-                        } else {
-                            death();
-                        }
-                        if (entity.health > 0) {
-                            entity.hit();
-                        } else {
-                            entity.death();
-                        }
-                    }
-                }
-                move();
+    public void process() {
+        for (Entity entity : getRoom().entities) {
+            if (this == entity) {
+                continue;
             }
-        };
-        timer.schedule(timertask, 0, Game.delay);
+            if (intersects(entity)) {
+                health--;
+                entity.health--;
+                if (health > 0) {
+                    hit();
+                } else {
+                    death();
+                }
+                if (entity.health > 0) {
+                    entity.hit();
+                } else {
+                    entity.death();
+                }
+            }
+        }
+        move();
+        shoot();
     }
 
     private void move() {
@@ -112,13 +105,13 @@ class Player extends Entity {
         timer.schedule(timertask, 10 * Game.delay);
         Timer timer2 = new Timer();
         timertask = new TimerTask() {
-            int count = 0;
+            int frame = 0;
 
             public void run() {
-                count++;
+                frame++;
                 getRoom().xAdjust = (int) (10 * Math.random()) - 5;
                 getRoom().yAdjust = (int) (10 * Math.random()) - 5;
-                if (count == 10) {
+                if (frame == 10) {
                     getRoom().xAdjust = 0;
                     getRoom().yAdjust = 0;
                     timer2.cancel();
@@ -136,31 +129,19 @@ class Player extends Entity {
     }
 
     private void shoot() {
-        speed = (int) (moveSpeed * weapon.getShootMoveSpeed());
-        Timer timer = new Timer();
-        TimerTask timertask = new TimerTask() {
-            public void run() {
-                if (!shoot) {
-                    timer.cancel();
-                    timer.purge();
-                    shooting = false;
-                    return;
+        if (weapon.canShoot() && shooting) {
+            weapon.shoot();
+            Timer timer = new Timer();
+            TimerTask timertask = new TimerTask() {
+                public void run() {
+                    getRoom().xAdjust = 0;
+                    getRoom().yAdjust = 0;
                 }
-                weapon.shoot();
-                Timer timer = new Timer();
-                TimerTask timertask = new TimerTask() {
-                    public void run() {
-                        getRoom().xAdjust = 0;
-                        getRoom().yAdjust = 0;
-                    }
-                };
-                getRoom().xAdjust = (int) (6 * Math.random()) - 3;
-                getRoom().yAdjust = (int) (6 * Math.random()) - 3;
-                timer.schedule(timertask, Game.delay);
-            }
-        };
-        timer.schedule(timertask, 0, weapon.getCooldown());
-        shooting = true;
+            };
+            getRoom().xAdjust = (int) (6 * Math.random()) - 3;
+            getRoom().yAdjust = (int) (6 * Math.random()) - 3;
+            timer.schedule(timertask, Game.delay);
+        }
     }
 
     void keyPressed(KeyEvent e) {
@@ -194,10 +175,8 @@ class Player extends Entity {
                 }
                 break;
             case KeyEvent.VK_SPACE:
-                if (!shoot && !shooting) {
-                    shoot = true;
-                    shoot();
-                }
+                shooting = true;
+                speed = moveSpeed * weapon.shootMoveSpeed;
                 break;
             case KeyEvent.VK_Q:
                 if (weapon2 != null) {
@@ -242,7 +221,7 @@ class Player extends Entity {
                 }
                 break;
             case KeyEvent.VK_SPACE:
-                shoot = false;
+                shooting = false;
                 speed = moveSpeed;
                 break;
         }

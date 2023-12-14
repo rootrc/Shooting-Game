@@ -12,15 +12,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import Geo.Point;
 import Geo.Polygon;
 
 public class Room extends Polygon {
     private int id;
-    private Timer timer = new Timer();
     ConcurrentHashMap.KeySetView<Projectile, Boolean> projectiles = ConcurrentHashMap.newKeySet();
     ConcurrentHashMap.KeySetView<Entity, Boolean> entities = ConcurrentHashMap.newKeySet();
     ConcurrentHashMap.KeySetView<MuzzleFlash, Boolean> muzzleFlashes = ConcurrentHashMap.newKeySet();
@@ -74,27 +71,39 @@ public class Room extends Polygon {
     }
 
     void process() {
-        player.process();
-        TimerTask timertask = new TimerTask() {
-            public void run() {
-                if (score < scoreForNextRoom) {
-                    for (Map.Entry<String, Double> e : enemySpawns.entrySet()) {
-                        if (Math.random() * e.getValue() < 1) {
-                            addEnemy(e.getKey());
-                        }
-                    }
-                }
-                if (score >= scoreForNextRoom && entities.size() <= 5) {
-                    if (upgradeCount != 0) {
-                        String upgrade = JOptionPane.showInputDialog(Game.getInstance().frame,
-                                "Choose an upgrade: shotgun, marksman, or grenade");
-                        player.weapon2 = Weapon.createWeapon(Room.this.player, "player_" + upgrade);
-                    }
-                    loadRoom(id + 1);
+        if (score < scoreForNextRoom) {
+            for (Map.Entry<String, Double> e : enemySpawns.entrySet()) {
+                if (Math.random() * e.getValue() < 1) {
+                    addEnemy(e.getKey());
                 }
             }
-        };
-        timer.schedule(timertask, 0, Game.delay);
+        }
+        if (score >= scoreForNextRoom && entities.size() <= 5) {
+            if (upgradeCount != 0) {
+                String upgrade = JOptionPane.showInputDialog(Game.getInstance().frame,
+                        "Choose an upgrade: shotgun, marksman, or grenade");
+                player.weapon2 = Weapon.createWeapon(Room.this.player, "player_" + upgrade);
+            }
+            loadRoom(id + 1);
+        }
+        for (Corpse corpse : corpses) {
+            corpse.process();
+        }
+        for (MuzzleFlash muzzleFlash : muzzleFlashes) {
+            muzzleFlash.process();
+        }
+        for (Particle particle : particles) {
+            particle.process();
+        }
+        for (Explosion explosion : explosions) {
+            explosion.process();
+        }
+        for (Projectile projectile : projectiles) {
+            projectile.process();
+        }
+        for (Entity entity : entities) {
+            entity.process();
+        }
     }
 
     void draw(Graphics2D g2d) {
@@ -125,7 +134,7 @@ public class Room extends Polygon {
         g2d.setColor(Color.black);
         g2d.drawString(Integer.toString(Math.max(player.health, 0)), 15 + xAdjust,
                 30 + yAdjust);
-        g2d.drawString(Integer.toString(id), 350 + xAdjust, 30 + yAdjust);
+        // g2d.drawString(Integer.toString(id), 350 + xAdjust, 30 + yAdjust);
         g2d.drawString(Integer.toString(score),
                 770 - SwingUtilities.computeStringWidth(g2d.getFontMetrics(), Integer.toString(score))
                         + xAdjust,

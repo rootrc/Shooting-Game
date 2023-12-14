@@ -65,6 +65,8 @@ abstract class Entity extends Polygon {
 
     public abstract Entity clone();
 
+    public abstract void process();
+
     protected abstract void hit();
 
     protected abstract void death();

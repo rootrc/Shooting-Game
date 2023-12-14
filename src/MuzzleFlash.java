@@ -1,14 +1,11 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import Geo.Line;
 import Geo.Point;
 
 class MuzzleFlash extends Line {
     private Room room;
-    private Timer timer = new Timer();
     private Point centroid;
     private double direction;
     private double length;
@@ -20,30 +17,21 @@ class MuzzleFlash extends Line {
         this.length = length;
         setBorderColor(new Color(247, 241, 181));
         setWidth(8);
-        process();
+        room.muzzleFlashes.add(this);
     }
 
     protected void draw(Graphics2D g2d, int x, int y) {
         super.draw(g2d, x, y);
     }
 
-    private void process() {
-        TimerTask timertask = new TimerTask() {
-            int count = 0;
+    private int frame = 0;
 
-            public void run() {
-                count++;
-                setP1(centroid);
-                setP2(centroid.directionTranslate(20 + length / 2, direction));
-                if (count == 3) {
-                    room.muzzleFlashes.remove(MuzzleFlash.this);
-                    timer.cancel();
-                    timer.purge();
-                }
-            }
-        };
-        room.muzzleFlashes.add(this);
-        timer.schedule(timertask, 0, Game.delay);
+    public void process() {
+        frame++;
+        setP1(centroid);
+        setP2(centroid.directionTranslate(20 + length / 2, direction));
+        if (frame == 3) {
+            room.muzzleFlashes.remove(this);
+        }
     }
-
 }

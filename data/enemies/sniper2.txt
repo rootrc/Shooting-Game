@@ -7,4 +7,4 @@ health: 1
 moveSpeed: 4
 shootDistance: 750
 moveDistance: 700
-runDistance: 400
+runDistance: 350

@@ -1,6 +1,5 @@
 import java.awt.Graphics2D;
 import java.util.Timer;
-import java.util.TimerTask;
 
 import Geo.Line;
 import Geo.Point;
@@ -10,8 +9,10 @@ abstract class Projectile extends Line {
     protected Timer timer = new Timer();
     protected boolean isPlayer;
     protected int damage;
-    protected double length;
     protected int knockback;
+
+    protected double length;
+    protected double direction;
 
     Projectile(Room room, Point p1, Point p2) {
         super(p1, p2);
@@ -20,12 +21,6 @@ abstract class Projectile extends Line {
 
     Projectile(Room room) {
         this.room = room;
-    }
-
-    protected void remove() {
-        getRoom().projectiles.remove(this);
-        timer.cancel();
-        timer.purge();
     }
 
     protected void hit(Entity entity, double direction) {
@@ -87,38 +82,40 @@ class Bullet extends Projectile {
         Bullet bullet = clone();
         bullet.set(centroid.directionTranslate(20, direction),
                 centroid.directionTranslate(20 + bullet.length, direction));
-        bullet.process();
+        bullet.direction = bullet.caculateRadian();
+        getRoom().projectiles.add(bullet);
     }
 
     void process() {
-        double direction = caculateRadian();
-        TimerTask timertask = new TimerTask() {
-            public void run() {
-                Bullet.this.directionMove(speed, direction);
-                if (getRoom().intersects(new Line(Bullet.this.p2, Bullet.this.p2
-                        .directionTranslate(-Bullet.this.speed, direction)))) {
-                    remove();
-                } else if (!getRoom().inside(getP2())) {
-                    remove();
-                }
-                for (Entity entity : getRoom().entities) {
-                    if (entity.getClass() != Player.class && !Bullet.this.isPlayer) {
-                        continue;
-                    }
-                    if (entity.intersects(
-                            new Line(Bullet.this.p2,
-                                    Bullet.this.p2.directionTranslate(-Bullet.this.speed, direction)))) {
-                        hit(entity, direction);
-                        Bullet.this.piercing--;
-                        if (Bullet.this.piercing <= 0) {
-                            remove();
-                        }
-                    }
+        directionMove(speed, direction);
+        if (getRoom().intersects(new Line(p2, p2
+                .directionTranslate(-speed, direction)))) {
+            getRoom().projectiles.remove(this);
+        } else if (!getRoom().inside(getP2())) {
+            getRoom().projectiles.remove(this);
+        }
+        if (!isPlayer) {
+            if (getRoom().player.intersects(new Line(p2, p2.directionTranslate(-speed, direction)))) {
+                hit(getRoom().player, direction);
+                piercing--;
+                if (piercing <= 0) {
+                    getRoom().projectiles.remove(this);
                 }
             }
-        };
-        getRoom().projectiles.add(this);
-        timer.schedule(timertask, 0, Game.delay);
+            return;
+        }
+        for (Entity entity : getRoom().entities) {
+            if (entity.getClass() == Player.class) {
+                continue;
+            }
+            if (entity.intersects(new Line(p2, p2.directionTranslate(-speed, direction)))) {
+                hit(entity, direction);
+                piercing--;
+                if (piercing <= 0) {
+                    getRoom().projectiles.remove(this);
+                }
+            }
+        }
     }
 }
 
@@ -149,51 +146,51 @@ class LimitedBullet extends Projectile {
         return limitedBullet;
     }
 
+    int frame = 0;
+
     void shoot(Point centroid, double direction) {
         LimitedBullet limitedBullet = clone();
         limitedBullet.setP1(centroid.directionTranslate(20, direction));
         limitedBullet.setP2(centroid.directionTranslate(20 + limitedBullet.length, direction));
-        limitedBullet.process();
+        limitedBullet.direction = limitedBullet.caculateRadian();
+        limitedBullet.duration = (int) ((0.8 + 0.4 * Math.random()) * duration);
+        getRoom().projectiles.add(limitedBullet);
     }
 
     void process() {
-        double direction = caculateRadian();
-        duration = (int) ((0.8 + 0.4 * Math.random()) * duration);
-        TimerTask timertask = new TimerTask() {
-            int count = 0;
-
-            public void run() {
-                LimitedBullet.this.p1.directionMove(speed + (double) LimitedBullet.this.length
-                        / (LimitedBullet.this.duration * LimitedBullet.this.duration) * (2 * count - 1), direction);
-                LimitedBullet.this.p2.directionMove(speed, direction);
-                count++;
-                if (getRoom().intersects(new Line(LimitedBullet.this.p2, LimitedBullet.this.p2
-                        .directionTranslate(-LimitedBullet.this.speed, direction)))) {
-                    remove();
-                } else if (!getRoom().inside(getP2())) {
-                    remove();
-                } else if (count == LimitedBullet.this.duration) {
-                    remove();
-                }
-                for (Entity entity : getRoom().entities) {
-                    if (entity.getClass() != Player.class && !LimitedBullet.this.isPlayer) {
-                        continue;
-                    }
-                    if (entity.intersects(
-                            new Line(LimitedBullet.this.p2,
-                                    LimitedBullet.this.p2.directionTranslate(-LimitedBullet.this.speed,
-                                            direction)))) {
-                        hit(entity, direction);
-                        LimitedBullet.this.piercing--;
-                        if (LimitedBullet.this.piercing <= 0) {
-                            remove();
-                        }
-                    }
+        frame++;
+        p1.directionMove(speed + (double) length / (duration * duration) * (2 * frame - 1), direction);
+        p2.directionMove(speed, direction);
+        if (getRoom().intersects(new Line(p2, p2
+                .directionTranslate(-speed, direction)))) {
+            getRoom().projectiles.remove(this);
+        } else if (!getRoom().inside(getP2())) {
+            getRoom().projectiles.remove(this);
+        } else if (frame == duration) {
+            getRoom().projectiles.remove(this);
+        }
+        if (!isPlayer) {
+            if (getRoom().player.intersects(new Line(p2, p2.directionTranslate(-speed, direction)))) {
+                hit(getRoom().player, direction);
+                piercing--;
+                if (piercing <= 0) {
+                    getRoom().projectiles.remove(this);
                 }
             }
-        };
-        getRoom().projectiles.add(this);
-        timer.schedule(timertask, 0, Game.delay);
+            return;
+        }
+        for (Entity entity : getRoom().entities) {
+            if (entity.getClass() == Player.class) {
+                continue;
+            }
+            if (entity.intersects(new Line(p2, p2.directionTranslate(-speed, direction)))) {
+                hit(entity, direction);
+                piercing--;
+                if (piercing <= 0) {
+                    getRoom().projectiles.remove(this);
+                }
+            }
+        }
     }
 }
 
@@ -224,38 +221,33 @@ class Grenade extends Projectile {
         return grenade;
     }
 
+    double distance;
+    double randomDistance;
+    int frame;
+
     void shoot(Point centroid, double direction) {
         Grenade grenade = clone();
         grenade.setP1(centroid.directionTranslate(20, direction));
         grenade.setP2(centroid.directionTranslate(20 + grenade.length, direction));
-        grenade.process();
+        grenade.direction = grenade.caculateRadian();
+        grenade.distance = Math.min(maxDistance,
+                new Line(grenade.p1, Game.getInstance().panel.mouseLocation()).getLength());
+        grenade.randomDistance = (0.8 - 0.3 * Math.random()) * grenade.distance;
+        getRoom().projectiles.add(grenade);
     }
 
     void process() {
-        double direction = caculateRadian();
-        double distance = Math.min(maxDistance, new Line(this.p1, Game.getInstance().panel.mouseLocation()).getLength());
-        double randomDistance = (0.8 - 0.3 * Math.random()) * distance;
-        TimerTask timertask = new TimerTask() {
-            int count = 0;
-            public void run() {
-                count += speed;
-                Grenade.this.directionMove(speed * (2 * distance - 2 * count - speed) / distance, direction);
-                if (getRoom().intersects(new Line(Grenade.this.p2, Grenade.this.p2
-                        .directionTranslate(-Grenade.this.speed, direction)))) {
-                    new Explosion(Grenade.this);
-                    remove();
-                } else if (!getRoom().inside(getP2())) {
-                    new Explosion(Grenade.this);
-                    remove();
-                } else if (count >= randomDistance) {
-                    new Explosion(Grenade.this);
-                    remove();
-                }
-
-            }
-        };
-        getRoom().projectiles.add(this);
-        timer.schedule(timertask, 0, Game.delay);
+        frame += speed;
+        directionMove(speed * (2 * distance - 2 * frame - speed) / distance, direction);
+        if (getRoom().intersects(new Line(p2, p2.directionTranslate(-speed, direction)))) {
+            new Explosion(this);
+            getRoom().projectiles.remove(this);
+        } else if (!getRoom().inside(getP2())) {
+            new Explosion(this);
+            getRoom().projectiles.remove(this);
+        } else if (frame >= randomDistance) {
+            new Explosion(this);
+            getRoom().projectiles.remove(this);
+        }
     }
-
 }

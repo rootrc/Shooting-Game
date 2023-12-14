@@ -21,7 +21,7 @@ public class Game {
     private Game() {
         frame = new JFrame();
         panel = new Panel();
-        room = new Room(new Point[] { new Point(10, 10), new Point(777, 10), new Point(777, 700), new Point(10, 700) }, 7);
+        room = new Room(new Point[] { new Point(10, 10), new Point(777, 10), new Point(777, 700), new Point(10, 700) }, 1);
         frame.add(panel);
         frame.pack();
         frame.setTitle("Game");
@@ -33,6 +33,7 @@ public class Game {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         Timer timer = new Timer(Game.delay, new ActionListener() {
             public void actionPerformed(ActionEvent ev) {
+                room.process();
                 panel.repaint();
             }
         });
@@ -46,7 +47,7 @@ public class Game {
     }
 
     public static void main(String[] args) {
-        Game.getInstance().room.process();
+        Game.getInstance();
     }
 
     static String parseStr(Scanner data) {

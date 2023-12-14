@@ -1,13 +1,10 @@
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import Geo.Point;
 
 abstract class Particle extends Point {
     private Room room;
-    protected Timer timer = new Timer();
     protected double direction;
 
     Particle(Room room, Point point, double direction) {
@@ -15,7 +12,6 @@ abstract class Particle extends Point {
         this.room = room;
         this.direction = direction;
         getRoom().particles.add(this);
-        process();
     }
 
     protected void draw(Graphics2D g2d, int x, int y) {
@@ -39,6 +35,8 @@ abstract class Particle extends Point {
             directionMove(-l, direction);
         }
     }
+
+    protected int frame;
 
     protected Room getRoom() {
         return room;
@@ -65,50 +63,19 @@ class Casing extends Particle {
     }
 
     void process() {
-        TimerTask timertask = new TimerTask() {
-            int count = 0;
-
-            public void run() {
-                count++;
-                double N = distance1 * (-2.0 * count / (time1 * time1) + 1.0 / (time1 * time1) + 2.0 / time1);
-                attemptMove(N, direction);
-                if (count == time1) {
-                    timer.cancel();
-                    timer.purge();
-                }
-            }
-        };
-        timer.schedule(timertask, 0, Game.delay);
-        Timer timer2 = new Timer();
-        TimerTask timertask2 = new TimerTask() {
-            int count = time1;
-
-            public void run() {
-                count++;
-                double N = (distance2 - distance1) * (2 * time1 + 2 * time2 - 2 * count + 1) / (time2 * time2);
-                attemptMove(N, direction);
-                if (count == time2) {
-                    timer2.cancel();
-                    timer2.purge();
-                }
-            }
-        };
-        timer2.schedule(timertask2, 0, Game.delay);
-        Timer timer3 = new Timer();
-        TimerTask timertask3 = new TimerTask() {
-            int count = 0;
-
-            public void run() {
-                count++;
-                Casing.this.setBorderColor(new Color(175, 156, 96, -255 * count
-                        * count / (time3 * time3) + 255));
-                if (count == time3) {
-                    getRoom().particles.remove(Casing.this);
-                    timer3.cancel();
-                    timer3.purge();
-                }
-            }
-        };
-        timer3.schedule(timertask3, 0, Game.delay);
+        frame++;
+        double N;
+        if (frame < time1) {
+            N = distance1 * (-2.0 * frame / (time1 * time1) + 1.0 / (time1 * time1) + 2.0 / time1);
+            attemptMove(N, direction);
+        }
+        if (time1 <= frame && frame < time2) {
+            N = (distance2 - distance1) * (2 * time1 + 2 * time2 - 2 * frame + 1) / (time2 * time2);
+            attemptMove(N, direction);
+        }
+        if (frame < time3) {
+            setBorderColor(new Color(175, 156, 96, -255 * frame
+                    * frame / (time3 * time3) + 255));
+        }
     }
 }

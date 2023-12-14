@@ -26,8 +26,8 @@ abstract class Weapon {
         try {
             Scanner data = new Scanner(new FileReader("data/weapons/" + name + ".txt"));
             String type = Game.parseStr(data);
-            switch(type) {
-                case "gun":  
+            switch (type) {
+                case "gun":
                     weapon = new Gun(entity);
                     break;
                 case "limitedGun":
@@ -37,7 +37,7 @@ abstract class Weapon {
                     weapon = new GrenadeLauncher(entity);
                     break;
             }
-            weapon.cooldown = Game.parseInt(data) * Game.delay;
+            weapon.cooldown = Game.parseInt(data);
             weapon.shotCount = Game.parseInt(data);
             if (weapon.shotCount != 1) {
                 weapon.shotCooldown = Game.parseInt(data);
@@ -89,7 +89,10 @@ abstract class Weapon {
         return weapon;
     }
 
+    protected int frame = 0;
+
     public void shoot() {
+        frame = 0;
         shot(entity.getCentroid(), entity.direction);
         if (shotCount == 1) {
             return;
@@ -117,20 +120,23 @@ abstract class Weapon {
                 shotCooldown * Game.delay);
     }
 
-    int getCooldown() {
-        return cooldown;
-    }
-
     double getShootMoveSpeed() {
         return shootMoveSpeed;
     }
+
+    public boolean canShoot() {
+        frame++;
+        return frame >= cooldown;
+    }
+
     protected abstract void shot(Point centroid, double direction);
 }
 
 class Gun extends Weapon {
-    Gun (Entity entity) {
+    Gun(Entity entity) {
         super(entity);
     }
+
     protected void shot(Point centroid, double direction) {
         direction += accuracy * Math.random() - accuracy / 2;
         entity.attemptMove(recoil, direction);
@@ -144,9 +150,10 @@ class Gun extends Weapon {
 }
 
 class LimitedGun extends Weapon {
-    LimitedGun (Entity entity) {
+    LimitedGun(Entity entity) {
         super(entity);
     }
+
     protected void shot(Point centroid, double direction) {
         direction += accuracy * Math.random() - accuracy / 2;
         entity.attemptMove(recoil, direction);
@@ -160,9 +167,10 @@ class LimitedGun extends Weapon {
 }
 
 class GrenadeLauncher extends Weapon {
-    GrenadeLauncher (Entity entity) {
+    GrenadeLauncher(Entity entity) {
         super(entity);
     }
+
     protected void shot(Point centroid, double direction) {
         direction += accuracy * Math.random() - accuracy / 2;
         entity.attemptMove(recoil, direction);
