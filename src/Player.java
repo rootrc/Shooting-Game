@@ -22,11 +22,12 @@ class Player extends Entity {
         moveSpeed = 5;
         speed = moveSpeed;
         health = 100;
-        orginalColor = Color.blue;
+        orginalColor = Color.cyan;
         setColor(orginalColor);
         corpseTime = 200;
         weapon1 = Weapon.createWeapon(this, "player_gun");
         weapon = weapon1;
+        healthBar = new HealthBar(this, health);
     }
 
     public Player clone() {
@@ -35,7 +36,7 @@ class Player extends Entity {
         player.d = d;
         player.s = s;
         player.w = w;
-        player.speed = speed;
+        player.speed = speed;   
         player.moveSpeed = moveSpeed;
         player.xMovement = xMovement;
         player.yMovement = yMovement;
@@ -51,8 +52,8 @@ class Player extends Entity {
                 continue;
             }
             if (intersects(entity)) {
-                health--;
-                entity.health--;
+                decreaseHealth(1);
+                entity.decreaseHealth(1);
                 if (health > 0) {
                     hit();
                 } else {
@@ -126,6 +127,16 @@ class Player extends Entity {
         timer.purge();
         getRoom().entities.remove(this);
         new Corpse(this, corpseTime);
+        Timer timer = new Timer();
+            TimerTask timertask = new TimerTask() {
+                public void run() {
+                    getRoom().xAdjust = 0;
+                    getRoom().yAdjust = 0;
+                }
+            };
+            getRoom().xAdjust = (int) (20 * Math.random()) - 10;
+            getRoom().yAdjust = (int) (20 * Math.random()) - 10;
+            timer.schedule(timertask, Game.delay);
     }
 
     private void shoot() {
@@ -142,6 +153,18 @@ class Player extends Entity {
             getRoom().yAdjust = (int) (6 * Math.random()) - 3;
             timer.schedule(timertask, Game.delay);
         }
+    }
+
+    public void pause() {
+        speed = moveSpeed;
+        a = false;
+        d = false;
+        s = false;
+        w = false;
+        shooting = false;
+        speed = moveSpeed;
+        xMovement = 0;
+        yMovement = 0;
     }
 
     void keyPressed(KeyEvent e) {

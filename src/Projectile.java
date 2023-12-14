@@ -24,7 +24,7 @@ abstract class Projectile extends Line {
     }
 
     protected void hit(Entity entity, double direction) {
-        entity.health -= damage;
+        entity.decreaseHealth(damage);
         entity.attemptMove(-knockback, direction);
         if (entity.health > 0) {
             entity.hit();

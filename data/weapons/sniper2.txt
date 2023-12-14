@@ -1,5 +1,5 @@
 type: gun
-cooldown: 600
+cooldown: 400
 shootCount: 1
 shootMoveSpeed: 0
 recoil: 40
@@ -9,4 +9,4 @@ width: 4
 length: 20
 knockback: 30
 piercing: 2
-speed: 30
+speed: 25

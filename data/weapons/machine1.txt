@@ -9,5 +9,5 @@ width: 1
 length: 10
 knockback: 10
 piercing: 1
-speed: 5
+speed: 4
 duration: 35

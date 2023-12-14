@@ -1,5 +1,5 @@
 type: gun
-cooldown: 225
+cooldown: 150
 shotCount: 3
 shotCooldown: 10
 shootMoveSpeed: 0.6

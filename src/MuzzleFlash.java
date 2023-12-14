@@ -15,7 +15,7 @@ class MuzzleFlash extends Line {
         centroid = entity.getCentroid().clone();
         direction = entity.direction;
         this.length = length;
-        setBorderColor(new Color(247, 241, 181));
+        setBorderColor(new Color(247, 231, 141));
         setWidth(8);
         room.muzzleFlashes.add(this);
     }

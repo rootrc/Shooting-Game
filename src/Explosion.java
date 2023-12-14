@@ -36,7 +36,7 @@ class Explosion extends Circle {
         speed -= 0.1;
         for (Entity entity : room.entities) {
             if (entity.isInside(this)) {
-                entity.health -= damage;
+                entity.decreaseHealth(damage);
                 double direction = new Line(center, entity.getCentroid()).caculateRadian();
                 entity.attemptMove(-knockback, direction);
                 if (entity.health > 0) {

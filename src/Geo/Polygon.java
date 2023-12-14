@@ -8,6 +8,7 @@ public class Polygon extends Geo<Polygon> {
     private Point[] points;
     private Line[] lines;
     private Point centroid = new Point();
+    public double size;
 
     public Polygon(Point[] points) {
         this.length = points.length;
@@ -17,6 +18,7 @@ public class Polygon extends Geo<Polygon> {
             lines[i] = new Line(points[i], points[(i + 1) % length]);
         }
         computeCentroid();
+        size = new Line(centroid, points[0]).getLength();
     }
 
     protected Polygon() {
@@ -31,6 +33,7 @@ public class Polygon extends Geo<Polygon> {
             lines[i] = new Line(points[i], points[(i + 1) % length]);
         }
         computeCentroid();
+        size = new Line(centroid, points[0]).getLength();
     }
 
     public Polygon clone() {

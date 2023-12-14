@@ -78,13 +78,18 @@ public class Room extends Polygon {
                 }
             }
         }
-        if (score >= scoreForNextRoom && entities.size() <= 5) {
-            if (upgradeCount != 0) {
+        if (upgradeCount == 0) {
+            if (score >= scoreForNextRoom && entities.size() <= 5) {
+                loadRoom(id + 1);
+            }
+        } else {
+            if (score >= scoreForNextRoom && entities.size() == 1) {
+                player.pause();
                 String upgrade = JOptionPane.showInputDialog(Game.getInstance().frame,
                         "Choose an upgrade: shotgun, marksman, or grenade");
                 player.weapon2 = Weapon.createWeapon(Room.this.player, "player_" + upgrade);
+                loadRoom(id + 1);
             }
-            loadRoom(id + 1);
         }
         for (Corpse corpse : corpses) {
             corpse.process();

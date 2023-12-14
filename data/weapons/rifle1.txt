@@ -9,4 +9,4 @@ width: 1
 length: 20
 knockback: 12
 piercing: 1
-speed: 8
+speed: 7

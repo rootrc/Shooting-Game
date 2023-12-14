@@ -4,4 +4,4 @@ point: 27.7128129211 0
 point: 0 16
 value: 3
 health: 3
-moveSpeed: 5
+moveSpeed: 4

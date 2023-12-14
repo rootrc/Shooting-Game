@@ -13,6 +13,7 @@ import Geo.Point;
 abstract class Enemy<T extends Enemy<T>> extends Entity {
     private static HashMap<String, Enemy<?>> map = new HashMap<>();
     protected int id;
+    protected double size;
     protected double speed;
     protected double moveSpeed;
     protected double rotationSpeed;
@@ -38,6 +39,7 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
         health = Game.parseInt(data);
         moveSpeed = Game.parseDouble(data);
         speed = moveSpeed;
+        healthBar = new HealthBar(this, health);
     }
 
     protected void draw(Graphics2D g2d, int x, int y) {
@@ -395,7 +397,7 @@ class Sharp extends Enemy<Sharp> {
             if (getRoom()
                     .intersects(directionTranslate(speed, direction + strafing * Math.PI / 2))) {
                 strafing *= -1;
-            } else if (Math.random() < 0.05) {
+            } else if (Math.random() < 0.01) {
                 strafing *= -1;
             }
             directionMove(speed, direction + strafing * Math.PI / 2);

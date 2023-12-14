@@ -2,6 +2,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.util.Timer;
 
+import Geo.Line;
 import Geo.Point;
 import Geo.Polygon;
 
@@ -13,6 +14,7 @@ abstract class Entity extends Polygon {
     protected int health;
     protected Color orginalColor;
     protected int corpseTime;
+    protected HealthBar healthBar;
 
     Entity(Room room, Point[] points) {
         super(points);
@@ -25,6 +27,7 @@ abstract class Entity extends Polygon {
 
     protected void draw(Graphics2D g2d, int x, int y) {
         super.draw(g2d, x, y);
+        healthBar.draw(g2d, x, y);
     }
 
     protected void fill(Graphics2D g2d, int x, int y) {
@@ -53,6 +56,10 @@ abstract class Entity extends Polygon {
             }
             directionMove(-l, direction);
         }
+    }
+
+    void decreaseHealth(int health) {
+        this.health -= health;
     }
 
     protected Room getRoom() {

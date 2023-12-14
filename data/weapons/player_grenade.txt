@@ -1,5 +1,5 @@
 type: grenade
-cooldown: 90
+cooldown: 80
 shootCount: 1
 shootMoveSpeed: 0.9
 recoil: 30
