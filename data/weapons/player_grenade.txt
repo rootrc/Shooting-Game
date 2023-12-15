@@ -9,5 +9,5 @@ width: 10
 length: 2
 knockback: 30
 speed: 3
-size: 70
+size: 100
 maxDistance: 400

@@ -8,5 +8,5 @@ damage: 1
 width: 4
 length: 20
 knockback: 24
-piercing: 1
-speed: 15
+pierce: 1
+speed: 12

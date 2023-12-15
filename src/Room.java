@@ -24,7 +24,8 @@ public class Room extends Polygon {
     ConcurrentHashMap.KeySetView<Explosion, Boolean> explosions = ConcurrentHashMap.newKeySet();
     private HashMap<String, Double> enemySpawns = new HashMap<>();
     ConcurrentHashMap.KeySetView<Corpse, Boolean> corpses = ConcurrentHashMap.newKeySet();
-    ConcurrentHashMap.KeySetView<Particle, Boolean> particles = ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.KeySetView<Particle, Boolean> particles1 = ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.KeySetView<Particle, Boolean> particles2 = ConcurrentHashMap.newKeySet();
     Player player;
     int xAdjust;
     int yAdjust;
@@ -97,7 +98,10 @@ public class Room extends Polygon {
         for (MuzzleFlash muzzleFlash : muzzleFlashes) {
             muzzleFlash.process();
         }
-        for (Particle particle : particles) {
+        for (Particle particle : particles1) {
+            particle.process();
+        }
+        for (Particle particle : particles2) {
             particle.process();
         }
         for (Explosion explosion : explosions) {
@@ -121,7 +125,7 @@ public class Room extends Polygon {
         for (MuzzleFlash muzzleFlash : muzzleFlashes) {
             muzzleFlash.draw(g2d, xAdjust, yAdjust);
         }
-        for (Particle particle : particles) {
+        for (Particle particle : particles1) {
             particle.draw(g2d, xAdjust, yAdjust);
         }
         for (Explosion explosion : explosions) {
@@ -134,6 +138,10 @@ public class Room extends Polygon {
         for (Entity entity : entities) {
             entity.draw(g2d, xAdjust, yAdjust);
             entity.fill(g2d, xAdjust, yAdjust);
+        }
+
+        for (Particle particle : particles2) {
+            particle.draw(g2d, xAdjust, yAdjust);
         }
         g2d.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
         g2d.setColor(Color.black);

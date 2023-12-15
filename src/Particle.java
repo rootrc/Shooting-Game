@@ -1,5 +1,8 @@
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
+
+import javax.swing.SwingUtilities;
 
 import Geo.Point;
 
@@ -11,7 +14,6 @@ abstract class Particle extends Point {
         super(point.getX(), point.getY());
         this.room = room;
         this.direction = direction;
-        getRoom().particles.add(this);
     }
 
     protected void draw(Graphics2D g2d, int x, int y) {
@@ -60,6 +62,7 @@ class Casing extends Particle {
         this.time1 = time1;
         this.time2 = time2;
         this.time3 = time3;
+        getRoom().particles1.add(this);
     }
 
     void process() {
@@ -76,6 +79,37 @@ class Casing extends Particle {
         if (frame < time3) {
             setBorderColor(new Color(175, 156, 96, -255 * frame
                     * frame / (time3 * time3) + 255));
+        } else {
+            getRoom().particles1.remove(this);
+        }
+    }
+}
+
+class DamageNum extends Particle {
+    private String N;
+
+    DamageNum(Room room, Point point, int N) {
+        super(room, point, Math.PI / 2);
+        this.N = Integer.toString(N);
+        move(20 * Math.random() - 10, 20 * Math.random() - 10);
+        getRoom().particles2.add(this);
+    }
+
+    protected void draw(Graphics2D g2d, int x, int y) {
+        g2d.setFont(new Font(Font.SERIF, Font.BOLD, 16));
+        g2d.setColor(Color.red);
+        g2d.drawString(N, (int) (getX() - SwingUtilities.computeStringWidth(g2d.getFontMetrics(), N) / 2 + x),
+                (int) (getY() + y));
+    }
+
+    private double speed = 0.8;
+    private int time = 30;
+
+    void process() {
+        frame++;
+        moveY((double) -speed * (2 * time - 2 * frame - 1) / time);
+        if (frame > 50) {
+            getRoom().particles2.remove(this);
         }
     }
 }

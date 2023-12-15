@@ -1,5 +1,5 @@
 type: limitedGun
-cooldown: 10
+cooldown: 20
 shootCount: 1
 shootMoveSpeed: 0.5
 recoil: 3
@@ -8,6 +8,6 @@ damage: 1
 width: 1
 length: 10
 knockback: 10
-piercing: 1
+pierce: 1
 speed: 4
 duration: 35

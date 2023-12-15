@@ -54,7 +54,7 @@ abstract class Projectile extends Line {
 }
 
 class Bullet extends Projectile {
-    int piercing;
+    int pierce;
     int speed;
 
     private Bullet(Room room, Point p1, Point p2) {
@@ -72,7 +72,7 @@ class Bullet extends Projectile {
         bullet.length = length;
         bullet.isPlayer = isPlayer;
         bullet.damage = damage;
-        bullet.piercing = piercing;
+        bullet.pierce = pierce;
         bullet.knockback = knockback;
         bullet.speed = speed;
         return bullet;
@@ -97,8 +97,8 @@ class Bullet extends Projectile {
         if (!isPlayer) {
             if (getRoom().player.intersects(new Line(p2, p2.directionTranslate(-speed, direction)))) {
                 hit(getRoom().player, direction);
-                piercing--;
-                if (piercing <= 0) {
+                pierce--;
+                if (pierce <= 0) {
                     getRoom().projectiles.remove(this);
                 }
             }
@@ -110,8 +110,8 @@ class Bullet extends Projectile {
             }
             if (entity.intersects(new Line(p2, p2.directionTranslate(-speed, direction)))) {
                 hit(entity, direction);
-                piercing--;
-                if (piercing <= 0) {
+                pierce--;
+                if (pierce <= 0) {
                     getRoom().projectiles.remove(this);
                 }
             }
@@ -120,7 +120,7 @@ class Bullet extends Projectile {
 }
 
 class LimitedBullet extends Projectile {
-    int piercing;
+    int pierce;
     int speed;
     int duration;
 
@@ -139,7 +139,7 @@ class LimitedBullet extends Projectile {
         limitedBullet.length = length;
         limitedBullet.isPlayer = isPlayer;
         limitedBullet.damage = damage;
-        limitedBullet.piercing = piercing;
+        limitedBullet.pierce = pierce;
         limitedBullet.knockback = knockback;
         limitedBullet.speed = speed;
         limitedBullet.duration = duration;
@@ -172,8 +172,8 @@ class LimitedBullet extends Projectile {
         if (!isPlayer) {
             if (getRoom().player.intersects(new Line(p2, p2.directionTranslate(-speed, direction)))) {
                 hit(getRoom().player, direction);
-                piercing--;
-                if (piercing <= 0) {
+                pierce--;
+                if (pierce <= 0) {
                     getRoom().projectiles.remove(this);
                 }
             }
@@ -185,8 +185,8 @@ class LimitedBullet extends Projectile {
             }
             if (entity.intersects(new Line(p2, p2.directionTranslate(-speed, direction)))) {
                 hit(entity, direction);
-                piercing--;
-                if (piercing <= 0) {
+                pierce--;
+                if (pierce <= 0) {
                     getRoom().projectiles.remove(this);
                 }
             }

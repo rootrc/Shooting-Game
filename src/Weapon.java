@@ -52,7 +52,7 @@ abstract class Weapon {
                     bullet.setWidth(Game.parseInt(data));
                     bullet.length = Game.parseInt(data);
                     bullet.knockback = Game.parseInt(data);
-                    bullet.piercing = Game.parseInt(data);
+                    bullet.pierce = Game.parseInt(data);
                     bullet.speed = Game.parseInt(data);
                     weapon.projectile = bullet;
                     break;
@@ -62,7 +62,7 @@ abstract class Weapon {
                     limitedBullet.setWidth(Game.parseInt(data));
                     limitedBullet.length = Game.parseInt(data);
                     limitedBullet.knockback = Game.parseInt(data);
-                    limitedBullet.piercing = Game.parseInt(data);
+                    limitedBullet.pierce = Game.parseInt(data);
                     limitedBullet.speed = Game.parseInt(data);
                     limitedBullet.duration = Game.parseInt(data);
                     weapon.projectile = limitedBullet;
@@ -89,7 +89,7 @@ abstract class Weapon {
         return weapon;
     }
 
-    protected int frame = 0;
+    protected int frame = cooldown / 2;
 
     public void shoot() {
         frame = 0;

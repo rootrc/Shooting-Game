@@ -21,11 +21,11 @@ class Player extends Entity {
         super(room, points);
         moveSpeed = 5;
         speed = moveSpeed;
-        health = 100;
+        health = 10;
         orginalColor = Color.cyan;
         setColor(orginalColor);
         corpseTime = 200;
-        weapon1 = Weapon.createWeapon(this, "player_gun");
+        weapon1 = Weapon.createWeapon(this, "player_shotgun");
         weapon = weapon1;
         healthBar = new HealthBar(this, health);
     }
@@ -36,7 +36,7 @@ class Player extends Entity {
         player.d = d;
         player.s = s;
         player.w = w;
-        player.speed = speed;   
+        player.speed = speed;
         player.moveSpeed = moveSpeed;
         player.xMovement = xMovement;
         player.yMovement = yMovement;
@@ -52,8 +52,9 @@ class Player extends Entity {
                 continue;
             }
             if (intersects(entity)) {
-                decreaseHealth(1);
-                entity.decreaseHealth(1);
+                int damage = Math.min(health, entity.health);
+                decreaseHealth(damage);
+                entity.decreaseHealth(damage);
                 if (health > 0) {
                     hit();
                 } else {
@@ -128,15 +129,16 @@ class Player extends Entity {
         getRoom().entities.remove(this);
         new Corpse(this, corpseTime);
         Timer timer = new Timer();
-            TimerTask timertask = new TimerTask() {
-                public void run() {
-                    getRoom().xAdjust = 0;
-                    getRoom().yAdjust = 0;
-                }
-            };
-            getRoom().xAdjust = (int) (20 * Math.random()) - 10;
-            getRoom().yAdjust = (int) (20 * Math.random()) - 10;
-            timer.schedule(timertask, Game.delay);
+        TimerTask timertask = new TimerTask() {
+            public void run() {
+                getRoom().xAdjust = 0;
+                getRoom().yAdjust = 0;
+            }
+        };
+        getRoom().xAdjust = (int) (20 * Math.random()) - 10;
+        getRoom().yAdjust = (int) (20 * Math.random()) - 10;
+        timer.schedule(timertask, Game.delay);
+        // System.exit(0);
     }
 
     private void shoot() {

@@ -1,4 +1,5 @@
 package Geo;
+
 import java.awt.Color;
 import java.awt.Graphics2D;
 
@@ -64,12 +65,12 @@ abstract class Geo<T extends Geo<T>> implements Cloneable {
 
     protected abstract void draw(Graphics2D g2d, int x, int y);
 
-    abstract void moveX(double x);
+    protected abstract void moveX(double x);
 
-    abstract void moveY(double x);
+    protected abstract void moveY(double x);
 
-    abstract void setBorderColor(Color color);
+    protected abstract void setBorderColor(Color color);
 
-    abstract void setWidth(int width);
+    protected abstract void setWidth(int width);
 
 }

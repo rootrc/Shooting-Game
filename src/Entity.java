@@ -58,8 +58,9 @@ abstract class Entity extends Polygon {
         }
     }
 
-    void decreaseHealth(int health) {
-        this.health -= health;
+    void decreaseHealth(int damage) {
+        this.health -= damage;
+        new DamageNum(room, getCentroid(), damage);
     }
 
     protected Room getRoom() {
