@@ -74,7 +74,7 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
         rotationSpeed /= 2;
         TimerTask timertask = new TimerTask() {
             public void run() {
-                Enemy.this.setColor(orginalColor);
+                setColor(orginalColor);
                 speed *= 2;
                 moveSpeed *= 2;
                 rotationSpeed *= 2;
@@ -262,11 +262,11 @@ class Sniper extends Enemy<Sniper> {
         double distance = turnToPlayer();
         if (distance >= moveDistance) {
             directionMove();
-        } else if (Sniper.this.directionTranslate(-speed, direction)
+        } else if (directionTranslate(-speed, direction)
                 .intersects(getRoom().boundingBox(20))) {
             directionMove(moveSpeed, direction);
         } else if (runDistance >= distance) {
-            if (!Sniper.this.directionTranslate(-speed, direction).intersects(getRoom().boundingBox(30))) {
+            if (!directionTranslate(-speed, direction).intersects(getRoom().boundingBox(30))) {
                 directionMove(-speed, direction);
             }
         }
@@ -281,9 +281,9 @@ class Sniper extends Enemy<Sniper> {
                 return;
             }
             if (runDistance <= distance && distance <= shootDistance
-                    || Sniper.this.directionTranslate(-speed, direction)
+                    || directionTranslate(-speed, direction)
                             .intersects(getRoom().boundingBox(30))) {
-                Sniper.super.shoot();
+                super.shoot();
             } else {
                 speed = moveSpeed;
             }
