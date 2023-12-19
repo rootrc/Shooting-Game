@@ -14,19 +14,25 @@ abstract class Entity extends Polygon {
     protected Color orginalColor;
     protected int corpseTime;
     protected HealthBar healthBar;
+    protected ShootBar shootBar;
 
     Entity(Room room, Point[] points) {
         super(points);
         this.room = room;
+        healthBar = new HealthBar(this);
+        shootBar = new ShootBar(this);
     }
 
     Entity(Room room) {
         this.room = room;
+        healthBar = new HealthBar(this);
+        shootBar = new ShootBar(this);
     }
 
     protected void draw(Graphics2D g2d, int x, int y) {
         super.draw(g2d, x, y);
         healthBar.draw(g2d, x, y);
+        shootBar.draw(g2d, x, y);
     }
 
     protected void fill(Graphics2D g2d, int x, int y) {

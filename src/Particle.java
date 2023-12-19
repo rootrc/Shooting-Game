@@ -108,7 +108,7 @@ class DamageNum extends Particle {
     void process() {
         frame++;
         moveY((double) -speed * (2 * time - 2 * frame - 1) / time);
-        if (frame > 50) {
+        if (frame > time) {
             getRoom().particles2.remove(this);
         }
     }

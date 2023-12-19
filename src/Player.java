@@ -22,12 +22,12 @@ class Player extends Entity {
         moveSpeed = 5;
         speed = moveSpeed;
         health = 10;
+        healthBar.setTotalHealth(health);
         orginalColor = Color.cyan;
         setColor(orginalColor);
         corpseTime = 200;
-        weapon1 = Weapon.createWeapon(this, "player_shotgun");
+        weapon1 = Weapon.createWeapon(this, "player_gun");
         weapon = weapon1;
-        healthBar = new HealthBar(this, health);
     }
 
     public Player clone() {

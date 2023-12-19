@@ -37,9 +37,9 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
         set(points);
         value = Game.parseInt(data) * 10;
         health = Game.parseInt(data);
+        healthBar.setTotalHealth(health);
         moveSpeed = Game.parseDouble(data);
         speed = moveSpeed;
-        healthBar = new HealthBar(this, health);
     }
 
     protected void draw(Graphics2D g2d, int x, int y) {
