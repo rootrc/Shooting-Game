@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 
 import javax.swing.SwingUtilities;
 
+import Geo.Circle;
 import Geo.Point;
 
 abstract class Particle extends Point {

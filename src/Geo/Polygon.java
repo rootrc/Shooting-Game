@@ -144,6 +144,22 @@ public class Polygon extends Geo<Polygon> {
         return false;
     }
 
+    public Point intersectionPoint(Line line) {
+        Point ans = null;
+        for (Line line2 : lines) {
+            Point temp = line2.intersectionPoint(line);
+            if (temp == null) {
+                continue;
+            }
+            if (ans == null) {
+                ans = temp.clone();
+            } else if (new Line(ans, line.p1).getLength() > new Line(temp, line.p1).getLength()) {
+                ans = temp.clone();
+            }
+        }
+        return ans;
+    }
+
     protected void rotate(double radian, Point pivot) {
         for (Point point : points) {
             point.rotate(radian, pivot);

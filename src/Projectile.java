@@ -1,12 +1,10 @@
 import java.awt.Graphics2D;
-import java.util.Timer;
 
 import Geo.Line;
 import Geo.Point;
 
 abstract class Projectile extends Line {
     private Room room;
-    protected Timer timer = new Timer();
     protected boolean isPlayer;
     protected int damage;
     protected int knockback;
@@ -23,9 +21,12 @@ abstract class Projectile extends Line {
         this.room = room;
     }
 
-    protected void hit(Entity entity, double direction) {
+    protected void hit(Entity entity, double direction, Point hitPoint) {
         entity.decreaseHealth(damage);
+        Point temp = entity.getCentroid().clone();
         entity.attemptMove(-knockback, direction);
+        new DamageCircle(room, hitPoint.translate(entity.getCentroid().getX() - temp.getX(),
+                entity.getCentroid().getY() - temp.getY()), 2 * getWidth());
         if (entity.health > 0) {
             entity.hit();
         } else {
@@ -96,7 +97,8 @@ class Bullet extends Projectile {
         }
         if (!isPlayer) {
             if (getRoom().player.intersects(new Line(p2, p2.directionTranslate(-speed, direction)))) {
-                hit(getRoom().player, direction);
+                hit(getRoom().player, direction,
+                        getRoom().player.intersectionPoint(new Line(p2, p2.directionTranslate(-speed, direction))));
                 pierce--;
                 if (pierce <= 0) {
                     getRoom().projectiles.remove(this);
@@ -109,7 +111,8 @@ class Bullet extends Projectile {
                 continue;
             }
             if (entity.intersects(new Line(p2, p2.directionTranslate(-speed, direction)))) {
-                hit(entity, direction);
+                hit(entity, direction,
+                        entity.intersectionPoint(new Line(p2, p2.directionTranslate(-speed, direction))));
                 pierce--;
                 if (pierce <= 0) {
                     getRoom().projectiles.remove(this);
@@ -171,7 +174,8 @@ class LimitedBullet extends Projectile {
         }
         if (!isPlayer) {
             if (getRoom().player.intersects(new Line(p2, p2.directionTranslate(-speed, direction)))) {
-                hit(getRoom().player, direction);
+                hit(getRoom().player, direction,
+                        getRoom().player.intersectionPoint(new Line(p2, p2.directionTranslate(-speed, direction))));
                 pierce--;
                 if (pierce <= 0) {
                     getRoom().projectiles.remove(this);
@@ -184,7 +188,8 @@ class LimitedBullet extends Projectile {
                 continue;
             }
             if (entity.intersects(new Line(p2, p2.directionTranslate(-speed, direction)))) {
-                hit(entity, direction);
+                hit(entity, direction,
+                        entity.intersectionPoint(new Line(p2, p2.directionTranslate(-speed, direction))));
                 pierce--;
                 if (pierce <= 0) {
                     getRoom().projectiles.remove(this);

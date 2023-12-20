@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import Geo.Circle;
 import Geo.Point;
 import Geo.Polygon;
 
@@ -24,6 +25,7 @@ public class Room extends Polygon {
     ConcurrentHashMap.KeySetView<Explosion, Boolean> explosions = ConcurrentHashMap.newKeySet();
     private HashMap<String, Double> enemySpawns = new HashMap<>();
     ConcurrentHashMap.KeySetView<Corpse, Boolean> corpses = ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.KeySetView<DamageCircle, Boolean> damageCircles = ConcurrentHashMap.newKeySet();
     ConcurrentHashMap.KeySetView<Particle, Boolean> particles1 = ConcurrentHashMap.newKeySet();
     ConcurrentHashMap.KeySetView<Particle, Boolean> particles2 = ConcurrentHashMap.newKeySet();
     Player player;
@@ -110,6 +112,9 @@ public class Room extends Polygon {
         for (Projectile projectile : projectiles) {
             projectile.process();
         }
+        for (DamageCircle damageCircle : damageCircles) {
+            damageCircle.process();
+        }
         for (Entity entity : entities) {
             entity.process();
         }
@@ -139,7 +144,9 @@ public class Room extends Polygon {
             entity.draw(g2d, xAdjust, yAdjust);
             entity.fill(g2d, xAdjust, yAdjust);
         }
-
+        for (DamageCircle damageCircle : damageCircles) {
+            damageCircle.fill(g2d, xAdjust, yAdjust);
+        }
         for (Particle particle : particles2) {
             particle.draw(g2d, xAdjust, yAdjust);
         }

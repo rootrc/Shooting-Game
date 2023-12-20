@@ -69,18 +69,21 @@ abstract class Enemy<T extends Enemy<T>> extends Entity {
     protected void hit() {
         setColor(new Color(139, 0, 0));
         Timer timer = new Timer();
-        speed /= 2;
-        moveSpeed /= 2;
-        rotationSpeed /= 2;
+        double speedOG = speed;
+        double moveSpeedOG = moveSpeed;
+        double rotationSpeedOG = rotationSpeed;
+        speed = 0;
+        moveSpeed = 0;
+        rotationSpeed = 0;
         TimerTask timertask = new TimerTask() {
             public void run() {
                 setColor(orginalColor);
-                speed *= 2;
-                moveSpeed *= 2;
-                rotationSpeed *= 2;
+                speed = speedOG;
+                moveSpeed = moveSpeedOG;
+                rotationSpeed = rotationSpeedOG;
             }
         };
-        timer.schedule(timertask, 10 * Game.delay);
+        timer.schedule(timertask, 8 * Game.delay);
     }
 
     protected void death() {
