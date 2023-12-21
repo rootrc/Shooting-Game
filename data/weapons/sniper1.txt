@@ -9,4 +9,4 @@ width: 4
 length: 20
 knockback: 24
 pierce: 1
-speed: 12
+speed: 15

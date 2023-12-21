@@ -12,6 +12,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import Geo.Circle;
 import Geo.Point;
@@ -187,6 +189,13 @@ public class Room extends Polygon {
                 x = (777 - 20 - enemy.getPoint(0).getX()) * Math.random() + 10;
             }
         }
+        // Timer timer = new Timer();
+        // TimerTask timertask = new TimerTask() {
+        //     public void run() {
+        //         entities.add(enemy.translate(x, y));
+        //     }
+        // };
+        // timer.schedule(timertask, 500 * id);
         enemy = enemy.translate(x, y);
         entities.add(enemy);
         enemy.process();

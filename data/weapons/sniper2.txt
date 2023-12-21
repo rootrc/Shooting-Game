@@ -6,7 +6,7 @@ recoil: 40
 accuracy: 60
 damage: 3
 width: 4
-length: 20
+length: 15
 knockback: 30
-pierce: 2
-speed: 20
+pierce: 1
+speed: 40

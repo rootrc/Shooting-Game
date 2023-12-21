@@ -83,13 +83,14 @@ abstract class Weapon {
             System.out.println("Weapon Loading Error");
             System.exit(-1);
         }
+        weapon.frame = (int) ((0.2 + 0.4 * Math.random()) * weapon.cooldown);
         if (name.contains("player")) {
             weapon.projectile.isPlayer = true;
         }
         return weapon;
     }
 
-    protected int frame = cooldown / 2;
+    protected int frame;
 
     public void shoot() {
         frame = 0;
