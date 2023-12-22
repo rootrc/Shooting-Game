@@ -12,10 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import Geo.Circle;
 import Geo.Point;
 import Geo.Polygon;
 
@@ -28,6 +25,7 @@ public class Room extends Polygon {
     private HashMap<String, Double> enemySpawns = new HashMap<>();
     ConcurrentHashMap.KeySetView<Corpse, Boolean> corpses = ConcurrentHashMap.newKeySet();
     ConcurrentHashMap.KeySetView<DamageCircle, Boolean> damageCircles = ConcurrentHashMap.newKeySet();
+    ConcurrentHashMap.KeySetView<SpawnCircle, Boolean> spawnCircles = ConcurrentHashMap.newKeySet();
     ConcurrentHashMap.KeySetView<Particle, Boolean> particles1 = ConcurrentHashMap.newKeySet();
     ConcurrentHashMap.KeySetView<Particle, Boolean> particles2 = ConcurrentHashMap.newKeySet();
     Player player;
@@ -117,6 +115,9 @@ public class Room extends Polygon {
         for (DamageCircle damageCircle : damageCircles) {
             damageCircle.process();
         }
+        for (SpawnCircle spawnCircle : spawnCircles) {
+            spawnCircle.process();
+        }
         for (Entity entity : entities) {
             entity.process();
         }
@@ -125,6 +126,9 @@ public class Room extends Polygon {
     void draw(Graphics2D g2d) {
         super.draw(g2d, xAdjust, yAdjust);
         super.fill(g2d, xAdjust, yAdjust);
+        for (SpawnCircle spawnCircle : spawnCircles) {
+            spawnCircle.fill(g2d, xAdjust, yAdjust);
+        }
         for (Corpse corpse : corpses) {
             corpse.draw(g2d, xAdjust, yAdjust);
             corpse.fill(g2d, xAdjust, yAdjust);
@@ -165,7 +169,7 @@ public class Room extends Polygon {
 
     void addEnemy(String name) {
         double x, y;
-        Enemy<?> enemy = Enemy.createEnemy(this, name);
+        final Enemy<?> enemy = Enemy.createEnemy(this, name);
         if (Math.random() < 0.5) {
             x = (777 - 20 - enemy.getPoint(0).getX()) * Math.random() + 10;
             if (30 < x && x < 777 - 50 - enemy.getPoint(0).getX()) {
@@ -189,16 +193,7 @@ public class Room extends Polygon {
                 x = (777 - 20 - enemy.getPoint(0).getX()) * Math.random() + 10;
             }
         }
-        // Timer timer = new Timer();
-        // TimerTask timertask = new TimerTask() {
-        //     public void run() {
-        //         entities.add(enemy.translate(x, y));
-        //     }
-        // };
-        // timer.schedule(timertask, 500 * id);
-        enemy = enemy.translate(x, y);
-        entities.add(enemy);
-        enemy.process();
+        new SpawnCircle(enemy.translate(x, y));
     }
 
     Polygon boundingBox(int width) {

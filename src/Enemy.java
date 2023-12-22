@@ -13,7 +13,6 @@ import Geo.Point;
 abstract class Enemy<T extends Enemy<T>> extends Entity {
     private static HashMap<String, Enemy<?>> map = new HashMap<>();
     protected int id;
-    protected double size;
     protected double speed;
     protected double moveSpeed;
     protected double rotationSpeed;
